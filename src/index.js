@@ -4,6 +4,7 @@ import { Router, Route, hashHistory } from 'react-router'
 
 import SubmitATip from './views/SubmitATip';
 import Dashboard from './views/Dashboard';
+import UserSettings from './views/UserSettings';
 import Login from './views/Login';
 import LoggedOut from './views/LoggedOut';
 import ForgotPassword from './views/ForgotPassword';
@@ -13,6 +14,7 @@ ReactDOM.render(
   <Router history={hashHistory}>
     <Route path="/" component={SubmitATip} />
     <Route path="admin" component={Dashboard} />
+    <Route path="settings" component={UserSettings} />
     <Route path="login" component={Login} />
     <Route path="logout" component={LoggedOut} />
     <Route path="forgot_password" component={ForgotPassword} />
