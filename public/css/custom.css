@@ -1,0 +1,76 @@
+#dashboard-metrics {
+    padding-bottom: 0px;
+}
+
+#mailbox {
+    padding-top: 0px;
+}
+
+#top-bar {
+  background: #2f4050;
+}
+
+.navbar-custom {
+  color: white;
+  font-size: 20px;
+  text-align: center;
+    float: left;
+    padding-top: 15px;
+    width: 400px;
+}
+
+#sign-out {
+  color: white;
+}
+
+.mail-box {
+  margin-bottom: 0px;
+}
+
+#recent-tips {
+  margin-bottom: 0px;
+}
+
+#refresh-btn {
+  margin-right: 10px;
+}
+
+#mark-important-btn {
+  margin-right: 10px;
+}
+
+#archive-btn {
+  margin-right: 20px;
+}
+
+#headline {
+  margin-top: 50px;
+}
+
+#headline2 {
+  margin-top: 30px;
+}
+
+#headline3 {
+  margin-top: 30px;
+}
+
+.footer {
+  margin-top: -80px;
+}
+
+.folder-list .category-list .tag-list {
+  padding: 0px;
+}
+
+.icheckbox_square {
+  position: relative;
+}
+
+.body {
+  background-color: #f3f3f4;
+}
+
+textarea { 
+  resize:vertical; 
+}
