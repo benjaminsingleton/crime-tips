@@ -6,6 +6,7 @@ import Mailbox from '../components/Mailbox'
 
 
 class Dashboard extends Component {
+
   render() {
     return (
       <Layout isAdmin={true} >
