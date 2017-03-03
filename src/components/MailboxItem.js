@@ -1,24 +1,29 @@
 import React, { Component } from 'react'
 
 class MailboxItem extends Component {
+
     render () {
+        const { details, index } = this.props;
         return (
-           <tr className={this.props.readStatus}>
+           <tr className={details.readStatus}>
                 <td className="check-mail">
                     <div className="icheckbox_square-green">
-                        <input type="checkbox" />
+                        <input type="checkbox" ref={index} onChange={() => this.props.addSelectedItem(index)}/>
                     </div>
                 </td>
-                <td className="mail-ontact">
-                    <a href="#">{this.props.crimeType}</a>
+                <td className="mail-status">
+                    {details.important ? <i className="fa fa-certificate"></i> : null}
+                </td>
+                <td className="mail-contact">
+                    <a onClick={() => this.props.markAsRead(index)}>{details.crimeType}</a>
                 </td>
                 <td className="mail-subject">
-                    <a href="#">{this.props.tipTextPreview}</a>
+                    <a onClick={() => this.props.markAsRead(index)}>{details.tipText}</a>
                 </td>
-                <td className="">
-                    { this.props.attachment ? <i className="fa fa-paperclip"></i> : ''}
+                <td className="mail-attachment">
+                    {details.attachment ? <i className="fa fa-paperclip"></i> : null}
                 </td>
-                <td className="text-right mail-date">{this.props.dateTime}</td>
+                <td className="text-right mail-date">{details.dateTime}</td>
             </tr> 
         )
     }

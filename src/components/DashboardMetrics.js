@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
+import { oneDayAgoDate, getMonthAndDay } from '../helpers'
 
 class DashboardMetrics extends Component {
     render () {
+        const {counts} = this.props;
         return (
             <div className="wrapper-content animated fadeInRight" id="dashboard-metrics">
                 <div className="row">
@@ -12,7 +14,7 @@ class DashboardMetrics extends Component {
                                 <h5>Unread Tips</h5>
                             </div>
                             <div className="ibox-content">
-                                <h1 className="no-margins">4</h1>
+                                <h1 className="no-margins">{counts.unreadCount}</h1>
                                 <small>Need to be reviewed</small>
                             </div>
                         </div>
@@ -24,10 +26,10 @@ class DashboardMetrics extends Component {
                                 <h5>Tips Received - 24 Hrs</h5>
                             </div>
                             <div className="ibox-content">
-                                <h1 className="no-margins">43</h1>
+                                <h1 className="no-margins">{counts.lastTwentyFourHourTipCount}</h1>
                                 <div className="stat-percent font-bold text-danger">14% <i className="fa fa-level-down"></i>
                                 </div>
-                                <small>Since February 15th</small>
+                                <small>Since { getMonthAndDay(oneDayAgoDate()) }</small>
                             </div>
                         </div>
                     </div>
@@ -38,10 +40,10 @@ class DashboardMetrics extends Component {
                                 <h5>Tips Received - YTD</h5>
                             </div>
                             <div className="ibox-content">
-                                <h1 className="no-margins">1,118</h1>
+                                <h1 className="no-margins">{counts.thisYearTipCount}</h1>
                                 <div className="stat-percent font-bold text-info">13% <i className="fa fa-level-up"></i>
                                 </div>
-                                <small>Since January 1st</small>
+                                <small>Since January 1</small>
                             </div>
                         </div>
                     </div>

@@ -1,18 +1,31 @@
 import React, { Component } from 'react';
 
+import base from '../base'
+
 import Layout from '../components/Layout'
 
 
 class TipSubmit extends Component {
+
     createTip(event) {
+        // prevent automatic page reload
         event.preventDefault();
-        console.log('form submitted')
+        // create object to store tip data
         const tip = {
             crimeType: this.crimeType.value,
             tipText: this.tipText.value,
+            dateTime: Date.now(),
+            readStatus: 'unread',
+            attachment: false,
+            important: false,
+            archived: false,
         }
-        console.log(tip)
+        // push tip object to firebase
+        base.push('tips', {data: tip});
+        // clear the form
+        this.tipForm.reset();
     }
+
     render() {
         return (
         <Layout isAdmin={false} >
@@ -32,8 +45,9 @@ class TipSubmit extends Component {
                                 <p>
                                     What kind of crime did you witness?
                                 </p>
-                                <form onSubmit={(e) => this.createTip(e)}>
-                                    <select ref={(input) => this.crimeType = input} className="form-control m-b" name="crime-type">
+                                <form ref={(input) => this.tipForm = input} onSubmit={(e) => this.createTip(e)}>
+                                    <select ref={(input) => this.crimeType = input} className="form-control m-b" defaultValue='default' name="crime-type">
+                                        <option value='default' disabled="disabled">Select a crime type</option>    
                                         <option>Murder</option>
                                         <option>Shooting</option>
                                         <option>Guns</option>

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Router, Route, hashHistory } from 'react-router'
+import { Router, Route, browserHistory } from 'react-router'
 
 import SubmitATip from './views/SubmitATip';
 import Dashboard from './views/Dashboard';
@@ -11,7 +11,7 @@ import ForgotPassword from './views/ForgotPassword';
 import NoMatch from './views/NoMatch';
 
 ReactDOM.render(
-  <Router history={hashHistory}>
+  <Router history={browserHistory}>
     <Route path="/" component={SubmitATip} />
     <Route path="admin" component={Dashboard} />
     <Route path="settings" component={UserSettings} />
