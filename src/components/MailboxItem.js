@@ -13,6 +13,7 @@ class MailboxItem extends Component {
                 </td>
                 <td className="mail-status">
                     {details.important ? <i className="fa fa-certificate"></i> : null}
+                    {details.archived ? <i className="fa fa-archive"></i> : null}
                 </td>
                 <td className="mail-contact">
                     <a onClick={() => this.props.markAsRead(index)}>{details.crimeType}</a>

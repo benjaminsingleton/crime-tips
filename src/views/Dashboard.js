@@ -15,6 +15,7 @@ class Dashboard extends Component {
     // get initial state
     this.state = {
       tips: {},
+      tipsToDisplayStatus: 'all',
       tipsToDisplay: {},
       selectedItems: [],
     }
@@ -66,7 +67,7 @@ class Dashboard extends Component {
 
     switch (name) {
       case 'important':
-        this.state.selectedItems.map(key => tips[key].important = !tips[key].important);
+        this.setState({ tips });
         break;
       case 'archived':
         this.state.selectedItems.map(key => tips[key].important = !tips[key].important);
@@ -87,12 +88,15 @@ class Dashboard extends Component {
     switch (criteria) {
       case 'all':
         filteredTipKeys = Object.keys(tips).filter(key => tips[key].archived === false);
+        this.setState({ tipsToDisplayStatus: 'all'});
         break;
       case 'important':
         filteredTipKeys = Object.keys(tips).filter(key => tips[key].important === true);
+        this.setState({ tipsToDisplayStatus: 'important'});
         break;
       case 'archived':
         filteredTipKeys = Object.keys(tips).filter(key => tips[key].archived === true);
+        this.setState({ tipsToDisplayStatus: 'archived'});
         break;
       default:
         throw new Error({'Unrecognized':"Items can only be filtered as 'important' or 'archived'"}); 
@@ -121,11 +125,33 @@ class Dashboard extends Component {
       thisYearTipCount,
     }
 
+    var filteredTipKeys = []
+    
+    switch (this.state.tipsToDisplayStatus) {
+      case 'all':
+        filteredTipKeys = Object.keys(tips).filter(key => tips[key].archived === false);
+        break;
+      case 'important':
+        filteredTipKeys = Object.keys(tips).filter(key => tips[key].important === true);
+        break;
+      case 'archived':
+        filteredTipKeys = Object.keys(tips).filter(key => tips[key].archived === true);
+        break;
+      default:
+        throw new Error({'Unrecognized':"Items can only be filtered as 'important' or 'archived'"}); 
+    }
+
+    const tipsToDisplay = {}
+
+    for (let key of filteredTipKeys) {
+      tipsToDisplay[key] = tips[key]
+    }
+
     return (
       <Layout isAdmin={true} >
         <DashboardMetrics counts={counts}/>
         <Mailbox  tips={this.state.tips} 
-                  tipsToDisplay={this.state.tipsToDisplay}
+                  tipsToDisplay={tipsToDisplay}
                   unreadCount={unreadCount}  
                   markAsRead={this.markAsRead} 
                   addSelectedItem={this.addSelectedItem}

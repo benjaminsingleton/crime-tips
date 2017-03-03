@@ -12,7 +12,14 @@ class Navigation extends Component {
                         </button>
                         <a href="#" className="navbar-brand">Crime Tips { this.props.isAdmin ? ' Admin' : '' }</a>
                     </div>
-                    { !this.props.isAdmin ? '' : 
+                    { !this.props.isAdmin ? 
+                        <div className="navbar-collapse collapse" id="navbar">
+                            <ul className="nav navbar-nav">
+                                <li className="active">
+                                    <Link to="admin" role="button">Admin</Link>
+                                </li>
+                            </ul>
+                        </div> : 
                         <div className="navbar-collapse collapse" id="navbar">
                             <ul className="nav navbar-nav">
                                 <li className="active">
