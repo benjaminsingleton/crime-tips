@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { tipTimeFormat } from '../helpers.js'
 
 class MailboxItem extends Component {
 
@@ -24,7 +25,7 @@ class MailboxItem extends Component {
                 <td className="mail-attachment">
                     {details.attachment ? <i className="fa fa-paperclip"></i> : null}
                 </td>
-                <td className="text-right mail-date">{details.dateTime}</td>
+                <td className="text-right mail-date">{tipTimeFormat(details.dateTime)}</td>
             </tr> 
         )
     }

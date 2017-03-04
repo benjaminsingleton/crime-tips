@@ -18,12 +18,16 @@ class Dashboard extends Component {
       tipsToDisplayStatus: 'all',
       tipsToDisplay: {},
       selectedItems: [],
+      showTipDetail: false,
+      tipDetail: null,
+      mailboxRightPanel: 'mailbox'
     }
 
     this.markAsRead = this.markAsRead.bind(this);
     this.addSelectedItem = this.addSelectedItem.bind(this);
     this.markTipAs = this.markTipAs.bind(this);
     this.showTips = this.showTips.bind(this);
+    this.openTipLongForm = this.openTipLongForm.bind(this);
 
   }
 
@@ -44,7 +48,13 @@ class Dashboard extends Component {
     // Tip marked as read when clicked
     const tips = {...this.state.tips};
     tips[key].readStatus = 'read'
-    this.setState({ tips });
+    
+    this.setState({ 
+      tips: tips, 
+      showTipDetail: true,
+      tipDetail: tips[key],
+      mailboxRightPanel: 'detail',
+    });
   }
 
   addSelectedItem(key) {
@@ -109,7 +119,18 @@ class Dashboard extends Component {
 
     // Object.keys(tips).filter(key => tips[key].important === true).map(key => tipsToDisplay[key] = tips[key] }) // why doesnt this work
 
-    this.setState({ tipsToDisplay: newTipsToDisplay });
+    this.setState({ 
+      tipsToDisplay: newTipsToDisplay,
+      showTipDetail: false,
+      tipDetail: null,
+      mailboxRightPanel: 'mailbox'
+     });
+  }
+
+  openTipLongForm() {
+    this.setState({ 
+      mailboxRightPanel: 'form'
+     });
   }
 
   render() {
@@ -157,6 +178,10 @@ class Dashboard extends Component {
                   addSelectedItem={this.addSelectedItem}
                   markTipAs={this.markTipAs}
                   showTips={this.showTips}
+                  showTipDetail={this.state.showTipDetail}
+                  tipDetail={this.state.tipDetail}
+                  mailboxRightPanel={this.state.mailboxRightPanel}
+                  openTipLongForm={this.openTipLongForm}
                   />
       </Layout>
     )

@@ -10,7 +10,7 @@ class Navigation extends Component {
                         <button data-target="#navbar" data-toggle="collapse" className="navbar-toggle collapsed" type="button">
                         <i className="fa fa-reorder"></i>
                         </button>
-                        <a href="#" className="navbar-brand">Crime Tips { this.props.isAdmin ? ' Admin' : '' }</a>
+                        <a href="#" className="navbar-brand">Crime Tips { this.props.isAdmin ? ' Admin' : null }</a>
                     </div>
                     { !this.props.isAdmin ? 
                         <div className="navbar-collapse collapse" id="navbar">

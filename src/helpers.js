@@ -1,3 +1,5 @@
+import moment from 'moment'
+
 export function oneDayAgoTimestamp() {
     var d = new Date();
     return d.setDate(d.getDate()-1);
@@ -35,4 +37,18 @@ export function getMonthAndDay(date) {
     var day = date.getDate();
     var monthDay = month + ' ' + day
     return monthDay
+}
+
+export function tipTimeFormat(ts) {
+
+    const tipDateTime = moment(new Date(ts))
+
+    return tipDateTime.format('ll')
+}
+
+export function tipTimeFormatLong(ts) {
+
+    const tipDateTime = moment(new Date(ts))
+
+    return tipDateTime.format('MMMM Do YYYY, h:mm a')
 }
