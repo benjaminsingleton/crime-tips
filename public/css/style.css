@@ -3953,6 +3953,7 @@ table.table-mail tr td {
 }
 .table-mail .mail-date {
   padding-right: 20px;
+  width: 20%;
 }
 .star-mail,
 .check-mail {
@@ -5152,7 +5153,7 @@ a.compose-mail {
   padding: 10px;
 }
 .mail-contact {
-  width: 23%;
+  width: 15%;
 }
 /* PROJECTS */
 .project-people,

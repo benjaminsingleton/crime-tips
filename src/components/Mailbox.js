@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import MailboxItem from './MailboxItem'
 import MailboxLeftPanel from './MailboxLeftPanel'
 import MailboxPanel from './MailboxPanel'
 import TipDetail from './TipDetail'

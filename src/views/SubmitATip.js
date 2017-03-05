@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-
 import base from '../base'
-
 import Layout from '../components/Layout'
 
 class SubmitATip extends Component {
@@ -14,17 +12,27 @@ class SubmitATip extends Component {
             displayForm: true,
         }
 
+        this.handleInputChange = this.handleInputChange.bind(this);
         this.createTip = this.createTip.bind(this)
         this.toggleDisplayForm = this.toggleDisplayForm.bind(this)
     }
 
+    handleInputChange(event) {
+        const target = event.target;
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        const name = target.name;
+
+        this.setState({
+            [name]: value
+        });
+    }
+
     createTip(event) {
-        // prevent automatic page reload
         event.preventDefault();
         // create object to store tip data
         const tip = {
-            crimeType: this.crimeType.value,
-            tipText: this.tipText.value,
+            crimeType: this.state.crimeType,
+            tipText: this.state.tipText,
             dateTime: Date.now(),
             readStatus: 'unread',
             attachment: false,
@@ -35,7 +43,11 @@ class SubmitATip extends Component {
         base.push('tips', {data: tip});
         // clear the form
         this.tipForm.reset();
-        this.setState({ displayForm: false});
+        this.setState({ 
+            displayForm: false,
+            crimeType: undefined,
+            tipText: undefined
+        });
     }
 
     toggleDisplayForm () {
@@ -65,7 +77,13 @@ class SubmitATip extends Component {
                                             What kind of crime did you witness?
                                         </p>
                                         <form ref={(input) => this.tipForm = input} onSubmit={(e) => this.createTip(e)}>
-                                            <select ref={(input) => this.crimeType = input} className="form-control m-b" defaultValue='default' name="crime-type">
+                                            <select 
+                                                className="form-control m-b" 
+                                                value={this.state.crimeType} 
+                                                defaultValue='default' 
+                                                name="crimeType"
+                                                onChange={this.handleInputChange} 
+                                            >
                                                 <option value='default' disabled="disabled">Select a crime type</option>    
                                                 <option>Murder</option>
                                                 <option>Shooting</option>
@@ -77,7 +95,12 @@ class SubmitATip extends Component {
                                             <p>
                                                 What did you witness?                                
                                             </p>
-                                            <textarea ref={(input) => this.tipText = input } className="form-control" />
+                                            <textarea 
+                                                className="form-control" 
+                                                name="tipText"
+                                                value={this.state.tipText} 
+                                                onChange={this.handleInputChange} 
+                                            />
                                             <br />
                                             <button className="btn btn-primary" type="submit">Submit</button>
                                         </form>

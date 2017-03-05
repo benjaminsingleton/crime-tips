@@ -4,7 +4,7 @@ import MailboxItem from './MailboxItem'
 
 const MailboxPanel = (props) => {
 
-    const { tips, markAsRead, addSelectedItem, markTipAs, tipsToDisplay } = props;
+    const { markAsRead, addSelectedItem, markTipAs, tipsToDisplay } = props;
 
     const mailboxItems =  Object.keys(tipsToDisplay)
                                 .reverse()
@@ -28,8 +28,8 @@ const MailboxPanel = (props) => {
                             </div>
                         </form>
                     <button className="btn btn-white btn-sm" data-placement="top" data-toggle="tooltip" id="refresh-btn" title="Refresh mailbox"><i className="fa fa-refresh"></i></button>
-                    <button onClick={() => this.props.markTipAs('important')} className="btn btn-white btn-sm" data-placement="top" data-toggle="tooltip" id="mark-important-btn" title="Mark as important"><i className="fa fa-certificate"></i></button> 
-                    <button onClick={() => this.props.markTipAs('archived')} className="btn btn-white btn-sm" data-placement="top" data-toggle="tooltip" id="archive-btn" title="Move to archives"><i className="fa fa-archive"></i></button>
+                    <button onClick={() => markTipAs('important')} className="btn btn-white btn-sm" data-placement="top" data-toggle="tooltip" id="mark-important-btn" title="Mark as important"><i className="fa fa-certificate"></i></button> 
+                    <button onClick={() => markTipAs('archived')} className="btn btn-white btn-sm" data-placement="top" data-toggle="tooltip" id="archive-btn" title="Move to archives"><i className="fa fa-archive"></i></button>
                     </span> 
                     <h2>Tip Inbox</h2>
                 </div>
