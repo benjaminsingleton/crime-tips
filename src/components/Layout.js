@@ -1,21 +1,19 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 import Navigation from '../components/Navigation'
 import Footer from '../components/Footer'
 
 
-class Layout extends Component {
-  render() {
+const Layout = (props) => {
     return (
         <div id="wrapper">
             <div id="page-wrapper" className="gray-bg">
-                < Navigation isAdmin={this.props.isAdmin} logout={this.props.logout} />
-                    {this.props.children}
+                < Navigation isAdmin={props.isAdmin} logout={props.logout} />
+                    {props.children}
                 < Footer />
             </div>
-    </div>
+        </div>
     );
-  }
 }
 
 export default Layout;
