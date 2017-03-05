@@ -9,7 +9,7 @@ class Layout extends Component {
     return (
         <div id="wrapper">
             <div id="page-wrapper" className="gray-bg">
-                < Navigation isAdmin={this.props.isAdmin} />
+                < Navigation isAdmin={this.props.isAdmin} logout={this.props.logout} />
                     {this.props.children}
                 < Footer />
             </div>

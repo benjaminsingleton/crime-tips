@@ -136,10 +136,6 @@ class Dashboard extends Component {
 
   render() {
 
-    // if (!this.state.uid) {
-    //   return 
-    // }
-
     const {tips} = this.state;
 
     const unreadCount = Object.keys(tips).filter(key => tips[key].readStatus === 'unread').length
@@ -176,7 +172,7 @@ class Dashboard extends Component {
 
     return (
 
-      <Layout isAdmin={true} >
+      <Layout isAdmin={true} logout={this.props.logout}>
         <DashboardMetrics counts={counts}/>
         <Mailbox  tips={this.state.tips} 
                   tipsToDisplay={tipsToDisplay}
