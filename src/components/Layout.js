@@ -8,7 +8,7 @@ const Layout = (props) => {
     return (
         <div id="wrapper">
             <div id="page-wrapper" className="gray-bg">
-                < Navigation isAdmin={props.isAdmin} logout={props.logout} />
+                < Navigation uid={props.uid} logout={props.logout} />
                     {props.children}
                 < Footer />
             </div>

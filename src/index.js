@@ -14,13 +14,13 @@ import ProtectedView from './components/ProtectedView'
 ReactDOM.render(
 	<Router history={browserHistory}>
 		<Route path="/" component={SubmitATip} />
+		<Route path="login" component={Login} />
+		<Route path="logout" component={LoggedOut} />
+		<Route path="forgot_password" component={ForgotPassword} />
 		<Route component={ProtectedView}>
 			<Route path="admin" component={Dashboard} />
 			<Route path="settings" component={UserSettings} />
-			<Route path="login" component={Login} />
-			<Route path="logout" component={LoggedOut} />
 		</Route>
-		<Route path="forgot_password" component={ForgotPassword} />
 		<Route path="*" component={NoMatch} />
   	</Router>,
   document.getElementById('root')

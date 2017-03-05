@@ -172,7 +172,7 @@ class Dashboard extends Component {
 
     return (
 
-      <Layout isAdmin={true} logout={this.props.logout}>
+      <Layout uid={this.props.uid} logout={this.props.logout}>
         <DashboardMetrics counts={counts}/>
         <Mailbox  tips={this.state.tips} 
                   tipsToDisplay={tipsToDisplay}

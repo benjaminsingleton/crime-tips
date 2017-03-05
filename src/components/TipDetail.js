@@ -67,4 +67,8 @@ class TipDetail extends Component {
     }
 }
 
+TipDetail.propTypes = {
+    details: React.PropTypes.object.isRequired
+}
+
 export default TipDetail;

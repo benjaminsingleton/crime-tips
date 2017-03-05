@@ -4,7 +4,7 @@ import Layout from '../components/Layout'
 
 const NoMatch = () => {
     return (
-		<Layout isAdmin={false} >
+		<Layout>
 			<div className="middle-box text-center animated fadeInDown">
 				<h1>404</h1>
 				<h3 className="font-bold">Page Not Found</h3>

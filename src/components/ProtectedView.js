@@ -42,6 +42,7 @@ class ProtectedView extends Component {
     authHandler(err, authData) {
         if (err) {
             console.error(err)
+            // TODO render message
             return;
         }
         this.setState({ uid: authData.uid })
@@ -51,7 +52,7 @@ class ProtectedView extends Component {
     logout() {
         base.unauth();
         this.setState({ uid: null })
-        browserHistory.push('/')
+        browserHistory.push('/logout')
     }
 
     renderLogin() {
@@ -68,7 +69,7 @@ class ProtectedView extends Component {
     render () {
         const logout = this.logout 
         const uid = this.state.uid
-        // add uid and logout to all children components
+        // adds uid and logout props to all children components
         var children = React.Children.map(this.props.children, function (child) {
             return React.cloneElement(child, {
                 logout: logout,

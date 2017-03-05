@@ -5,8 +5,6 @@ import Layout from '../components/Layout'
 
 const Login = (props) => {
 
-    const { email, password, authenticate, handleInputChange } = props;
-
     return (
         <Layout isAdmin={false} >
             <div className="middle-box text-center loginscreen animated fadeInDown">
@@ -16,7 +14,7 @@ const Login = (props) => {
                     </div>
                     <h3>Welcome to Crime Tips</h3>
                     <p>Login in below.</p>
-                    <form className="m-t" role="form">
+                    <form className="m-t" role="form" onSubmit={props.authenticate}>
                         <div className="form-group">
                             <input 
                                 name="email" 
@@ -24,8 +22,8 @@ const Login = (props) => {
                                 className="form-control" 
                                 placeholder="Email" 
                                 required=""
-                                value={email}
-                                onChange={handleInputChange} 
+                                value={props.email}
+                                onChange={props.handleInputChange} 
                             />
                         </div>
                         <div className="form-group">
@@ -35,15 +33,11 @@ const Login = (props) => {
                                 className="form-control" 
                                 placeholder="Password" 
                                 required=""
-                                value={password}
-                                onChange={handleInputChange} 
+                                value={props.password}
+                                onChange={props.handleInputChange} 
                             />
                         </div>
-                        <button 
-                            className="btn btn-primary block full-width m-b"
-                            type="submit" 
-                            onClick={(e) => authenticate(e) }     
-                        >Login</button>
+                        <button className="btn btn-primary block full-width m-b" type="submit">Login</button>
                         <Link to="forgot_password"><small>Forgot password?</small></Link>
                     </form>
                 </div>
