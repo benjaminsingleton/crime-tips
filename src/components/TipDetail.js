@@ -1,5 +1,5 @@
 import React, { Component }  from 'react'
-import { tipTimeFormatLong } from '../helpers'
+import { tipTimeFormatLong } from '../helpers/helpers'
 
 class TipDetail extends Component {
 

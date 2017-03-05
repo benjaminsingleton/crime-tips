@@ -19,8 +19,8 @@ ReactDOM.render(
 			<Route path="settings" component={UserSettings} />
 			<Route path="login" component={Login} />
 			<Route path="logout" component={LoggedOut} />
-			<Route path="forgot_password" component={ForgotPassword} />
 		</Route>
+		<Route path="forgot_password" component={ForgotPassword} />
 		<Route path="*" component={NoMatch} />
   	</Router>,
   document.getElementById('root')

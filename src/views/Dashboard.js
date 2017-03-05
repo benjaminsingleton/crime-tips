@@ -5,7 +5,7 @@ import Layout from '../components/Layout'
 import DashboardMetrics from '../components/DashboardMetrics'
 import Mailbox from '../components/Mailbox'
 
-import { oneDayAgoTimestamp, firstOfThisYearTimestamp } from '../helpers'
+import { oneDayAgoTimestamp, firstOfThisYearTimestamp } from '../helpers/helpers'
 
 
 class Dashboard extends Component {

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { oneDayAgoDate, getMonthAndDay } from '../helpers'
+import { oneDayAgoDate, getMonthAndDay } from '../helpers/helpers'
 
 class DashboardMetrics extends Component {
     render () {

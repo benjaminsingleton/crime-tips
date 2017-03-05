@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { tipTimeFormat } from '../helpers.js'
+import { tipTimeFormat } from '../helpers/helpers'
 
 class MailboxItem extends Component {
 
