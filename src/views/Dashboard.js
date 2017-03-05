@@ -11,25 +11,18 @@ import { oneDayAgoTimestamp, firstOfThisYearTimestamp } from '../helpers/helpers
 class Dashboard extends Component {
   constructor () {
     super()
-
-    // get initial state
     this.state = {
-      uid: null,
       tips: {},
-      tipsToDisplayStatus: 'all',
-      tipsToDisplay: {},
+      tipsToDisplay: null,
       selectedItems: [],
-      showTipDetail: false,
       tipDetail: null,
       mailboxRightPanel: 'mailbox'
     }
-
-    this.markAsRead = this.markAsRead.bind(this);
+    this.showTipDetail = this.showTipDetail.bind(this);
     this.addSelectedItem = this.addSelectedItem.bind(this);
     this.markTipAs = this.markTipAs.bind(this);
     this.showTips = this.showTips.bind(this);
     this.openTipLongForm = this.openTipLongForm.bind(this);
-
   }
 
   componentWillMount () {
@@ -38,21 +31,19 @@ class Dashboard extends Component {
         context: this,
         state: 'tips'
     });
-    
   }
 
   componentWillUnmount () {
     base.removeBinding(this.ref);
   }
 
-  markAsRead(key) {
+  showTipDetail(key) {
     // Tip marked as read when clicked
     const tips = {...this.state.tips};
     tips[key].readStatus = 'read'
     
     this.setState({ 
       tips: tips, 
-      showTipDetail: true,
       tipDetail: tips[key],
       mailboxRightPanel: 'detail',
     });
@@ -73,15 +64,16 @@ class Dashboard extends Component {
   }
 
   markTipAs(name) {
+    console.log(name)
     // Marks selected tips as important or archived
     const tips = {...this.state.tips};
 
     switch (name) {
       case 'important':
-        this.setState({ tips });
+        this.state.selectedItems.map(key => tips[key].important = !tips[key].important);
         break;
       case 'archived':
-        this.state.selectedItems.map(key => tips[key].important = !tips[key].important);
+        this.state.selectedItems.map(key => tips[key].archived = !tips[key].archived);
         break;
       default:
         throw new Error({'Unrecognized':"Items can only be marked 'important' or 'archived'"}); 
@@ -93,37 +85,35 @@ class Dashboard extends Component {
   showTips(criteria) {
     // Displays tips
     const tips = {...this.state.tips};
-
+    // store keys of tip to be displayed
     var filteredTipKeys = []
 
     switch (criteria) {
       case 'all':
         filteredTipKeys = Object.keys(tips).filter(key => tips[key].archived === false);
-        this.setState({ tipsToDisplayStatus: 'all'});
+        // why doesnt this work
+        // this.setState({ 
+        //   tipsToDisplay: Object.keys(tips).filter(key => tips[key].important === true)
+        //                                   .map(key => tipsToDisplay[key] = tips[key])
+        // });
         break;
       case 'important':
         filteredTipKeys = Object.keys(tips).filter(key => tips[key].important === true);
-        this.setState({ tipsToDisplayStatus: 'important'});
         break;
       case 'archived':
         filteredTipKeys = Object.keys(tips).filter(key => tips[key].archived === true);
-        this.setState({ tipsToDisplayStatus: 'archived'});
         break;
       default:
-        throw new Error({'Unrecognized':"Items can only be filtered as 'important' or 'archived'"}); 
+        console.error("Items can only be filtered as important or archived"); 
     }
 
-    const newTipsToDisplay = {}
+    const tipsToDisplay = {}
     for (let key of filteredTipKeys) {
-      newTipsToDisplay[key] = tips[key]
+      tipsToDisplay[key] = tips[key]
     }
-
-    // Object.keys(tips).filter(key => tips[key].important === true).map(key => tipsToDisplay[key] = tips[key] }) // why doesnt this work
 
     this.setState({ 
-      tipsToDisplay: newTipsToDisplay,
-      showTipDetail: false,
-      tipDetail: null,
+      tipsToDisplay: tipsToDisplay,
       mailboxRightPanel: 'mailbox'
      });
   }
@@ -138,51 +128,23 @@ class Dashboard extends Component {
 
     const {tips} = this.state;
 
-    const unreadCount = Object.keys(tips).filter(key => tips[key].readStatus === 'unread').length
-    const lastTwentyFourHourTipCount = Object.keys(tips).filter(key => tips[key].dateTime >= oneDayAgoTimestamp()).length
-    const thisYearTipCount = Object.keys(tips).filter(key => tips[key].dateTime >= firstOfThisYearTimestamp()).length
-
     const counts = {
-      unreadCount,
-      lastTwentyFourHourTipCount,
-      thisYearTipCount,
-    }
-
-    var filteredTipKeys = []
-    
-    switch (this.state.tipsToDisplayStatus) {
-      case 'all':
-        filteredTipKeys = Object.keys(tips).filter(key => tips[key].archived === false);
-        break;
-      case 'important':
-        filteredTipKeys = Object.keys(tips).filter(key => tips[key].important === true);
-        break;
-      case 'archived':
-        filteredTipKeys = Object.keys(tips).filter(key => tips[key].archived === true);
-        break;
-      default:
-        throw new Error({'Unrecognized':"Items can only be filtered as 'important' or 'archived'"}); 
-    }
-
-    const tipsToDisplay = {}
-
-    for (let key of filteredTipKeys) {
-      tipsToDisplay[key] = tips[key]
+      unreadCount: Object.keys(tips).filter(key => tips[key].readStatus === 'unread').length,
+      lastTwentyFourHourTipCount: Object.keys(tips).filter(key => tips[key].dateTime >= oneDayAgoTimestamp()).length,
+      thisYearTipCount: Object.keys(tips).filter(key => tips[key].dateTime >= firstOfThisYearTimestamp()).length
     }
 
     return (
-
       <Layout uid={this.props.uid} logout={this.props.logout}>
         <DashboardMetrics counts={counts}/>
         <Mailbox  tips={this.state.tips} 
-                  tipsToDisplay={tipsToDisplay}
-                  unreadCount={unreadCount}  
-                  markAsRead={this.markAsRead} 
+                  tipsToDisplay={this.state.tipsToDisplay ? this.state.tipsToDisplay : this.state.tips}
+                  unreadCount={counts.unreadCount}  
+                  showTipDetail={this.showTipDetail}
+                  tipDetail={this.state.tipDetail}
                   addSelectedItem={this.addSelectedItem}
                   markTipAs={this.markTipAs}
                   showTips={this.showTips}
-                  showTipDetail={this.state.showTipDetail}
-                  tipDetail={this.state.tipDetail}
                   mailboxRightPanel={this.state.mailboxRightPanel}
                   openTipLongForm={this.openTipLongForm}
                   />

@@ -9,7 +9,7 @@ const MailboxPanel = (props) => {
                                 .map(key => <MailboxRow
                                                 key={key} 
                                                 index={key} 
-                                                markAsRead={props.markAsRead}
+                                                showTipDetail={props.showTipDetail}
                                                 addSelectedItem={props.addSelectedItem}
                                                 details={props.tipsToDisplay[key]} 
                                             />);
@@ -80,7 +80,7 @@ const MailboxPanel = (props) => {
 }
 
 MailboxPanel.propTypes = {
-     markAsRead: React.PropTypes.func.isRequired,
+     showTipDetail: React.PropTypes.func.isRequired,
      addSelectedItem: React.PropTypes.func.isRequired,
      markTipAs: React.PropTypes.func.isRequired,
      tipsToDisplay: React.PropTypes.object.isRequired

@@ -10,7 +10,7 @@ class Mailbox extends Component {
         if (this.props.mailboxRightPanel==='mailbox') {
             return (
                 <MailboxPanel 
-                    markAsRead={this.props.markAsRead}
+                    showTipDetail={this.props.showTipDetail}
                     addSelectedItem={this.props.addSelectedItem}
                     markTipAs={this.props.markTipAs}
                     tipsToDisplay={this.props.tipsToDisplay}

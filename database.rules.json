@@ -1,6 +1,14 @@
 {
   "rules": {
-    ".read": true,
-    ".write": true
+    "tips": {
+      "$tip": {
+        ".read": "auth !== null",
+        ".write": "!data.exists() || auth !== null",
+      },
+    },
+    "users": {
+      ".read": "auth !== null",
+      ".write": "auth !== null"
+    }
   }
 }

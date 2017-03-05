@@ -3,8 +3,7 @@
 # dependencies
 /node_modules
 
-# for now
-/src/base.js
+# temp ignore
 
 # testing
 /coverage
