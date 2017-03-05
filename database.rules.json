@@ -3,8 +3,8 @@
     "tips": {
       "$tip": {
         ".read": "auth !== null",
-        ".write": "!data.exists() || auth !== null",
-      },
+        ".write": "!data.exists() || auth !== null"
+      }
     },
     "users": {
       ".read": "auth !== null",
