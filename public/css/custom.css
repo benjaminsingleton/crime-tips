@@ -78,3 +78,12 @@ textarea {
 #mailbox-controls {
   background-color: white;
 }
+
+.btn-next {
+  margin-left: 10px;
+}
+
+.btn-prev {
+  background: #eee;
+  color: #aaa;
+}
