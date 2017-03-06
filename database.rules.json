@@ -1,8 +1,8 @@
 {
   "rules": {
     "tips": {
+      ".read": "auth !== null",
       "$tip": {
-        ".read": "auth !== null",
         ".write": "!data.exists() || auth !== null"
       }
     },
