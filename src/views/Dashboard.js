@@ -13,7 +13,10 @@ class Dashboard extends Component {
     super()
     this.state = {
       tips: {},
-      tipsToDisplay: null,
+      tipsToDisplayStatus: {
+        'criteria': 'archived',
+        'value': false
+      },
       selectedItems: [],
       tipDetail: null,
       mailboxRightPanel: 'mailbox'
@@ -21,7 +24,7 @@ class Dashboard extends Component {
     this.showTipDetail = this.showTipDetail.bind(this);
     this.addSelectedItem = this.addSelectedItem.bind(this);
     this.markTipAs = this.markTipAs.bind(this);
-    this.showTips = this.showTips.bind(this);
+    this.filterTips = this.filterTips.bind(this);
     this.openTipLongForm = this.openTipLongForm.bind(this);
   }
 
@@ -82,38 +85,12 @@ class Dashboard extends Component {
     this.setState({ tips: tips, selectedItems: []});
   }
 
-  showTips(criteria) {
-    // Displays tips
-    const tips = {...this.state.tips};
-    // store keys of tip to be displayed
-    var filteredTipKeys = []
-
-    switch (criteria) {
-      case 'all':
-        filteredTipKeys = Object.keys(tips).filter(key => tips[key].archived === false);
-        // why doesnt this work
-        // this.setState({ 
-        //   tipsToDisplay: Object.keys(tips).filter(key => tips[key].important === true)
-        //                                   .map(key => tipsToDisplay[key] = tips[key])
-        // });
-        break;
-      case 'important':
-        filteredTipKeys = Object.keys(tips).filter(key => tips[key].important === true);
-        break;
-      case 'archived':
-        filteredTipKeys = Object.keys(tips).filter(key => tips[key].archived === true);
-        break;
-      default:
-        console.error("Items can only be filtered as important or archived"); 
-    }
-
-    const tipsToDisplay = {}
-    for (let key of filteredTipKeys) {
-      tipsToDisplay[key] = tips[key]
-    }
-
+  filterTips(criteria, value) {
     this.setState({ 
-      tipsToDisplay: tipsToDisplay,
+      tipsToDisplayStatus: {
+        'criteria': criteria,
+        'value': value
+      },
       mailboxRightPanel: 'mailbox'
      });
   }
@@ -126,7 +103,10 @@ class Dashboard extends Component {
 
   render() {
 
-    const {tips} = this.state;
+    const {tips, tipsToDisplayStatus} = this.state;
+
+    const tipsToDisplay = Object.keys(tips).filter(key => tips[key][tipsToDisplayStatus['criteria']] === tipsToDisplayStatus['value'])
+                                            .map(key => tips[key]);
 
     const counts = {
       unreadCount: Object.keys(tips).filter(key => tips[key].readStatus === 'unread').length,
@@ -138,13 +118,13 @@ class Dashboard extends Component {
       <Layout uid={this.props.uid} logout={this.props.logout}>
         <DashboardMetrics counts={counts}/>
         <Mailbox  tips={this.state.tips} 
-                  tipsToDisplay={this.state.tipsToDisplay ? this.state.tipsToDisplay : this.state.tips}
+                  tipsToDisplay={tipsToDisplay}
                   unreadCount={counts.unreadCount}  
                   showTipDetail={this.showTipDetail}
                   tipDetail={this.state.tipDetail}
                   addSelectedItem={this.addSelectedItem}
                   markTipAs={this.markTipAs}
-                  showTips={this.showTips}
+                  filterTips={this.filterTips}
                   mailboxRightPanel={this.state.mailboxRightPanel}
                   openTipLongForm={this.openTipLongForm}
                   />

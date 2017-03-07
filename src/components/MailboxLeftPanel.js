@@ -2,7 +2,7 @@ import React from 'react'
 
 const MailboxLeftPanel  = (props) => {
     
-    const {unreadCount, showTips, openTipLongForm } = props;
+    const {unreadCount, filterTips, openTipLongForm } = props;
 
     return (
         <div className="col-lg-3 animated fadeInRight" id="mailbox-controls">
@@ -19,13 +19,13 @@ const MailboxLeftPanel  = (props) => {
                         <h5>Folders</h5>
                         <ul className="folder-list m-b-md">
                             <li>
-                                <a onClick={() => showTips('all')}>
+                                <a onClick={() => filterTips('archived', false)}>
                                     <i className="fa fa-inbox"></i> Tip Inbox 
                                     <span className="label label-warning pull-right">{ unreadCount }</span>
                                 </a>
                             </li>
                             <li>
-                                <a onClick={() => showTips('important')}>
+                                <a onClick={() => filterTips('important', true)}>
                                     <i className="fa fa-certificate"></i> Important
                                 </a>
                             </li>
@@ -36,25 +36,35 @@ const MailboxLeftPanel  = (props) => {
                                 </a>
                             </li>
                             <li>
-                                <a onClick={() => showTips('archived')}><i className="fa fa-archive"></i> Archived</a>
+                                <a onClick={() => filterTips('archived', true)}><i className="fa fa-archive"></i> Archived</a>
                             </li>
                         </ul>
                         <h5>Categories</h5>
                         <ul className="category-list">
                             <li>
-                                <a><i className="fa fa-circle text-danger"></i> Murder</a>
+                                <a onClick={() => filterTips('crimeType', 'Murder')}>
+                                    <i className="fa fa-circle text-danger"></i> Murder
+                                </a>
                             </li>
                             <li>
-                                <a><i className="fa fa-circle text-navy"></i> Shooting</a>
+                                <a onClick={() => filterTips('crimeType', 'Shooting')}>
+                                    <i className="fa fa-circle text-navy"></i> Shooting
+                                </a>
                             </li>
                             <li>
-                                <a><i className="fa fa-circle text-primary"></i> Robbery</a>
+                                <a onClick={() => filterTips('crimeType', 'Illegal Gun Possession / Sale')}>
+                                    <i className="fa fa-circle text-primary"></i> Illegal Gun Possession / Sale
+                                </a>
+                            </li>
+                             <li>
+                                <a onClick={() => filterTips('crimeType', 'Rape / Sexual Assault')}>
+                                    <i className="fa fa-circle text-info"></i> Rape / Sexual Assault
+                                </a>
                             </li>
                             <li>
-                                <a><i className="fa fa-circle text-info"></i> Guns</a>
-                            </li>
-                            <li>
-                                <a><i className="fa fa-circle text-warning"></i> Drugs</a>
+                                <a onClick={() => filterTips('crimeType', 'Robbery')}>
+                                    <i className="fa fa-circle text-warning"></i> Robbery
+                                </a>
                             </li>
                         </ul>
                         
