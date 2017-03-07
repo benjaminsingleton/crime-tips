@@ -5,7 +5,7 @@ import Layout from '../components/Layout'
 class UserSettings extends Component {
   render() {
     return (
-      <Layout isAdmin={true} >
+      <Layout uid={this.props.uid} logout={this.props.logout}>
         <div className="wrapper wrapper-content">
             <div className="row animated fadeInRight">
                 <div className="col-md-4">

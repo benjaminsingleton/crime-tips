@@ -30,7 +30,7 @@ const TipFormIntro = (props) => {
                     </select>
                     <br />
                     <p>
-                        Please tell us what you know. 
+                        Please tell us the information you wanted to share. 
                         <span className="pull-right">
                             <small><a>Click here</a> for an example of a helpful tip.</small>
                         </span>
