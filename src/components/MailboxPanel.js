@@ -11,7 +11,8 @@ const MailboxPanel = (props) => {
                                                 index={key} 
                                                 showTipDetail={props.showTipDetail}
                                                 addSelectedItem={props.addSelectedItem}
-                                                details={props.tipsToDisplay[key]} 
+                                                details={props.tipsToDisplay[key]}
+                                                checked={props.selectedItems.includes(key)}
                                             />);
     return (
             <div className="col-lg-9 animated fadeInRight">
@@ -83,7 +84,6 @@ MailboxPanel.propTypes = {
      showTipDetail: React.PropTypes.func.isRequired,
      addSelectedItem: React.PropTypes.func.isRequired,
      markTipAs: React.PropTypes.func.isRequired,
-    //  tipsToDisplay: React.PropTypes.obj.isRequired,
 }
 
 export default MailboxPanel
