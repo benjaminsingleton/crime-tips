@@ -20,8 +20,7 @@ const TipFormIntro = (props) => {
                         <option>Murder</option>
                         <option>Shooting</option>
                         <option>Illegal Gun Possession / Sale</option>
-                        <option>Rape</option>
-                        <option>Sexual Assault</option>
+                        <option>Rape / Sexual Assault</option>
                         <option>Robbery</option>
                         <option>Assault</option>
                         <option>Drug Sale / Possession</option>
