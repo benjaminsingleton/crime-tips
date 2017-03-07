@@ -19,7 +19,7 @@ class Dashboard extends Component {
       },
       selectedItems: [],
       tipDetail: null,
-      mailboxRightPanel: 'mailbox'
+      mailboxRightPanel: 'mailbox',
     }
     this.showTipDetail = this.showTipDetail.bind(this);
     this.addSelectedItem = this.addSelectedItem.bind(this);
@@ -125,7 +125,8 @@ class Dashboard extends Component {
                   filterTips={this.filterTips}
                   mailboxRightPanel={this.state.mailboxRightPanel}
                   openTipLongForm={this.openTipLongForm}
-                  />
+                  selectedItems={this.state.selectedItems}
+        />
       </Layout>
     )
   }

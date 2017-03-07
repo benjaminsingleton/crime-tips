@@ -9,7 +9,7 @@ const MailboxRow = (props) => {
         <tr className={details.readStatus}>
             <td className="check-mail">
                 <div className="icheckbox_square-green">
-                    <input type="checkbox" onChange={() => props.addSelectedItem(props.index)}/>
+                    <input type="checkbox" checked={props.checked} onChange={() => props.addSelectedItem(props.index)}/>
                 </div>
             </td>
             <td className="mail-status">

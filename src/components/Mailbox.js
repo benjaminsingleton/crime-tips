@@ -14,6 +14,7 @@ class Mailbox extends Component {
                     addSelectedItem={this.props.addSelectedItem}
                     markTipAs={this.props.markTipAs}
                     tipsToDisplay={this.props.tipsToDisplay}
+                    selectedItems={this.props.selectedItems}
                 />
             );
         } else if (this.props.mailboxRightPanel==='detail') {
