@@ -66,23 +66,17 @@ class Dashboard extends Component {
     this.setState({selectedItems: selectedItems})
   }
 
-  markTipAs(name) {
-    console.log(name)
+  markTipAs(criteria) {
+    console.log(criteria)
     // Marks selected tips as important or archived
     const tips = {...this.state.tips};
 
-    switch (name) {
-      case 'important':
-        this.state.selectedItems.map(key => tips[key].important = !tips[key].important);
-        break;
-      case 'archived':
-        this.state.selectedItems.map(key => tips[key].archived = !tips[key].archived);
-        break;
-      default:
-        throw new Error({'Unrecognized':"Items can only be marked 'important' or 'archived'"}); 
-    }
+    this.state.selectedItems.map(key => tips[key][criteria] = !tips[key][criteria]);
     
-    this.setState({ tips: tips, selectedItems: []});
+    this.setState({ 
+      tips: tips, 
+      selectedItems: []
+    });
   }
 
   filterTips(criteria, value) {
@@ -105,8 +99,12 @@ class Dashboard extends Component {
 
     const {tips, tipsToDisplayStatus} = this.state;
 
-    const tipsToDisplay = Object.keys(tips).filter(key => tips[key][tipsToDisplayStatus['criteria']] === tipsToDisplayStatus['value'])
-                                            .map(key => tips[key]);
+    const tipsToDisplayKeys = Object.keys(tips).filter(key => tips[key][tipsToDisplayStatus['criteria']] === tipsToDisplayStatus['value'])
+
+    const tipsToDisplay = {}
+    for (var i = 0; i < tipsToDisplayKeys.length; i++) {
+      tipsToDisplay[tipsToDisplayKeys[i]] = tips[tipsToDisplayKeys[i]]
+    } 
 
     const counts = {
       unreadCount: Object.keys(tips).filter(key => tips[key].readStatus === 'unread').length,

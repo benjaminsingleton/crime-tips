@@ -83,7 +83,7 @@ MailboxPanel.propTypes = {
      showTipDetail: React.PropTypes.func.isRequired,
      addSelectedItem: React.PropTypes.func.isRequired,
      markTipAs: React.PropTypes.func.isRequired,
-     tipsToDisplay: React.PropTypes.array.isRequired
+    //  tipsToDisplay: React.PropTypes.obj.isRequired,
 }
 
 export default MailboxPanel
