@@ -4,6 +4,7 @@ import Layout from '../components/Layout'
 import TipFormContainer from '../components/TipFormContainer'
 import TipFormIntro from '../components/TipFormIntro'
 import TipFormSuspectDescription from '../components/TipFormSuspectDescription'
+import TipFormSuspectLocation from '../components/TipFormSuspectLocation'
 
 
 class SubmitATip extends Component {
@@ -81,35 +82,45 @@ class SubmitATip extends Component {
         switch (this.state.stepNumber) {
             case 0:
                 return (
-                    <TipFormIntro 
-                        title={'Submit a Tip'}
-                        handleInputChange={this.handleInputChange}
-                        createTip={this.createTip}
-                        tip={this.state.tip}
-                        changeStep={this.changeStep}
-                    />
+                    <TipFormContainer title="Submit a Tip" changeStep={this.changeStep}>
+                        <TipFormIntro 
+                            handleInputChange={this.handleInputChange}
+                            tip={this.state.tip}
+                        />
+                    </TipFormContainer>
                 )
             case 1: // 'suspect-description'
                 return (
-                    <TipFormSuspectDescription
-                        title={'Suspect Description'}
-                        handleInputChange={this.handleInputChange}
-                        createTip={this.createTip}
-                        tip={this.state.tip}
-                        changeStep={this.changeStep}
-                    />
+                    <TipFormContainer title="Suspect Description" changeStep={this.changeStep}>
+                        <TipFormSuspectDescription 
+                            handleInputChange={this.handleInputChange}
+                            tip={this.state.tip}
+                        />
+                    </TipFormContainer>
                 )
             case 2: // suspect location
-                return 'TODO'
+                return (
+                    <TipFormContainer title="Suspect Location" changeStep={this.changeStep}>
+                        <TipFormSuspectLocation 
+                            handleInputChange={this.handleInputChange}
+                            tip={this.state.tip}
+                        />
+                    </TipFormContainer>
+                )
             case 3: // suspect employment
+                this.setState({title: 'Suspect Location'})
                 return 'TODO'
             case 4: // suspect vehicle
+                this.setState({title: 'Suspect Vehicle'})
                 return 'TODO'
             case 5: // drugs
+                this.setState({title: 'Drugs'})
                 return 'TODO'
             case 6: // media upload
+                this.setState({title: 'Media Upload'})
                 return 'TODO'
             case 7: // conclusion
+                this.setState({title: 'Conclusion'})
                 return 'TODO'
             case 99: // success
                 return (
@@ -137,10 +148,8 @@ class SubmitATip extends Component {
                 </div>
                 <div className="wrapper wrapper-content animated fadeInRight">
                     <div className="row">
-                        <div className="col-md-6 col-md-offset-3">
-                            <TipFormContainer title={this.state.title}>
-                                { this.renderDisplay() }
-                            </ TipFormContainer>
+                        <div className="col-lg-8 col-lg-offset-2">
+                            { this.renderDisplay() }
                         </div>
                     </div>
                 </div>
