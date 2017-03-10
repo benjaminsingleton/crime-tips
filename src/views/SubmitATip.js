@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import base from '../base'
 import Layout from '../components/Layout'
+import TipFormContainer from '../components/TipFormContainer'
 import TipFormIntro from '../components/TipFormIntro'
 import TipFormSuspectDescription from '../components/TipFormSuspectDescription'
 
@@ -14,6 +15,7 @@ class SubmitATip extends Component {
         this.state = {
             tip: {},
             stepNumber: 0,
+            title: 'Submit a Tip'
         }
 
         this.renderDisplay = this.renderDisplay.bind(this)
@@ -136,7 +138,9 @@ class SubmitATip extends Component {
                 <div className="wrapper wrapper-content animated fadeInRight">
                     <div className="row">
                         <div className="col-md-6 col-md-offset-3">
-                            { this.renderDisplay() }
+                            <TipFormContainer title={this.state.title}>
+                                { this.renderDisplay() }
+                            </ TipFormContainer>
                         </div>
                     </div>
                 </div>
