@@ -91,7 +91,7 @@ class SubmitATip extends Component {
                         />
                     </TipFormContainer>
                 )
-            case 1: // 'suspect-description'
+            case 1:
                 return (
                     <TipFormContainer title="Suspect Description" changeStep={this.changeStep}>
                         <TipFormSuspectDescription 
@@ -100,7 +100,7 @@ class SubmitATip extends Component {
                         />
                     </TipFormContainer>
                 )
-            case 2: // suspect location
+            case 2:
                 return (
                     <TipFormContainer title="Suspect Location" changeStep={this.changeStep}>
                         <TipFormSuspectLocation 
@@ -109,7 +109,7 @@ class SubmitATip extends Component {
                         />
                     </TipFormContainer>
                 )
-            case 3: // suspect employment
+            case 3:
                 return (
                     <TipFormContainer title="Suspect Employment" changeStep={this.changeStep}>
                         <TipFormSuspectEmployment 
@@ -118,7 +118,7 @@ class SubmitATip extends Component {
                         />
                     </TipFormContainer>
                 )
-            case 4: // suspect vehicle
+            case 4:
                 return (
                     <TipFormContainer title="Suspect Vehicle" changeStep={this.changeStep}>
                         <TipFormSuspectVehicle 
@@ -136,7 +136,7 @@ class SubmitATip extends Component {
                         />
                     </TipFormContainer>
                 )
-            case 6: // media upload
+            case 6:
                 return (
                     <TipFormContainer title="Media Upload" changeStep={this.changeStep}>
                         <TipFormMedia
@@ -146,7 +146,7 @@ class SubmitATip extends Component {
                     </TipFormContainer>
 
                 )
-            case 7: // conclusion
+            case 7:
                 return (
                     <TipFormContainer title="Conclusion" changeStep={this.changeStep} showSubmit={true} noNextButton={true}>
                         <TipFormFinal
@@ -155,7 +155,7 @@ class SubmitATip extends Component {
                         />
                     </TipFormContainer>
                 )
-            case 99: // success
+            case 99:
                 return (
                     <h3 className="text-center">
                         Thanks! <a onClick={this.resetForm}>Click here</a> to write another tip.
@@ -182,7 +182,7 @@ class SubmitATip extends Component {
                 <div className="wrapper wrapper-content animated fadeInRight">
                     <div className="row">
                         <div className="col-xs-12 col-lg-6 col-lg-offset-3">
-                            { this.getStepContent(this.state.stepIndex) }
+                            {this.getStepContent(this.state.stepIndex)}
                         </div>
                     </div>
                 </div>
