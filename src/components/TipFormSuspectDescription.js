@@ -189,6 +189,33 @@ const TipFormSuspectDescription = (props) => {
                         </div>
                     </div>
                     <br />
+                    <div className="form-group">
+                        <label className="col-sm-6 control-label">If the suspect has tattoos, piercings or markings, 
+                            please describe them.</label>
+                        <div className="col-sm-6">
+                            <input 
+                                className="form-control" 
+                                name="suspectTatoosPiercingsMarkings"
+                                placeholder="Tattoo / Piercing / Marking Description"
+                                value={props.tip.suspectTatoosPiercingsMarkings} 
+                                onChange={props.handleInputChange} 
+                            />
+                        </div>
+                    </div>
+                    <br />
+                    <div className="form-group">
+                        <label className="col-sm-6 control-label">What is the suspect's social media account?</label>
+                        <div className="col-sm-6">
+                            <input 
+                                className="form-control" 
+                                name="suspectSocialMedia"
+                                placeholder="https://www.facebook.com/username"
+                                value={props.tip.suspectSocialMedia} 
+                                onChange={props.handleInputChange} 
+                            />
+                        </div>
+                    </div>
+                    <br />
                     <div className="text-center">
                         <button className="btn btn-primary" type="submit">Submit</button>
                         <div className="pull-right">
