@@ -43,27 +43,47 @@ const MailboxLeftPanel  = (props) => {
                         <ul className="category-list">
                             <li>
                                 <a onClick={() => filterTips('crimeType', 'Murder')}>
-                                    <i className="fa fa-circle text-danger"></i> Murder
+                                    <i className="fa fa-circle text-primary"></i> Murder
                                 </a>
                             </li>
                             <li>
                                 <a onClick={() => filterTips('crimeType', 'Shooting')}>
-                                    <i className="fa fa-circle text-navy"></i> Shooting
+                                    <i className="fa fa-circle text-success"></i> Shooting
                                 </a>
                             </li>
                             <li>
                                 <a onClick={() => filterTips('crimeType', 'Illegal Gun Possession / Sale')}>
-                                    <i className="fa fa-circle text-primary"></i> Illegal Gun Possession / Sale
+                                    <i className="fa fa-circle text-info"></i> Illegal Gun Possession / Sale
                                 </a>
                             </li>
                              <li>
                                 <a onClick={() => filterTips('crimeType', 'Rape / Sexual Assault')}>
-                                    <i className="fa fa-circle text-info"></i> Rape / Sexual Assault
+                                    <i className="fa fa-circle text-warning"></i> Rape / Sexual Assault
                                 </a>
                             </li>
                             <li>
                                 <a onClick={() => filterTips('crimeType', 'Robbery')}>
-                                    <i className="fa fa-circle text-warning"></i> Robbery
+                                    <i className="fa fa-circle text-danger"></i> Robbery
+                                </a>
+                            </li>
+                             <li>
+                                <a onClick={() => filterTips('crimeType', 'Assault')}>
+                                    <i className="fa fa-circle text-navy"></i> Assault
+                                </a>
+                            </li>
+                             <li>
+                                <a onClick={() => filterTips('crimeType', 'Drug Sale / Possession')}>
+                                    <i className="fa fa-circle text-primary"></i> Drug Sale / Possession
+                                </a>
+                            </li>
+                             <li>
+                                <a onClick={() => filterTips('crimeType', 'Human Trafficking / Prostitution')}>
+                                    <i className="fa fa-circle text-success"></i> Human Trafficking / Prostitution
+                                </a>
+                            </li>
+                            <li>
+                                <a onClick={() => filterTips('crimeType', 'Other')}>
+                                    <i className="fa fa-circle text-info"></i> Other
                                 </a>
                             </li>
                         </ul>
