@@ -7,12 +7,24 @@ const TipFormContainer = (props) => {
                 <h5>{props.title}</h5>
             </div>
             <div className="ibox-content">
-                <form className="form-horizonal">
+                <form className="form-horizontal">
                 {props.children}
+                { props.showSubmit
+                    ? <div className="text-center">
+                        <button className="btn btn-primary" onClick={()=>props.createTip()}>Submit</button>'
+                      </div>
+                    : null
+                }
                 </form>
                 <div className="text-right">
-                    <button className="btn btn-prev" onClick={() => props.changeStep('previous')}>Previous</button>
-                    <button className="btn btn-primary" onClick={() => props.changeStep('next')}>Next</button>
+                    { props.noPreviousButton 
+                        ? null 
+                        : <button className="btn btn-prev" onClick={() => props.changeStep('previous')}>Previous</button> 
+                    }
+                    { props.noNextButton 
+                        ? null
+                        : <button className="btn btn-primary" onClick={() => props.changeStep('next')}>Next</button>
+                    }
                 </div>
             </div>
         </div>

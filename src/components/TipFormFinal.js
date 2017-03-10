@@ -4,7 +4,7 @@ const TipFormFinal = (props) => {
     return (
         <div>
             <div className="form-group">
-                <label className="col-sm-6 control-label">How did you find out how to provide a crime tip? </label>
+                <label className="col-sm-6 control-label">How did you find out about online crime tips? </label>
                 <div className="col-sm-6">
                     <select 
                         className="form-control m-b" 

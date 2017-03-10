@@ -65,7 +65,6 @@ const TipFormIntro = (props) => {
 }
 
 TipFormIntro.propTypes = {
-    title: React.PropTypes.string.isRequired,
     handleInputChange: React.PropTypes.func.isRequired
 }
 
