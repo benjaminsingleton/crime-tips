@@ -5,21 +5,23 @@ import TipFormContainer from '../components/TipFormContainer'
 import TipFormIntro from '../components/TipFormIntro'
 import TipFormSuspectDescription from '../components/TipFormSuspectDescription'
 import TipFormSuspectLocation from '../components/TipFormSuspectLocation'
+import TipFormSuspectEmployment from '../components/TipFormSuspectEmployment'
+import TipFormSuspectVehicle from '../components/TipFormSuspectVehicle'
+import TipFormDrugs from '../components/TipFormDrugs'
+import TipFormMedia from '../components/TipFormMedia'
+import TipFormFinal from '../components/TipFormFinal'
 
 
 class SubmitATip extends Component {
 
     constructor () {
         super()
-
-        // get initial state
         this.state = {
             tip: {},
-            stepNumber: 0,
-            title: 'Submit a Tip'
+            stepIndex: 0,
         }
 
-        this.renderDisplay = this.renderDisplay.bind(this)
+        this.getStepContent = this.getStepContent.bind(this)
         this.handleInputChange = this.handleInputChange.bind(this);
         this.createTip = this.createTip.bind(this)
         this.resetForm = this.resetForm.bind(this)
@@ -58,31 +60,31 @@ class SubmitATip extends Component {
         // clear the form and render success
         this.setState({ 
             tip: {},
-            stepNumber: 99
+            stepIndex: 99
         });
     }
 
     resetForm() {
-        this.setState({ stepNumber: 0 })
+        this.setState({ stepIndex: 0 })
     }
 
     changeStep(direction){
-        var stepNumber = this.state.stepNumber
+        var stepIndex = this.state.stepIndex
 
         if (direction==='next') {
-            stepNumber++;
+            stepIndex++;
         } else if (direction==='previous') {
-            stepNumber--;
+            stepIndex--;
         };
 
-        this.setState({ stepNumber })
+        this.setState({ stepIndex })
     }
 
-    renderDisplay() {
-        switch (this.state.stepNumber) {
+    getStepContent(stepIndex) {
+        switch (stepIndex) {
             case 0:
                 return (
-                    <TipFormContainer title="Submit a Tip" changeStep={this.changeStep}>
+                    <TipFormContainer title="Submit a Tip" changeStep={this.changeStep} noPreviousButton={true}>
                         <TipFormIntro 
                             handleInputChange={this.handleInputChange}
                             tip={this.state.tip}
@@ -108,20 +110,51 @@ class SubmitATip extends Component {
                     </TipFormContainer>
                 )
             case 3: // suspect employment
-                this.setState({title: 'Suspect Location'})
-                return 'TODO'
+                return (
+                    <TipFormContainer title="Suspect Employment" changeStep={this.changeStep}>
+                        <TipFormSuspectEmployment 
+                            handleInputChange={this.handleInputChange}
+                            tip={this.state.tip}
+                        />
+                    </TipFormContainer>
+                )
             case 4: // suspect vehicle
-                this.setState({title: 'Suspect Vehicle'})
-                return 'TODO'
+                return (
+                    <TipFormContainer title="Suspect Vehicle" changeStep={this.changeStep}>
+                        <TipFormSuspectVehicle 
+                            handleInputChange={this.handleInputChange}
+                            tip={this.state.tip}
+                        />
+                    </TipFormContainer>
+                )
             case 5: // drugs
-                this.setState({title: 'Drugs'})
-                return 'TODO'
+                return (
+                    <TipFormContainer title="Drugs" changeStep={this.changeStep}>
+                        <TipFormDrugs 
+                            handleInputChange={this.handleInputChange}
+                            tip={this.state.tip}
+                        />
+                    </TipFormContainer>
+                )
             case 6: // media upload
-                this.setState({title: 'Media Upload'})
-                return 'TODO'
+                return (
+                    <TipFormContainer title="Media Upload" changeStep={this.changeStep}>
+                        <TipFormMedia
+                            handleInputChange={this.handleInputChange}
+                            tip={this.state.tip}
+                        />
+                    </TipFormContainer>
+
+                )
             case 7: // conclusion
-                this.setState({title: 'Conclusion'})
-                return 'TODO'
+                return (
+                    <TipFormContainer title="Conclusion" changeStep={this.changeStep} showSubmit={true} noNextButton={true}>
+                        <TipFormFinal
+                            handleInputChange={this.handleInputChange}
+                            tip={this.state.tip}
+                        />
+                    </TipFormContainer>
+                )
             case 99: // success
                 return (
                     <h3 className="text-center">
@@ -148,8 +181,8 @@ class SubmitATip extends Component {
                 </div>
                 <div className="wrapper wrapper-content animated fadeInRight">
                     <div className="row">
-                        <div className="col-lg-8 col-lg-offset-2">
-                            { this.renderDisplay() }
+                        <div className="col-xs-12 col-lg-6 col-lg-offset-3">
+                            { this.getStepContent(this.state.stepIndex) }
                         </div>
                     </div>
                 </div>
