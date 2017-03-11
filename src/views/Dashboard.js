@@ -14,8 +14,8 @@ class Dashboard extends Component {
     this.state = {
       tips: {},
       tipsToDisplayStatus: {
-        'criteria': 'archived',
-        'value': false
+        'criteria': 'all',
+        'value': ''
       },
       selectedItems: [],
       tipDetail: null,
@@ -67,12 +67,22 @@ class Dashboard extends Component {
   }
 
   markTipAs(criteria) {
-    console.log(criteria)
-    // Marks selected tips as important or archived
+    const uid = this.props.uid;
     const tips = {...this.state.tips};
 
-    this.state.selectedItems.map(key => tips[key][criteria] = !tips[key][criteria]);
-    
+    function updateItem(criteria, key) {
+      if (tips[key][criteria] == null) {
+        tips[key][criteria] = {};
+        tips[key][criteria]['status'] = true;
+        tips[key][criteria]['user'] = uid;
+        tips[key][criteria]['timestamp'] = Date.now();
+      } else {
+        tips[key][criteria] = null;
+      };
+    };
+
+    this.state.selectedItems.map(key => updateItem(criteria, key))
+
     this.setState({ 
       tips: tips, 
       selectedItems: []
@@ -99,7 +109,17 @@ class Dashboard extends Component {
 
     const {tips, tipsToDisplayStatus} = this.state;
 
-    const tipsToDisplayKeys = Object.keys(tips).filter(key => tips[key][tipsToDisplayStatus['criteria']] === tipsToDisplayStatus['value'])
+    const criteria = tipsToDisplayStatus['criteria']
+    const value = tipsToDisplayStatus['value']
+    var tipsToDisplayKeys = []
+
+    if (criteria==='all') {
+      tipsToDisplayKeys = Object.keys(tips).filter(key => tips[key]['archived'] == null)
+    } else if (criteria === 'archived' || criteria === 'important') {
+      tipsToDisplayKeys = Object.keys(tips).filter(key => tips[key][criteria] != null)
+    } else {
+      tipsToDisplayKeys = Object.keys(tips).filter(key => tips[key][criteria] === value)
+    }
 
     const tipsToDisplay = {}
     for (var i = 0; i < tipsToDisplayKeys.length; i++) {

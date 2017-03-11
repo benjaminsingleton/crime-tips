@@ -46,11 +46,9 @@ class SubmitATip extends Component {
         var tip = {...this.state.tip}
 
         const tipDefaultProperties = {
-            dateTime: Date.now(),
+            timestamp: Date.now(),
             readStatus: 'unread',
             attachment: false,
-            important: false,
-            archived: false,
         }
         
         tip = Object.assign(tip, tipDefaultProperties);
