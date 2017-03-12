@@ -49,6 +49,8 @@ class SubmitATip extends Component {
             timestamp: Date.now(),
             readStatus: 'unread',
             attachment: false,
+            archived: false,
+            important: false
         }
         
         tip = Object.assign(tip, tipDefaultProperties);

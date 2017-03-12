@@ -14,8 +14,8 @@ class Dashboard extends Component {
     this.state = {
       tips: {},
       tipsToDisplayStatus: {
-        'criteria': 'all',
-        'value': ''
+        'criteria': 'archived',
+        'value': false
       },
       selectedItems: [],
       tipDetail: null,
@@ -44,6 +44,12 @@ class Dashboard extends Component {
     // Tip marked as read when clicked
     const tips = {...this.state.tips};
     tips[key].readStatus = 'read'
+
+    // Log activity to 'logs' and 'users/uid' for auditing purposes
+    const user = this.props.uid;
+    const timestamp = Date.now()
+    base.push(`logs/read/${key}`, {data: {user, timestamp}});
+    base.push(`users/${user}/read/${key}`, {data: {timestamp}});
     
     this.setState({ 
       tips: tips, 
@@ -67,18 +73,17 @@ class Dashboard extends Component {
   }
 
   markTipAs(criteria) {
-    const uid = this.props.uid;
+    const user = this.props.uid;
+    const timestamp = Date.now()
     const tips = {...this.state.tips};
 
+    // toggle criteria boolean value and log activity
     function updateItem(criteria, key) {
-      if (tips[key][criteria] == null) {
-        tips[key][criteria] = {};
-        tips[key][criteria]['status'] = true;
-        tips[key][criteria]['user'] = uid;
-        tips[key][criteria]['timestamp'] = Date.now();
-      } else {
-        tips[key][criteria] = null;
-      };
+      const status = !tips[key][criteria]
+      tips[key][criteria] = status
+
+      base.push(`logs/${criteria}/${key}`, {data: {user, status, timestamp}});
+      base.push(`users/${user}/${criteria}/${key}`, {data: {status, timestamp}});
     };
 
     this.state.selectedItems.map(key => updateItem(criteria, key))
@@ -109,17 +114,7 @@ class Dashboard extends Component {
 
     const {tips, tipsToDisplayStatus} = this.state;
 
-    const criteria = tipsToDisplayStatus['criteria']
-    const value = tipsToDisplayStatus['value']
-    var tipsToDisplayKeys = []
-
-    if (criteria==='all') {
-      tipsToDisplayKeys = Object.keys(tips).filter(key => tips[key]['archived'] == null)
-    } else if (criteria === 'archived' || criteria === 'important') {
-      tipsToDisplayKeys = Object.keys(tips).filter(key => tips[key][criteria] != null)
-    } else {
-      tipsToDisplayKeys = Object.keys(tips).filter(key => tips[key][criteria] === value)
-    }
+    const tipsToDisplayKeys = Object.keys(tips).filter(key => tips[key][tipsToDisplayStatus['criteria']] === tipsToDisplayStatus['value'])
 
     const tipsToDisplay = {}
     for (var i = 0; i < tipsToDisplayKeys.length; i++) {

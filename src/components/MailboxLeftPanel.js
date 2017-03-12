@@ -19,7 +19,7 @@ const MailboxLeftPanel  = (props) => {
                         <h5>Folders</h5>
                         <ul className="folder-list m-b-md">
                             <li>
-                                <a onClick={() => filterTips('all', '')}>
+                                <a onClick={() => filterTips('archived', false)}>
                                     <i className="fa fa-inbox"></i> Tip Inbox 
                                     <span className="label label-warning pull-right">{ unreadCount }</span>
                                 </a>
