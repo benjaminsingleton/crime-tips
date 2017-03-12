@@ -177,7 +177,7 @@ class TipLongForm extends Component {
                                  <div className="panel panel-default">
                                     <div className="panel-heading">
                                         <h4 className="panel-title">
-                                            <a onClick={() => this.togglePanel(7)}>7. Drugs</a>
+                                            <a onClick={() => this.togglePanel(7)}>7. Media</a>
                                         </h4>
                                     </div>
                                     <div className={"panel-collapse collapse " + (panelDisplay[7] ? "in" : "")}>
