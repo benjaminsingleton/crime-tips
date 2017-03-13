@@ -60,6 +60,86 @@ const TipFormIntro = (props) => {
             </div>
         </div>
         <br />
+        <p>We need to ask you a few more questions to take action based on the information you’ve provided. 
+            Please check any of the following statements so we can prompt you with a few important follow-up questions.
+        </p>
+        <br />
+        <div className="form-group">
+            <label className="col-sm-10 control-label">
+                I know the suspect’s name/nickname or I can provide a description of the suspect.
+            </label>
+            <div className="col-sm-2">
+                <input 
+                    className="form-control"
+                    type="checkbox"
+                    name="tipsterKnowsSuspectDescription"
+                    checked={props.tip.tipsterKnowsSuspectDescription} 
+                    onChange={props.handleInputChange} 
+                />
+            </div>
+        </div>
+        <br />
+        <div className="form-group">
+            <label className="col-sm-10 control-label">
+                I know where the suspect lives or hangs out.
+            </label>
+            <div className="col-sm-2">
+                <input 
+                    className="form-control"
+                    type="checkbox"
+                    name="tipsterKnowsSuspectLocation"
+                    checked={props.tip.tipsterKnowsSuspectLocation} 
+                    onChange={props.handleInputChange} 
+                />
+            </div>
+        </div>
+        <br />
+        <div className="form-group">
+            <label className="col-sm-10 control-label">
+                I know where the suspect works.
+            </label>
+            <div className="col-sm-2">
+                <input 
+                    className="form-control"
+                    type="checkbox"
+                    name="tipsterKnowsSuspectEmployment"
+                    checked={props.tip.tipsterKnowsSuspectEmployment} 
+                    onChange={props.handleInputChange} 
+                />
+            </div>
+        </div>
+        <br />
+        <div className="form-group">
+            <label className="col-sm-10 control-label">
+                I can provide a description of the suspect’s vehicle (or I can provide a 
+                description of the vehicle involved in the crime).
+            </label>
+            <div className="col-sm-2">
+                <input 
+                    className="form-control"
+                    type="checkbox"
+                    name="tipsterKnowsSuspectVehicle"
+                    checked={props.tip.tipsterKnowsSuspectVehicle} 
+                    onChange={props.handleInputChange} 
+                />
+            </div>
+        </div>
+        <br />
+        <div className="form-group">
+            <label className="col-sm-10 control-label">
+                I have media (photo / video / screenshot) to upload.
+            </label>
+            <div className="col-sm-2">
+                <input 
+                    className="form-control"
+                    type="checkbox"
+                    name="tipsterHasMedia"
+                    checked={props.tip.tipsterHasMedia} 
+                    onChange={props.handleInputChange} 
+                />
+            </div>
+        </div>
+        <br />
         </div>
     );
 }
