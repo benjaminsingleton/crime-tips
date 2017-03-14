@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import base from '../base'
+import { pick } from 'underscore'
 
 import Layout from '../components/Layout'
 import DashboardMetrics from '../components/DashboardMetrics'
@@ -48,8 +49,8 @@ class Dashboard extends Component {
     // Log activity to 'logs' and 'users/uid' for auditing purposes
     const user = this.props.uid;
     const timestamp = Date.now()
-    base.push(`logs/read/${key}`, {data: {user, timestamp}});
-    base.push(`users/${user}/read/${key}`, {data: {timestamp}});
+    base.push(`logs/`, {data: {user, key, action: 'read', timestamp}});
+    base.push(`users/${user}/activity/`, {data: {key, action: 'read', timestamp}});
     
     this.setState({ 
       tips: tips, 
@@ -69,7 +70,7 @@ class Dashboard extends Component {
       selectedItems.splice(pos, 1)
     };
 
-    this.setState({selectedItems: selectedItems})
+    this.setState({selectedItems})
   }
 
   markTipAs(criteria) {
@@ -82,8 +83,8 @@ class Dashboard extends Component {
       const status = !tips[key][criteria]
       tips[key][criteria] = status
 
-      base.push(`logs/${criteria}/${key}`, {data: {user, status, timestamp}});
-      base.push(`users/${user}/${criteria}/${key}`, {data: {status, timestamp}});
+      base.push(`logs/`, {data: {user, key, action: criteria, status, timestamp}});
+      base.push(`users/${user}/activity/`, {data: {key, action: criteria, status, timestamp}});
     };
 
     this.state.selectedItems.map(key => updateItem(criteria, key))
@@ -113,13 +114,10 @@ class Dashboard extends Component {
   render() {
 
     const {tips, tipsToDisplayStatus} = this.state;
+    const criteria = tipsToDisplayStatus['criteria']
+    const value = tipsToDisplayStatus['value']
 
-    const tipsToDisplayKeys = Object.keys(tips).filter(key => tips[key][tipsToDisplayStatus['criteria']] === tipsToDisplayStatus['value'])
-
-    const tipsToDisplay = {}
-    for (var i = 0; i < tipsToDisplayKeys.length; i++) {
-      tipsToDisplay[tipsToDisplayKeys[i]] = tips[tipsToDisplayKeys[i]]
-    } 
+    const tipsToDisplay = pick(tips, key => key[criteria]===value)
 
     const counts = {
       unreadCount: Object.keys(tips).filter(key => tips[key].readStatus === 'unread').length,

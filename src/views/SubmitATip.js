@@ -25,12 +25,13 @@ class SubmitATip extends Component {
                 tipsterHasMedia: false,
             },
             stepIndex: 0,
-            
-            stepDirection: 'next',
+            stepContent: ['initial', 'final', 'success'],
         }
+        this.baseState = this.state
 
         this.getStepContent = this.getStepContent.bind(this)
-        this.handleInputChange = this.handleInputChange.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this)
+        this.addToStepContent = this.addToStepContent.bind(this)
         this.createTip = this.createTip.bind(this)
         this.resetForm = this.resetForm.bind(this)
         this.changeStep = this.changeStep.bind(this)
@@ -65,15 +66,13 @@ class SubmitATip extends Component {
             
         // push tip object to firebase
         base.push('tips', {data: tip});
-        // clear the form and render success
-        this.setState({ 
-            tip: {},
-            stepIndex: 99
-        });
+
+        var stepIndex = this.state.stepIndex
+        this.setState({stepIndex: stepIndex++});
     }
 
     resetForm() {
-        this.setState({ stepIndex: 0 })
+        this.setState(this.baseState)
     }
 
     changeStep(direction){
@@ -85,107 +84,99 @@ class SubmitATip extends Component {
             stepIndex--;
         };
 
-        this.setState({ stepIndex, stepDirection: direction })
+        this.setState({ stepIndex })
+    }
+
+    addToStepContent(event) {
+        const stepContent = this.state.stepContent
+        let step = event.target.name
+
+        if (step === 'crimeType' && 
+                (event.target.value === 'Drug Sale / Possession' || stepContent.includes('tipsterKnowsAboutDrugs'))) {
+            step = 'tipsterKnowsAboutDrugs'
+        } else if (step === 'crimeType') {
+            return;
+        }
+
+        if (!stepContent.includes(step)) {
+            stepContent.splice(-2, 0, step) // add step in 3rd to last place (behind final, success)
+        } else {
+            var pos = stepContent.indexOf(step);
+            stepContent.splice(pos, 1)
+        };
+
+        this.setState({ stepContent })
     }
 
     getStepContent(stepIndex) {
-        switch (stepIndex) {
-            case 0:
+        const contentToDisplay = this.state.stepContent[stepIndex]
+
+        switch (contentToDisplay) {
+            case 'initial':
                 return (
                     <TipFormContainer title="Submit a Tip" changeStep={this.changeStep} noPreviousButton={true}>
                         <TipFormIntro 
+                            handleInputChange={this.handleInputChange}
+                            addToStepContent={this.addToStepContent}
+                            tip={this.state.tip}
+                        />
+                    </TipFormContainer>
+                )
+            case 'tipsterKnowsSuspectDescription':
+                return (
+                    <TipFormContainer title="Suspect Description" changeStep={this.changeStep}>
+                        <TipFormSuspectDescription 
                             handleInputChange={this.handleInputChange}
                             tip={this.state.tip}
                         />
                     </TipFormContainer>
                 )
-            case 1:
-                if (this.state.tip.tipsterKnowsSuspectDescription) {
-                    return (
-                        <TipFormContainer title="Suspect Description" changeStep={this.changeStep}>
-                            <TipFormSuspectDescription 
-                                handleInputChange={this.handleInputChange}
-                                tip={this.state.tip}
-                            />
-                        </TipFormContainer>
-                    )
-                } else {
-                    this.changeStep(this.state.stepDirection)
-                    break;
-                }
-                
-            case 2:
-                if (this.state.tip.tipsterKnowsSuspectLocation) {
-                    return (
-                        <TipFormContainer title="Suspect Location" changeStep={this.changeStep}>
-                            <TipFormSuspectLocation 
-                                handleInputChange={this.handleInputChange}
-                                tip={this.state.tip}
-                            />
-                        </TipFormContainer>
-                    )
-                } else {
-                    this.changeStep(this.state.stepDirection)
-                    break;
-                }
-                
-            case 3:
-                if (this.state.tip.tipsterKnowsSuspectEmployment) {
-                    return (
-                        <TipFormContainer title="Suspect Employment" changeStep={this.changeStep}>
-                            <TipFormSuspectEmployment 
-                                handleInputChange={this.handleInputChange}
-                                tip={this.state.tip}
-                            />
-                        </TipFormContainer>
-                    )
-                } else {
-                    this.changeStep(this.state.stepDirection)
-                    break;
-                }
-            case 4:
-                if (this.state.tip.tipsterKnowsSuspectVehicle) {
-                    return (
-                        <TipFormContainer title="Suspect Vehicle" changeStep={this.changeStep}>
-                            <TipFormSuspectVehicle 
-                                handleInputChange={this.handleInputChange}
-                                tip={this.state.tip}
-                            />
-                        </TipFormContainer>
-                    )
-                } else {
-                    this.changeStep(this.state.stepDirection)
-                    break;
-                }
-            case 5: // drugs
-                if (this.state.tip.crimeType==='Drug Sale / Possession') {
-                    return (
-                        <TipFormContainer title="Drugs" changeStep={this.changeStep}>
-                            <TipFormDrugs 
-                                handleInputChange={this.handleInputChange}
-                                tip={this.state.tip}
-                            />
-                        </TipFormContainer>
-                    )
-                } else {
-                    this.changeStep(this.state.stepDirection)
-                    break;
-                }
-            case 6:
-                if (this.state.tip.tipsterHasMedia) {
-                    return (
-                        <TipFormContainer title="Media Upload" changeStep={this.changeStep}>
-                            <TipFormMedia
-                                handleInputChange={this.handleInputChange}
-                                tip={this.state.tip}
-                            />
-                        </TipFormContainer>
-                    )
-                } else {
-                    this.changeStep(this.state.stepDirection)
-                    break;
-                }
-            case 7:
+            case 'tipsterKnowsSuspectLocation':
+                return (
+                    <TipFormContainer title="Suspect Location" changeStep={this.changeStep}>
+                        <TipFormSuspectLocation 
+                            handleInputChange={this.handleInputChange}
+                            tip={this.state.tip}
+                        />
+                    </TipFormContainer>
+                )
+            case 'tipsterKnowsSuspectEmployment':
+                return (
+                    <TipFormContainer title="Suspect Employment" changeStep={this.changeStep}>
+                        <TipFormSuspectEmployment 
+                            handleInputChange={this.handleInputChange}
+                            tip={this.state.tip}
+                        />
+                    </TipFormContainer>
+                )
+            case 'tipsterKnowsSuspectVehicle':
+                return (
+                    <TipFormContainer title="Suspect Vehicle" changeStep={this.changeStep}>
+                        <TipFormSuspectVehicle 
+                            handleInputChange={this.handleInputChange}
+                            tip={this.state.tip}
+                        />
+                    </TipFormContainer>
+                )
+            case 'tipsterKnowsAboutDrugs':
+                return (
+                    <TipFormContainer title="Drugs" changeStep={this.changeStep}>
+                        <TipFormDrugs 
+                            handleInputChange={this.handleInputChange}
+                            tip={this.state.tip}
+                        />
+                    </TipFormContainer>
+                )
+            case 'tipsterHasMedia':
+                return (
+                    <TipFormContainer title="Media Upload" changeStep={this.changeStep}>
+                        <TipFormMedia
+                            handleInputChange={this.handleInputChange}
+                            tip={this.state.tip}
+                        />
+                    </TipFormContainer>
+                )
+            case 'final':
                 return (
                     <TipFormContainer title="Conclusion" changeStep={this.changeStep} showSubmit={true} noNextButton={true}>
                         <TipFormFinal
@@ -194,7 +185,7 @@ class SubmitATip extends Component {
                         />
                     </TipFormContainer>
                 )
-            case 99:
+            case 'success':
                 return (
                     <h3 className="text-center">
                         Thanks! <a onClick={this.resetForm}>Click here</a> to write another tip.
