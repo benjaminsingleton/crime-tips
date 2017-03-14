@@ -11,7 +11,7 @@ const TipFormIntro = (props) => {
                     value={props.tip.crimeType} 
                     defaultValue='default'
                     name="crimeType"
-                    onChange={props.handleInputChange} 
+                    onChange={(e) => {props.handleInputChange(e); props.addToStepContent(e)}}
                 >
                     <option value='default' disabled="disabled">Select a crime type</option>    
                     <option>Murder</option>
@@ -74,7 +74,7 @@ const TipFormIntro = (props) => {
                     type="checkbox"
                     name="tipsterKnowsSuspectDescription"
                     checked={props.tip.tipsterKnowsSuspectDescription} 
-                    onChange={props.handleInputChange} 
+                    onChange={(e) => {props.handleInputChange(e); props.addToStepContent(e)}} 
                 />
             </div>
         </div>
@@ -89,7 +89,7 @@ const TipFormIntro = (props) => {
                     type="checkbox"
                     name="tipsterKnowsSuspectLocation"
                     checked={props.tip.tipsterKnowsSuspectLocation} 
-                    onChange={props.handleInputChange} 
+                    onChange={(e) => {props.handleInputChange(e); props.addToStepContent(e)}} 
                 />
             </div>
         </div>
@@ -104,7 +104,7 @@ const TipFormIntro = (props) => {
                     type="checkbox"
                     name="tipsterKnowsSuspectEmployment"
                     checked={props.tip.tipsterKnowsSuspectEmployment} 
-                    onChange={props.handleInputChange} 
+                    onChange={(e) => {props.handleInputChange(e); props.addToStepContent(e)}} 
                 />
             </div>
         </div>
@@ -120,7 +120,7 @@ const TipFormIntro = (props) => {
                     type="checkbox"
                     name="tipsterKnowsSuspectVehicle"
                     checked={props.tip.tipsterKnowsSuspectVehicle} 
-                    onChange={props.handleInputChange} 
+                    onChange={(e) => {props.handleInputChange(e); props.addToStepContent(e)}} 
                 />
             </div>
         </div>
@@ -135,7 +135,7 @@ const TipFormIntro = (props) => {
                     type="checkbox"
                     name="tipsterHasMedia"
                     checked={props.tip.tipsterHasMedia} 
-                    onChange={props.handleInputChange} 
+                    onChange={(e) => {props.handleInputChange(e); props.addToStepContent(e)}} 
                 />
             </div>
         </div>
