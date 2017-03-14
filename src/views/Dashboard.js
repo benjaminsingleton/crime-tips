@@ -49,8 +49,8 @@ class Dashboard extends Component {
     // Log activity to 'logs' and 'users/uid' for auditing purposes
     const user = this.props.uid;
     const timestamp = Date.now()
-    base.push(`logs/`, {data: {user, key, action: 'read', timestamp}});
-    base.push(`users/${user}/activity/`, {data: {key, action: 'read', timestamp}});
+    base.push(`logs/`, {data: {user, tip: key, action: 'read', timestamp}});
+    base.push(`users/${user}/activity/`, {data: {tip: key, action: 'read', timestamp}});
     
     this.setState({ 
       tips: tips, 
@@ -83,8 +83,8 @@ class Dashboard extends Component {
       const status = !tips[key][criteria]
       tips[key][criteria] = status
 
-      base.push(`logs/`, {data: {user, key, action: criteria, status, timestamp}});
-      base.push(`users/${user}/activity/`, {data: {key, action: criteria, status, timestamp}});
+      base.push(`logs/`, {data: {user, tip: key, action: criteria, status, timestamp}});
+      base.push(`users/${user}/activity/`, {data: {tip: key, action: criteria, status, timestamp}});
     };
 
     this.state.selectedItems.map(key => updateItem(criteria, key))
