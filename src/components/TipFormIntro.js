@@ -60,8 +60,8 @@ const TipFormIntro = (props) => {
             </div>
         </div>
         <br />
-        <p>We need to ask you a few more questions to take action based on the information you’ve provided. 
-            Please check any of the following statements so we can prompt you with a few important follow-up questions.
+        <p>We need to ask you a few more questions so we can take action based on the information you’ve provided. 
+            Please check any of the following statements if they are true so we can ask you a few important follow-up questions.
         </p>
         <br />
         <div className="form-group">
