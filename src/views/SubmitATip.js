@@ -3,6 +3,7 @@ import base from '../base'
 import Layout from '../components/Layout'
 import TipFormContainer from '../components/TipFormContainer'
 import TipFormIntro from '../components/TipFormIntro'
+import TipFormIntroPartTwo from '../components/TipFormIntroPartTwo'
 import TipFormSuspectDescription from '../components/TipFormSuspectDescription'
 import TipFormSuspectLocation from '../components/TipFormSuspectLocation'
 import TipFormSuspectEmployment from '../components/TipFormSuspectEmployment'
@@ -22,10 +23,11 @@ class SubmitATip extends Component {
                 tipsterKnowsSuspectLocation: false,
                 tipsterKnowsSuspectEmployment: false,
                 tipsterKnowsSuspectVehicle: false,
+                tipsterKnowsAboutDrugs: false,
                 tipsterHasMedia: false,
             },
             stepIndex: 0,
-            stepContent: ['initial', 'final', 'success'],
+            stepContent: ['initial', 'second', 'final', 'success'],
         }
         this.baseState = this.state
 
@@ -35,6 +37,28 @@ class SubmitATip extends Component {
         this.createTip = this.createTip.bind(this)
         this.resetForm = this.resetForm.bind(this)
         this.changeStep = this.changeStep.bind(this)
+
+        this.handleSelectChange = this.handleSelectChange.bind(this)
+        this.handleTextChange = this.handleTextChange.bind(this)
+        this.handleCheckboxChange = this.handleCheckboxChange.bind(this)
+    }
+
+    handleSelectChange(name, event, index, value) {
+        const tip = {...this.state.tip}
+        tip[name] = value
+        this.setState({ tip })
+    }
+
+    handleTextChange(name, event) {
+        const tip = {...this.state.tip}
+        tip[name] = event.target.value
+        this.setState({ tip })
+    }
+
+    handleCheckboxChange(name, event, isInputChecked) {
+        const tip = {...this.state.tip}
+        tip[name] = isInputChecked
+        this.setState({ tip })
     }
 
     handleInputChange(event) {
@@ -87,25 +111,20 @@ class SubmitATip extends Component {
         this.setState({ stepIndex })
     }
 
-    addToStepContent(event) {
+    addToStepContent(name, event, isInputChecked) {
         const stepContent = this.state.stepContent
-        let step = event.target.name
+        const tip = {...this.state.tip}
 
-        if (step === 'crimeType' && 
-                (event.target.value === 'Drug Sale / Possession' || stepContent.includes('tipsterKnowsAboutDrugs'))) {
-            step = 'tipsterKnowsAboutDrugs'
-        } else if (step === 'crimeType') {
-            return;
-        }
-
-        if (!stepContent.includes(step)) {
-            stepContent.splice(-2, 0, step) // add step in 3rd to last place (behind final, success)
+        if (!stepContent.includes(name)) {
+            stepContent.splice(-2, 0, name) // add step in 3rd to last place (behind final, success)
         } else {
-            var pos = stepContent.indexOf(step);
+            var pos = stepContent.indexOf(name);
             stepContent.splice(pos, 1)
         };
 
-        this.setState({ stepContent })
+        tip[name] = isInputChecked
+
+        this.setState({ stepContent, tip })
     }
 
     getStepContent(stepIndex) {
@@ -116,9 +135,18 @@ class SubmitATip extends Component {
                 return (
                     <TipFormContainer title="Submit a Tip" changeStep={this.changeStep} noPreviousButton={true}>
                         <TipFormIntro 
-                            handleInputChange={this.handleInputChange}
-                            addToStepContent={this.addToStepContent}
+                            handleSelectChange={this.handleSelectChange}
+                            handleTextChange={this.handleTextChange}
                             tip={this.state.tip}
+                        />
+                    </TipFormContainer>
+                )
+            case 'second':
+                return (
+                    <TipFormContainer title="Clarifying Questions" changeStep={this.changeStep}>
+                        <TipFormIntroPartTwo 
+                            tip={this.state.tip}
+                            addToStepContent={this.addToStepContent}
                         />
                     </TipFormContainer>
                 )
@@ -126,7 +154,8 @@ class SubmitATip extends Component {
                 return (
                     <TipFormContainer title="Suspect Description" changeStep={this.changeStep}>
                         <TipFormSuspectDescription 
-                            handleInputChange={this.handleInputChange}
+                            handleSelectChange={this.handleSelectChange}
+                            handleTextChange={this.handleTextChange}
                             tip={this.state.tip}
                         />
                     </TipFormContainer>
@@ -135,7 +164,9 @@ class SubmitATip extends Component {
                 return (
                     <TipFormContainer title="Suspect Location" changeStep={this.changeStep}>
                         <TipFormSuspectLocation 
-                            handleInputChange={this.handleInputChange}
+                            handleSelectChange={this.handleSelectChange}
+                            handleTextChange={this.handleTextChange}
+                            handleCheckboxChange={this.handleCheckboxChange}
                             tip={this.state.tip}
                         />
                     </TipFormContainer>
@@ -144,7 +175,9 @@ class SubmitATip extends Component {
                 return (
                     <TipFormContainer title="Suspect Employment" changeStep={this.changeStep}>
                         <TipFormSuspectEmployment 
-                            handleInputChange={this.handleInputChange}
+                            handleSelectChange={this.handleSelectChange}
+                            handleTextChange={this.handleTextChange}
+                            handleCheckboxChange={this.handleCheckboxChange}
                             tip={this.state.tip}
                         />
                     </TipFormContainer>
@@ -153,7 +186,9 @@ class SubmitATip extends Component {
                 return (
                     <TipFormContainer title="Suspect Vehicle" changeStep={this.changeStep}>
                         <TipFormSuspectVehicle 
-                            handleInputChange={this.handleInputChange}
+                            handleSelectChange={this.handleSelectChange}
+                            handleTextChange={this.handleTextChange}
+                            handleCheckboxChange={this.handleCheckboxChange}
                             tip={this.state.tip}
                         />
                     </TipFormContainer>
@@ -162,7 +197,9 @@ class SubmitATip extends Component {
                 return (
                     <TipFormContainer title="Drugs" changeStep={this.changeStep}>
                         <TipFormDrugs 
-                            handleInputChange={this.handleInputChange}
+                            handleSelectChange={this.handleSelectChange}
+                            handleTextChange={this.handleTextChange}
+                            handleCheckboxChange={this.handleCheckboxChange}
                             tip={this.state.tip}
                         />
                     </TipFormContainer>
@@ -180,7 +217,9 @@ class SubmitATip extends Component {
                 return (
                     <TipFormContainer title="Conclusion" changeStep={this.changeStep} showSubmit={true} noNextButton={true}>
                         <TipFormFinal
-                            handleInputChange={this.handleInputChange}
+                            handleSelectChange={this.handleSelectChange}
+                            handleTextChange={this.handleTextChange}
+                            handleCheckboxChange={this.handleCheckboxChange}
                             tip={this.state.tip}
                         />
                     </TipFormContainer>
@@ -199,21 +238,10 @@ class SubmitATip extends Component {
     render() {
         return (
             <Layout>
-                <div className="row">
-                    <div className="col-md-8 col-md-offset-2 text-center">
-                    <h1 id="headline">Gotham Crime Tips</h1>
-                    <h3 id="headline2">Do you have information about a crime?</h3>
-                    <h4 id="headline3">
-                        Provide it anonymously and receive up to $2000 
-                        for a tip that leads to an arrest and indictment.
-                    </h4>
-                    </div>
-                </div>
-                <div className="wrapper wrapper-content animated fadeInRight">
-                    <div className="row">
-                        <div className="col-xs-12 col-lg-6 col-lg-offset-3">
-                            {this.getStepContent(this.state.stepIndex)}
-                        </div>
+                <div className="appBarBannerAccent"></div>
+                <div className="row" style={{margin: '-260px 2px 30px 2px'}}>
+                    <div className="col-xs-12 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 col-lg-offset-3 col-lg-6">
+                        {this.getStepContent(this.state.stepIndex)}
                     </div>
                 </div>
             </Layout>

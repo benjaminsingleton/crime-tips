@@ -1,151 +1,66 @@
 import React from 'react'
+import {redA200} from 'material-ui/styles/colors';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
+import TextField from 'material-ui/TextField';
 
 const TipFormIntro = (props) => {
     return (
         <div>
-        <div className="form-group">
-            <label className="col-sm-6 control-label">What kind of crime was committed?</label>
-            <div className="col-sm-6">
-                <select 
-                    className="form-control m-b" 
-                    value={props.tip.crimeType} 
-                    defaultValue='default'
-                    name="crimeType"
-                    onChange={(e) => {props.handleInputChange(e); props.addToStepContent(e)}}
+            <div style={{color: redA200, fontSize: '12px'}}>* Required</div>
+            <div className="prompt">What kind of crime was committed?<span className="requiredText">  *</span></div>
+            <div>
+                <SelectField
+                    hintText="Select a crime type"
+                    value={props.tip.crimeType}
+                    onChange={props.handleSelectChange.bind(null, "crimeType")}
+                    >
+                    <MenuItem value="Murder" primaryText="Murder" />
+                    <MenuItem value="Shooting" primaryText="Shooting" />
+                    <MenuItem value="Illegal Gun Possession / Sale" primaryText="Illegal Gun Possession / Sale" />
+                    <MenuItem value="Rape / Sexual Assault" primaryText="Rape / Sexual Assault" />
+                    <MenuItem value="Robbery" primaryText="Robbery" />
+                    <MenuItem value="Assault" primaryText="Assault" />
+                    <MenuItem value="Drug Sale / Possession" primaryText="Drug Sale / Possession" />
+                    <MenuItem value="Human Trafficking / Prostitution" primaryText="Human Trafficking / Prostitution" />
+                    <MenuItem value="Other" primaryText="Other" />
+                </SelectField>
+            </div>
+            <br />
+            <div className="prompt">Please tell us the information you wanted to share.<span className="requiredText">  *</span></div>
+            <div>
+                <TextField
+                hintText="Tip description"
+                multiLine={true}
+                fullWidth={true}
+                value={props.tip.tipText}
+                onChange={props.handleTextChange.bind(null, "tipText")}
+                />
+            </div>
+            <br />
+            <div className="prompt">How are you aware of this crime?<span className="requiredText">  *</span></div>
+            <div>
+                <SelectField
+                hintText="Select a source"
+                value={props.tip.tipsterAwareOfCrimeMethod}
+                onChange={props.handleSelectChange.bind(null, "tipsterAwareOfCrimeMethod")}
                 >
-                    <option value='default' disabled="disabled">Select a crime type</option>    
-                    <option>Murder</option>
-                    <option>Shooting</option>
-                    <option>Illegal Gun Possession / Sale</option>
-                    <option>Rape / Sexual Assault</option>
-                    <option>Robbery</option>
-                    <option>Assault</option>
-                    <option>Drug Sale / Possession</option>
-                    <option>Human Trafficking / Prostitution</option>
-                    <option>Other</option>
-                </select>
+                <MenuItem value="I was a witness" primaryText="I was a witness" />
+                <MenuItem value="It happened to me directly" primaryText="It happened to me directly" />
+                <MenuItem value="Somebody told me about it" primaryText="Somebody told me about it" />
+                <MenuItem value="I overheard a conversation" primaryText="I overheard a conversation" />
+                <MenuItem value="I prefer not to answer" primaryText="I prefer not to answer" />
+                <MenuItem value="Other" primaryText="Other" />
+                </SelectField>
             </div>
-        </div>
-        <br />
-        <p>
-            <strong>Please tell us the information you wanted to share.</strong>
-            <span className="pull-right">
-                <small><a>Click here</a> for an example of a helpful tip.</small>
-            </span>
-        </p>
-        <textarea 
-            className="form-control" 
-            name="tipText"
-            value={props.tip.tipText} 
-            onChange={props.handleInputChange} 
-        />
-        <br />
-        <div className="form-group">
-            <label className="col-sm-6 control-label">How are you aware of this crime?</label>
-            <div className="col-sm-6">
-                <select 
-                    className="form-control m-b" 
-                    value={props.tip.reporterAwareOfCrimeMethod} 
-                    defaultValue='default' 
-                    name="reporterAwareOfCrimeMethod"
-                    onChange={props.handleInputChange} 
-                >
-                    <option value='default' disabled="disabled">Select an option</option>    
-                    <option>I observed it happen</option>
-                    <option>It happened to me directly</option>
-                    <option>Somebody I know told me about it</option>
-                    <option>I overheard a conversation inadvertently</option>
-                    <option>Other</option>
-                </select>
-            </div>
-        </div>
-        <br />
-        <p>We need to ask you a few more questions so we can take action based on the information you’ve provided. 
-            Please check any of the following statements if they are true so we can ask you a few important follow-up questions.
-        </p>
-        <br />
-        <div className="form-group">
-            <label className="col-sm-10 control-label">
-                I know the suspect’s name/nickname or I can provide a description of the suspect.
-            </label>
-            <div className="col-sm-2">
-                <input 
-                    className="form-control"
-                    type="checkbox"
-                    name="tipsterKnowsSuspectDescription"
-                    checked={props.tip.tipsterKnowsSuspectDescription} 
-                    onChange={(e) => {props.handleInputChange(e); props.addToStepContent(e)}} 
-                />
-            </div>
-        </div>
-        <br />
-        <div className="form-group">
-            <label className="col-sm-10 control-label">
-                I know where the suspect lives or hangs out.
-            </label>
-            <div className="col-sm-2">
-                <input 
-                    className="form-control"
-                    type="checkbox"
-                    name="tipsterKnowsSuspectLocation"
-                    checked={props.tip.tipsterKnowsSuspectLocation} 
-                    onChange={(e) => {props.handleInputChange(e); props.addToStepContent(e)}} 
-                />
-            </div>
-        </div>
-        <br />
-        <div className="form-group">
-            <label className="col-sm-10 control-label">
-                I know where the suspect works.
-            </label>
-            <div className="col-sm-2">
-                <input 
-                    className="form-control"
-                    type="checkbox"
-                    name="tipsterKnowsSuspectEmployment"
-                    checked={props.tip.tipsterKnowsSuspectEmployment} 
-                    onChange={(e) => {props.handleInputChange(e); props.addToStepContent(e)}} 
-                />
-            </div>
-        </div>
-        <br />
-        <div className="form-group">
-            <label className="col-sm-10 control-label">
-                I can provide a description of the suspect’s vehicle (or I can provide a 
-                description of the vehicle involved in the crime).
-            </label>
-            <div className="col-sm-2">
-                <input 
-                    className="form-control"
-                    type="checkbox"
-                    name="tipsterKnowsSuspectVehicle"
-                    checked={props.tip.tipsterKnowsSuspectVehicle} 
-                    onChange={(e) => {props.handleInputChange(e); props.addToStepContent(e)}} 
-                />
-            </div>
-        </div>
-        <br />
-        <div className="form-group">
-            <label className="col-sm-10 control-label">
-                I have media (photo / video / screenshot) to upload.
-            </label>
-            <div className="col-sm-2">
-                <input 
-                    className="form-control"
-                    type="checkbox"
-                    name="tipsterHasMedia"
-                    checked={props.tip.tipsterHasMedia} 
-                    onChange={(e) => {props.handleInputChange(e); props.addToStepContent(e)}} 
-                />
-            </div>
-        </div>
-        <br />
+            <br />
         </div>
     );
 }
 
 TipFormIntro.propTypes = {
-    handleInputChange: React.PropTypes.func.isRequired
+    handleSelectChange: React.PropTypes.func.isRequired,
+    handleTextChange: React.PropTypes.func.isRequired
 }
 
 export default TipFormIntro

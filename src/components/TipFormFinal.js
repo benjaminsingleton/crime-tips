@@ -1,74 +1,54 @@
 import React from 'react'
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
+import TextField from 'material-ui/TextField';
+import Checkbox from 'material-ui/Checkbox';
 
 const TipFormFinal = (props) => {
     return (
         <div>
-            <div className="form-group">
-                <label className="col-sm-6 control-label">How did you find out about online crime tips? </label>
-                <div className="col-sm-6">
-                    <select 
-                        className="form-control m-b" 
-                        value={props.tip.tipsterWebsiteDiscoveryMethod} 
-                        defaultValue='default'
-                        name="tipsterWebsiteDiscoveryMethod"
-                        onChange={props.handleInputChange} 
-                    >
-                        <option value='default' disabled="disabled">Select a method</option>  
-                        <option>TV</option>  
-                        <option>Google</option>
-                        <option>Facebook</option>
-                        <option>Twitter</option>
-                        <option>Radio</option>
-                        <option>Newspaper</option>
-                        <option>Word of Mouth</option>
-                        <option>Sign / Billboard</option>
-                        <option>Other</option>
-                    </select>
-                </div>
-            </div>
-            <br/>
-            <div className="form-group">
-                <label className="col-sm-6 control-label">How would you like to be contacted?</label>
-                <div className="col-sm-6">
-                    <div><label>
-                        <input checked="" value="Yes" id="optionsRadios1" name="tipsterWantsToBeContacted" type="radio" /> Yes
-                    </label></div>
-                    <div><label>
-                        <input value="No" id="optionsRadios2" name="tipsterWantsToBeContacted" type="radio" /> No
-                        </label></div>
-                </div>
-            </div>
-            <br />
-            <div className="form-group">
-                <label className="col-sm-6 control-label">How would you like to be contacted?</label>
-                <div className="col-sm-6">
-                    <select 
-                        className="form-control m-b" 
-                        value={props.tip.tipsterContactMethod} 
-                        defaultValue='default'
-                        name="tipsterContactMethod"
-                        onChange={props.handleInputChange} 
-                    >
-                        <option value='default' disabled="disabled">Select a method</option>  
-                        <option>Phone</option>  
-                        <option>Email</option>
-                        <option>Other</option>
-                    </select>
-                </div>
-            </div>
-            <div className="form-group">
-                <label className="col-sm-6 control-label">Please provide contact information.</label>
-                <div className="col-sm-6">
-                    <input 
-                        className="form-control" 
-                        name="tipsterContactDetails"
-                        placeholder="Email / Phone / Other"
-                        value={props.tip.tipsterContactDetails} 
-                        onChange={props.handleInputChange} 
-                    />
-                </div>
+        <div className="prompt">How did you find out about online crime tips?</div>
+        <div>
+            <SelectField
+                hintText="Select an option"
+                value={props.tip.tipsterWebsiteDiscoveryMethod}
+                onChange={props.handleSelectChange.bind(null, "tipsterWebsiteDiscoveryMethod")}
+            >
+                <MenuItem value="TV" primaryText="TV" />
+                <MenuItem value="Google" primaryText="Google" />
+                <MenuItem value="Facebook" primaryText="Facebook" />
+                <MenuItem value="Twitter" primaryText="Twitter" />
+                <MenuItem value="Radio" primaryText="Radio" />
+                <MenuItem value="Newspaper" primaryText="Newspaper" />
+                <MenuItem value="Word of Mouth" primaryText="Word of Mouth" />
+                <MenuItem value="Sign / Billboard" primaryText="Sign / Billboard" />
+                <MenuItem value="Other" primaryText="Other" />
+            </SelectField>
+        </div>
+        <br />
+        <div>
+            <Checkbox
+            label="I want to be contacted by the police."
+            style={{marginTop: '16px'}}
+            checked={props.tip.tipsterWantsToBeContacted}
+            onCheck={props.handleCheckboxChange.bind(null, "tipsterWantsToBeContacted")}
+            />
+        </div>
+        <br />
+        { !props.tip.tipsterWantsToBeContacted ? null : 
+            <div>
+            <div className="prompt">Please provide contact details.</div>
+            <div>
+                <TextField
+                    hintText="Contact information"
+                    fullWidth={true}
+                    value={props.tip.tipsterContactDetails}
+                    onChange={props.handleTextChange.bind(null, "tipsterContactDetails")}
+                />
             </div>
             <br />
+            </div>
+        }
         </div>
     );
 }
