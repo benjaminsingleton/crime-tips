@@ -6,9 +6,9 @@ const Navigation = (props) => {
 
     return (
         <AppBar 
-            title="Gotham Police Crime Tips" 
-            iconElementRight={<FlatButton label="Log Out" href="log_out" />} 
-            zDepth={0} 
+            title="Gotham Police Crime Tips"
+            iconElementRight={props.uid ? <FlatButton label="Log Out" href="log_out" /> : null} 
+            zDepth={0}
         />
     );
 }

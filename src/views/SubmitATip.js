@@ -133,17 +133,22 @@ class SubmitATip extends Component {
         switch (contentToDisplay) {
             case 'initial':
                 return (
-                    <TipFormContainer title="Submit a Tip" changeStep={this.changeStep} noPreviousButton={true}>
+                    <TipFormContainer title="Submit a Tip" 
+                        changeStep={this.changeStep} 
+                        noPreviousButton={true} 
+                        noOptionalMsg={true}
+                    >
                         <TipFormIntro 
                             handleSelectChange={this.handleSelectChange}
                             handleTextChange={this.handleTextChange}
                             tip={this.state.tip}
+                            noOptionalMsg={true}
                         />
                     </TipFormContainer>
                 )
             case 'second':
                 return (
-                    <TipFormContainer title="Clarifying Questions" changeStep={this.changeStep}>
+                    <TipFormContainer title="Clarifying Questions" changeStep={this.changeStep} noOptionalMsg={true}>
                         <TipFormIntroPartTwo 
                             tip={this.state.tip}
                             addToStepContent={this.addToStepContent}
