@@ -12,23 +12,20 @@ class ProtectedView extends Component {
             email: '',
             password: '',
         }
-        this.handleInputChange = this.handleInputChange.bind(this);
+        this.handleTextChange = this.handleTextChange.bind(this);
         this.authenticate = this.authenticate.bind(this)
         this.authHandler = this.authHandler.bind(this)
         this.logout = this.logout.bind(this)
     }
 
-    handleInputChange(event) {
-        const target = event.target;
-        const value = target.value;
-        const name = target.name;
-
+    handleTextChange(name, event) {
         this.setState({
-            [name]: value
+            [name]: event.target.value
         });
     }
 
     authenticate(e) {
+        console.log('authenticating')
         e.preventDefault();
 
         base.authWithPassword({
@@ -40,12 +37,16 @@ class ProtectedView extends Component {
     }
 
     authHandler(err, authData) {
+        console.log('auth handler')
         if (err) {
+            console.log('theres an error')
             console.error(err)
-            // TODO render message
             return;
         }
+        console.log('success')
+        console.log(authData.uid)
         this.setState({ uid: authData.uid })
+        console.log('state set')
         browserHistory.push('/admin')
     }
 
@@ -61,7 +62,7 @@ class ProtectedView extends Component {
                 email={this.state.email}
                 password={this.state.password} 
                 authenticate={this.authenticate}
-                handleInputChange={this.handleInputChange}
+                handleTextChange={this.handleTextChange}
             />
         )
     }

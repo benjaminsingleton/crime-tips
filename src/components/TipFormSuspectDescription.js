@@ -1,5 +1,4 @@
 import React from 'react'
-import {gray500} from 'material-ui/styles/colors';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import TextField from 'material-ui/TextField';
@@ -8,10 +7,6 @@ import DatePicker from 'material-ui/DatePicker';
 const TipFormSuspectDescription = (props) => {
     return (
         <div>
-            <div style={{color: gray500, fontSize: '12px'}}>
-                All of our questions are optional so feel free to skip any questions you can’t answer. 
-                That said, the more details you can provide, the better we can do our job.
-            </div>
             <div className="prompt">What is the suspect's government name?</div>
             <div>
                 <TextField
@@ -20,7 +15,7 @@ const TipFormSuspectDescription = (props) => {
                     value={props.tip.suspectFullName}
                     onChange={props.handleTextChange.bind(null, "suspectFullName")}
                 />
-                </div>
+            </div>
             <br />
             <div className="prompt">If the suspect has a nickname, provide it here:</div>
             <div>

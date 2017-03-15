@@ -1,5 +1,4 @@
 import React from 'react'
-import {gray500} from 'material-ui/styles/colors';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import TextField from 'material-ui/TextField';
@@ -10,10 +9,6 @@ import usStates from '../helpers/state_data'
 const TipFormSuspectLocation = (props) => {
     return (
         <div>
-            <div style={{color: gray500, fontSize: '12px'}}>
-                All of our questions are optional so feel free to skip any questions you can’t answer. 
-                That said, the more details you can provide, the better we can do our job.
-            </div>
             <div className="prompt">Where does the suspect hang out?</div>
             <div>
                 <TextField
