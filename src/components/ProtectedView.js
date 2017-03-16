@@ -25,7 +25,6 @@ class ProtectedView extends Component {
     }
 
     authenticate(e) {
-        console.log('authenticating')
         e.preventDefault();
 
         base.authWithPassword({
@@ -37,16 +36,11 @@ class ProtectedView extends Component {
     }
 
     authHandler(err, authData) {
-        console.log('auth handler')
         if (err) {
-            console.log('theres an error')
             console.error(err)
             return;
         }
-        console.log('success')
-        console.log(authData.uid)
-        this.setState({ uid: authData.uid })
-        console.log('state set')
+        this.setState({ uid: authData.uid})
         browserHistory.push('/admin')
     }
 
