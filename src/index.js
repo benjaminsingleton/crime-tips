@@ -35,8 +35,8 @@ ReactDOM.render(
 			<Route path="login" component={Login} />
 			<Route path="admin" component={Dashboard} />
 			<Route path="settings" component={UserSettings} />
+			<Route path="logout" component={LoggedOut} />
 		</Route>
-		<Route path="logout" component={LoggedOut} />
 		<Route path="forgot_password" component={ForgotPassword} />
 		<Route path="*" component={NoMatch} />
   	</Router>
