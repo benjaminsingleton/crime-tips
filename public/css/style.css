@@ -31,6 +31,10 @@ h1 {
     font-size: 18px;
 }
 
+.metric {
+  color: #FF5252;
+  font-size: 24px;
+}
 
 /*#dashboard-metrics {
     padding-bottom: 0px;

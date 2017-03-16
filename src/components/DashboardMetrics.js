@@ -1,4 +1,6 @@
 import React from 'react'
+import {Card, CardTitle, CardText} from 'material-ui/Card';
+
 import { oneDayAgoDate, getMonthAndDay } from '../helpers/helpers'
 
 const DashboardMetrics = (props) => {
@@ -6,62 +8,38 @@ const DashboardMetrics = (props) => {
     const {counts} = props;
 
     return (
-        <div className="wrapper-content animated fadeInRight" id="dashboard-metrics">
-            <div className="row">
-                <div className="col-md-3">
-                    <div className="ibox float-e-margins">
-                        <div className="ibox-title">
-                            <span className="label label-danger pull-right">Now</span>
-                            <h5>Unread Tips</h5>
-                        </div>
-                        <div className="ibox-content">
-                            <h1 className="no-margins">{counts.unreadCount}</h1>
-                            <small>Need to be reviewed</small>
-                        </div>
-                    </div>
-                </div>
-                <div className="col-md-3">
-                    <div className="ibox float-e-margins">
-                        <div className="ibox-title">
-                            <span className="label label-primary pull-right">24 Hrs</span>
-                            <h5>Tips Received - 24 Hrs</h5>
-                        </div>
-                        <div className="ibox-content">
-                            <h1 className="no-margins">{counts.lastTwentyFourHourTipCount}</h1>
-                            <div className="stat-percent font-bold text-danger">X% <i className="fa fa-level-down"></i>
-                            </div>
-                            <small>Since { getMonthAndDay(oneDayAgoDate()) }</small>
-                        </div>
-                    </div>
-                </div>
-                <div className="col-md-3">
-                    <div className="ibox float-e-margins">
-                        <div className="ibox-title">
-                            <span className="label label-success pull-right">YTD</span>
-                            <h5>Tips Received - YTD</h5>
-                        </div>
-                        <div className="ibox-content">
-                            <h1 className="no-margins">{counts.thisYearTipCount}</h1>
-                            <div className="stat-percent font-bold text-info">X% <i className="fa fa-level-up"></i>
-                            </div>
-                            <small>Since January 1</small>
-                        </div>
-                    </div>
-                </div>
-                <div className="col-md-3">
-                    <div className="ibox float-e-margins">
-                        <div className="ibox-title">
-                            <span className="label label-success pull-right">YTD</span>
-                            <h5>Abandoned Tips - YTD</h5>
-                        </div>
-                        <div className="ibox-content">
-                            <h1 className="no-margins">XX</h1>
-                            <div className="stat-percent font-bold text-info">X% <i className="fa fa-level-up"></i>
-                            </div>
-                            <small>Never completed</small>
-                        </div>
-                    </div>
-                </div>
+        <div className="row" style={{margin: '10px 2px 8px 2px'}}>
+            <div className="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+                <Card>
+                    <CardTitle title="Unread Tips" />
+                    <CardText>
+                        <div className="metric">{counts.unreadCount}</div>
+                    </CardText>
+                </Card>
+            </div>
+            <div className="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+                <Card>
+                    <CardTitle title="Tips Received - 24hrs" />
+                    <CardText>
+                        <div className="metric">{counts.lastTwentyFourHourTipCount}</div>
+                    </CardText>
+                </Card>
+            </div>
+            <div className="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+                <Card>
+                    <CardTitle title="Tips Received - YTD" />
+                    <CardText>
+                        <div className="metric">{counts.thisYearTipCount}</div>
+                    </CardText>
+                </Card>
+            </div>
+            <div className="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+                <Card>
+                    <CardTitle title="Abandoned Tips" />
+                    <CardText>
+                        <div className="metric">XX</div>
+                    </CardText>
+                </Card>
             </div>
         </div>
     );
