@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import base from '../base'
-import { pick } from 'underscore'
+import { pick, isEmpty } from 'underscore'
 
 import Layout from '../components/Layout'
 import DashboardMetrics from '../components/DashboardMetrics'
@@ -14,10 +14,7 @@ class Dashboard extends Component {
     super()
     this.state = {
       tips: {},
-      tipsToDisplayStatus: {
-        'criteria': 'archived',
-        'value': false
-      },
+      tipsToDisplay: {},
       selectedItems: [],
       tipDetail: null,
       mailboxRightPanel: 'mailbox',
@@ -27,6 +24,7 @@ class Dashboard extends Component {
     this.markTipAs = this.markTipAs.bind(this);
     this.filterTips = this.filterTips.bind(this);
     this.openTipLongForm = this.openTipLongForm.bind(this);
+    this.reverseTips = this.reverseTips.bind(this)
   }
 
   componentWillMount () {
@@ -59,16 +57,24 @@ class Dashboard extends Component {
     });
   }
 
-  addSelectedItem(key) {
+  addSelectedItem(selectedRows) {
+    console.log(selectedRows)
     // Adds keys of items checked in mailbox
     const selectedItems = this.state.selectedItems
+    const tipsToDisplay = isEmpty(this.state.tipsToDisplay) ? this.reverseTips(this.state.tips) : this.state.tipsToDisplay
 
-    if (!selectedItems.includes(key)) {
-      selectedItems.push(key)
-    } else {
-      var pos = selectedItems.indexOf(key);
-      selectedItems.splice(pos, 1)
-    };
+    function toggleSelectedItem(index) {
+      const key = Object.keys(tipsToDisplay)[index]
+      console.log(key)
+      if (!selectedItems.includes(key)) {
+        selectedItems.push(key)
+      } else {
+        var pos = selectedItems.indexOf(key);
+        selectedItems.splice(pos, 1)
+      };
+    }
+    
+    selectedRows.map((index) => toggleSelectedItem(index))
 
     this.setState({selectedItems})
   }
@@ -95,14 +101,17 @@ class Dashboard extends Component {
     });
   }
 
+  reverseTips(tipObj) {
+    const tipsToDisplay = {};
+    Object.keys(tipObj).reverse().forEach((key) => tipsToDisplay[key] = tipObj[key])
+    return tipsToDisplay
+  }
+
   filterTips(criteria, value) {
-    this.setState({ 
-      tipsToDisplayStatus: {
-        'criteria': criteria,
-        'value': value
-      },
-      mailboxRightPanel: 'mailbox'
-     });
+    const filteredTips = pick(this.state.tips, key => key[criteria]===value)
+    const tipsToDisplay = this.reverseTips(filteredTips);
+
+    this.setState({ tipsToDisplay, mailboxRightPanel: 'mailbox' })
   }
 
   openTipLongForm() {
@@ -113,11 +122,9 @@ class Dashboard extends Component {
 
   render() {
 
-    const {tips, tipsToDisplayStatus} = this.state;
-    const criteria = tipsToDisplayStatus['criteria']
-    const value = tipsToDisplayStatus['value']
+    const {tips} = this.state;
 
-    const tipsToDisplay = pick(tips, key => key[criteria]===value)
+    const tipsToDisplay = isEmpty(this.state.tipsToDisplay) ? this.reverseTips(tips) : this.state.tipsToDisplay
 
     const counts = {
       unreadCount: Object.keys(tips).filter(key => tips[key].readStatus === 'unread').length,
@@ -128,7 +135,7 @@ class Dashboard extends Component {
     return (
       <Layout uid={this.props.uid} logout={this.props.logout}>
         <DashboardMetrics counts={counts}/>
-        <Mailbox  tips={this.state.tips} 
+        <Mailbox  tips={tips} 
                   tipsToDisplay={tipsToDisplay}
                   unreadCount={counts.unreadCount}  
                   showTipDetail={this.showTipDetail}
