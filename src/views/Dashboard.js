@@ -58,14 +58,12 @@ class Dashboard extends Component {
   }
 
   addSelectedItem(selectedRows) {
-    console.log(selectedRows)
     // Adds keys of items checked in mailbox
     const selectedItems = this.state.selectedItems
     const tipsToDisplay = isEmpty(this.state.tipsToDisplay) ? this.reverseTips(this.state.tips) : this.state.tipsToDisplay
 
     function toggleSelectedItem(index) {
       const key = Object.keys(tipsToDisplay)[index]
-      console.log(key)
       if (!selectedItems.includes(key)) {
         selectedItems.push(key)
       } else {
