@@ -15,7 +15,7 @@ class Dashboard extends Component {
     this.state = {
       tips: {},
       tipsToDisplay: {},
-      selectedItems: [],
+      selectedTipKeys: [],
       tipDetail: null,
       mailboxRightPanel: 'mailbox',
     }
@@ -59,22 +59,12 @@ class Dashboard extends Component {
 
   addSelectedItem(selectedRows) {
     // Adds keys of items checked in mailbox
-    const selectedItems = this.state.selectedItems
     const tipsToDisplay = isEmpty(this.state.tipsToDisplay) ? this.reverseTips(this.state.tips) : this.state.tipsToDisplay
 
-    function toggleSelectedItem(index) {
-      const key = Object.keys(tipsToDisplay)[index]
-      if (!selectedItems.includes(key)) {
-        selectedItems.push(key)
-      } else {
-        var pos = selectedItems.indexOf(key);
-        selectedItems.splice(pos, 1)
-      };
-    }
-    
-    selectedRows.map((index) => toggleSelectedItem(index))
+    const selectedTipKeys = []
+    selectedRows.map((index) => selectedTipKeys.push(Object.keys(tipsToDisplay)[index]))
 
-    this.setState({selectedItems})
+    this.setState({selectedTipKeys})
   }
 
   markTipAs(criteria) {
@@ -91,11 +81,11 @@ class Dashboard extends Component {
       base.push(`users/${user}/activity/`, {data: {tip: key, action: criteria, status, timestamp}});
     };
 
-    this.state.selectedItems.map(key => updateItem(criteria, key))
+    this.state.selectedTipKeys.map(key => updateItem(criteria, key))
 
     this.setState({ 
       tips: tips, 
-      selectedItems: []
+      selectedTipKeys: []
     });
   }
 
@@ -143,7 +133,7 @@ class Dashboard extends Component {
                   filterTips={this.filterTips}
                   mailboxRightPanel={this.state.mailboxRightPanel}
                   openTipLongForm={this.openTipLongForm}
-                  selectedItems={this.state.selectedItems}
+                  selectedTipKeys={this.state.selectedTipKeys}
         />
       </Layout>
     )
