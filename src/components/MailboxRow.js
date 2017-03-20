@@ -1,31 +1,23 @@
 import React from 'react'
 import { tipTimeFormat } from '../helpers/helpers'
+import {TableRow, TableRowColumn} from 'material-ui/Table';
+import ActionGrade from 'material-ui/svg-icons/action/grade';
+import EditorAttachFile from 'material-ui/svg-icons/editor/attach-file';
+
 
 const MailboxRow = (props) => {
 
-    const { details } = props;
+    const { details, index, addSelectedItem, showTipDetail, ...otherProps } = props;
 
     return (
-        <tr className={details.readStatus}>
-            <td className="check-mail">
-                <div className="icheckbox_square-green">
-                    <input type="checkbox" checked={props.checked} onChange={() => props.addSelectedItem(props.index)}/>
-                </div>
-            </td>
-            <td className="mail-status">
-                {details.important ? <i className="fa fa-certificate"></i> : null}
-            </td>
-            <td className="mail-contact">
-                <a onClick={() => props.showTipDetail(props.index)}>{details.crimeType}</a>
-            </td>
-            <td className="mail-subject">
-                <a onClick={() => props.showTipDetail(props.index)}>{details.tipText}</a>
-            </td>
-            <td className="mail-attachment">
-                {details.attachment ? <i className="fa fa-paperclip"></i> : null}
-            </td>
-            <td className="text-right mail-date">{tipTimeFormat(details.dateTime)}</td>
-        </tr> 
+        <TableRow { ...otherProps }>
+            {otherProps.children[0]}
+            <TableRowColumn style={{width: '10%'}}>{details.important ? <ActionGrade /> : null}</TableRowColumn>
+            <TableRowColumn style={{width: '20%'}}>{details.crimeType}</TableRowColumn>
+            <TableRowColumn style={{width: '45%'}}>{details.tipText}</TableRowColumn>
+            <TableRowColumn style={{width: '10%'}}>{details.attachment ? <EditorAttachFile /> : null}</TableRowColumn>
+            <TableRowColumn style={{width: '15%', textAlign: 'right'}}>{tipTimeFormat(details.dateTime)}</TableRowColumn>
+        </TableRow>
     )
 }
 
@@ -37,3 +29,5 @@ MailboxRow.propTypes = {
 }
 
 export default MailboxRow
+
+{/*<input type="checkbox" checked={props.checked} onChange={() => props.addSelectedItem(props.index)}/>*/}

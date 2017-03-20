@@ -39,7 +39,7 @@ const Login = (props) => {
                         </CardText>
                         <CardActions>
                             <RaisedButton type="submit" label="Login" primary={true} />
-                            <Link to="forgot_password"><small>Forgot password?</small></Link>
+                            <Link to="forgot_password" style={{textDecoration:'none', fontSize: '12px'}}>Forgot password?</Link>
                         </CardActions>
                         </form>
                     </Card>

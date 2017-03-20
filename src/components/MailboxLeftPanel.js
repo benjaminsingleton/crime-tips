@@ -1,96 +1,89 @@
 import React from 'react'
+import {Card, CardText} from 'material-ui/Card';
+import RaisedButton from 'material-ui/RaisedButton';
+import {List, ListItem} from 'material-ui/List';
+import ContentInbox from 'material-ui/svg-icons/content/inbox';
+import ActionGrade from 'material-ui/svg-icons/action/grade';
+import ContentDrafts from 'material-ui/svg-icons/content/drafts';
+import ContentArchive from 'material-ui/svg-icons/content/archive';
+import ImageLens from 'material-ui/svg-icons/image/lens';
 
 const MailboxLeftPanel  = (props) => {
     
-    const {unreadCount, filterTips, openTipLongForm } = props;
+    const {filterTips, openTipLongForm } = props;
 
     return (
-        <div className="col-lg-3 animated fadeInRight" id="mailbox-controls">
-            <div className="ibox float-e-margins">
-                <div className="ibox-content mailbox-content">
-                    <div className="file-manager">
-                        <a 
-                            className="btn btn-block btn-primary compose-mail" 
-                            onClick={() => openTipLongForm()}
-                        >
-                            New Tip
-                        </a>
-                        <div className="space-25"></div>
-                        <h5>Folders</h5>
-                        <ul className="folder-list m-b-md">
-                            <li>
-                                <a onClick={() => filterTips('archived', false)}>
-                                    <i className="fa fa-inbox"></i> Tip Inbox 
-                                    <span className="label label-warning pull-right">{ unreadCount }</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a onClick={() => filterTips('important', true)}>
-                                    <i className="fa fa-certificate"></i> Important
-                                </a>
-                            </li>
-                            <li>
-                                <a>
-                                    <i className="fa fa-file-text-o"></i> My Tip Drafts 
-                                    <span className="label label-danger pull-right">2</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a onClick={() => filterTips('archived', true)}><i className="fa fa-archive"></i> Archived</a>
-                            </li>
-                        </ul>
-                        <h5>Categories</h5>
-                        <ul className="category-list">
-                            <li>
-                                <a onClick={() => filterTips('crimeType', 'Murder')}>
-                                    <i className="fa fa-circle text-primary"></i> Murder
-                                </a>
-                            </li>
-                            <li>
-                                <a onClick={() => filterTips('crimeType', 'Shooting')}>
-                                    <i className="fa fa-circle text-success"></i> Shooting
-                                </a>
-                            </li>
-                            <li>
-                                <a onClick={() => filterTips('crimeType', 'Illegal Gun Possession / Sale')}>
-                                    <i className="fa fa-circle text-info"></i> Illegal Gun Possession / Sale
-                                </a>
-                            </li>
-                             <li>
-                                <a onClick={() => filterTips('crimeType', 'Rape / Sexual Assault')}>
-                                    <i className="fa fa-circle text-warning"></i> Rape / Sexual Assault
-                                </a>
-                            </li>
-                            <li>
-                                <a onClick={() => filterTips('crimeType', 'Robbery')}>
-                                    <i className="fa fa-circle text-danger"></i> Robbery
-                                </a>
-                            </li>
-                             <li>
-                                <a onClick={() => filterTips('crimeType', 'Assault')}>
-                                    <i className="fa fa-circle text-navy"></i> Assault
-                                </a>
-                            </li>
-                             <li>
-                                <a onClick={() => filterTips('crimeType', 'Drug Sale / Possession')}>
-                                    <i className="fa fa-circle text-primary"></i> Drug Sale / Possession
-                                </a>
-                            </li>
-                             <li>
-                                <a onClick={() => filterTips('crimeType', 'Human Trafficking / Prostitution')}>
-                                    <i className="fa fa-circle text-success"></i> Human Trafficking / Prostitution
-                                </a>
-                            </li>
-                            <li>
-                                <a onClick={() => filterTips('crimeType', 'Other')}>
-                                    <i className="fa fa-circle text-info"></i> Other
-                                </a>
-                            </li>
-                        </ul>
-                        
-                    </div>
-                </div>
-            </div>
+        <div className="col-xs-12 col-sm-4 col-md-3 col-lg-3">
+            <Card>
+                <CardText>
+                    <RaisedButton label="New Tip" primary={true} fullWidth={true} onClick={() => openTipLongForm()} />
+                    <h4>FOLDERS</h4>
+                    <List>
+                        <ListItem primaryText="Tip Inbox" 
+                            leftIcon={<ContentInbox />} 
+                            onClick={() => filterTips('archived', false)} 
+                            style={{fontSize:'12px;'}} 
+                        />
+                        <ListItem primaryText="Important" 
+                            leftIcon={<ActionGrade />} 
+                            onClick={() => filterTips('important', true)} 
+                            style={{fontSize:'12px;'}} 
+                        />
+                        <ListItem primaryText="My Drafts" 
+                            leftIcon={<ContentDrafts />} 
+                            style={{fontSize:'12px;'}} 
+                        />
+                        <ListItem primaryText="Archived" 
+                            leftIcon={<ContentArchive />} 
+                            onClick={() => filterTips('archived', true)}
+                            style={{fontSize:'12px;'}} 
+                        />
+                    </List>
+                    <h4>CATEGORIES</h4>
+                    <List>
+                        <ListItem primaryText="Murder" 
+                            leftIcon={<ImageLens style={{fill: 'red'}} />} 
+                            onClick={() => filterTips('crimeType', 'Murder')} 
+                            style={{fontSize:'12px;'}} 
+                        />
+                        <ListItem primaryText="Shooting" 
+                            leftIcon={<ImageLens style={{fill: 'DarkBlue'}} />} 
+                            onClick={() => filterTips('crimeType', 'Shooting')} 
+                            style={{fontSize:'12px;'}} 
+                        />
+                        <ListItem primaryText="Illegal Gun Possession / Sale" 
+                            leftIcon={<ImageLens style={{fill: 'DarkOrange'}} />} 
+                            onClick={() => filterTips('crimeType', 'Illegal Gun Possession / Sale')} 
+                            style={{fontSize:'12px;'}} 
+                        />
+                        <ListItem primaryText="Rape / Sexual Assault" 
+                            leftIcon={<ImageLens style={{fill: 'DarkSlateGrey'}} />} 
+                            onClick={() => filterTips('crimeType', 'Rape / Sexual Assault')} 
+                            style={{fontSize:'12px;'}} 
+                        />
+                        <ListItem primaryText="Robbery" 
+                            leftIcon={<ImageLens style={{fill: 'Gold'}} />} 
+                            onClick={() => filterTips('crimeType', 'Robbery')} 
+                            style={{fontSize:'12px;'}} 
+                        />
+                        <ListItem primaryText="Assault" 
+                            leftIcon={<ImageLens style={{fill: 'DodgerBlue'}} />} 
+                            onClick={() => filterTips('crimeType', 'Assault')} 
+                            style={{fontSize:'12px;'}} 
+                        />
+                        <ListItem primaryText="Drug Sale / Possession" 
+                            leftIcon={<ImageLens style={{fill: 'SaddleBrown'}} />} 
+                            onClick={() => filterTips('crimeType', 'Drug Sale / Possession')} 
+                            style={{fontSize:'12px;'}} 
+                        />
+                        <ListItem primaryText="Other" 
+                            leftIcon={<ImageLens style={{fill: 'LimeGreen'}} />} 
+                            onClick={() => filterTips('crimeType', 'Other')} 
+                            style={{fontSize:'12px;'}} 
+                        />
+                    </List>
+                </CardText>
+            </Card>
         </div>
         )
 }

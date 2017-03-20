@@ -32,15 +32,13 @@ class Mailbox extends Component {
 
     render () {
         return (
-            <div className="wrapper wrapper-content" id="mailbox">
-                <div className="row">
-                    <MailboxLeftPanel 
-                        unreadCount={this.props.unreadCount} 
-                        filterTips={this.props.filterTips}
-                        openTipLongForm={this.props.openTipLongForm}
-                    />
-                    { this.renderRightPanel() }
-                </div>
+            <div className="row" style={{margin: '10px 2px 8px 2px'}}>
+                <MailboxLeftPanel 
+                    unreadCount={this.props.unreadCount} 
+                    filterTips={this.props.filterTips}
+                    openTipLongForm={this.props.openTipLongForm}
+                />
+                { this.renderRightPanel() }
             </div>
         )
     }
