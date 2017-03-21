@@ -220,7 +220,12 @@ class SubmitATip extends Component {
                 )
             case 'final':
                 return (
-                    <TipFormContainer title="Conclusion" changeStep={this.changeStep} showSubmit={true} noNextButton={true}>
+                    <TipFormContainer title="Conclusion" 
+                        changeStep={this.changeStep} 
+                        showSubmit={true} 
+                        noNextButton={true}
+                        createTip={this.createTip}
+                    >
                         <TipFormFinal
                             handleSelectChange={this.handleSelectChange}
                             handleTextChange={this.handleTextChange}
