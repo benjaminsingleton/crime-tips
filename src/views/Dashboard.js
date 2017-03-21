@@ -35,9 +35,7 @@ class Dashboard extends Component {
     });
   }
 
-  componentWillUnmount () {
-    base.removeBinding(this.ref);
-  }
+  componentWillUnmount = () => base.removeBinding(this.ref);
 
   showTipDetail(key) {
     // Tip marked as read when clicked
@@ -96,23 +94,25 @@ class Dashboard extends Component {
   }
 
   filterTips(criteria, value) {
-    const filteredTips = pick(this.state.tips, key => key[criteria]===value)
+    let filteredTips
+    if (criteria === 'archived' && value === true) {
+      filteredTips = pick(this.state.tips, key => key['archived']===true)      
+    } else {
+      let notArchivedTips = pick(this.state.tips, key => key['archived']===false)
+      filteredTips = pick(notArchivedTips, key => key[criteria]===value)
+    }
     const tipsToDisplay = this.reverseTips(filteredTips);
 
     this.setState({ tipsToDisplay, mailboxRightPanel: 'mailbox' })
   }
 
-  openTipLongForm() {
-    this.setState({ 
-      mailboxRightPanel: 'form'
-     });
-  }
+  openTipLongForm = () => this.setState({mailboxRightPanel: 'form'});
 
   render() {
 
-    const {tips} = this.state;
+    const { tips } = this.state;
 
-    const tipsToDisplay = isEmpty(this.state.tipsToDisplay) ? this.reverseTips(tips) : this.state.tipsToDisplay
+    const tipsToDisplay = isEmpty(this.state.tipsToDisplay) ? this.reverseTips(pick(tips, key => key['archived']===false)) : this.state.tipsToDisplay
 
     const counts = {
       unreadCount: Object.keys(tips).filter(key => tips[key].readStatus === 'unread').length,
