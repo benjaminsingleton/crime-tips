@@ -11,7 +11,10 @@ import ImageLens from 'material-ui/svg-icons/image/lens';
 const MailboxLeftPanel = (props) => {
 
   const {filterTips, openTipLongForm} = props;
-  const style}
+  const style = {
+    fontSize: '14px',
+    lineHeight: '8px'
+  }
 
   return (  <div className="col-xs-12 col-sm-4 col-md-3 col-lg-3">
       <Card>
@@ -25,23 +28,23 @@ const MailboxLeftPanel = (props) => {
           <List>
             <ListItem
               primaryText="Tip Inbox"
-              leftIcon={< ContentInbox />}
+              leftIcon={<ContentInbox />}
               onClick={() => filterTips('archived', false)}
               style={style}/>
             <ListItem
               primaryText="Important"
-              leftIcon={< ActionGrade />}
+              leftIcon={<ActionGrade />}
               onClick={() => filterTips('important', true)}
               style={style}
             />
             <ListItem
               primaryText="My Drafts"
-              leftIcon={< ContentDrafts />}
+              leftIcon={<ContentDrafts />}
               style={style}
             />
             <ListItem
               primaryText="Archived"
-              leftIcon={< ContentArchive />}
+              leftIcon={<ContentArchive />}
               onClick={() => filterTips('archived', true)}
               style={style}
             />
@@ -50,50 +53,62 @@ const MailboxLeftPanel = (props) => {
           <List>
             <ListItem
               primaryText="Murder"
-              leftIcon={< ImageLens style={{fill: 'red'}}/>}
+              leftIcon={<ImageLens style={{fill: 'red', height: '16px'}}/>}
               onClick={() => filterTips('crimeType', 'Murder')}
               style={style}
             />
             <ListItem
               primaryText="Shooting"
-              leftIcon={< ImageLens style={{fill: 'DarkBlue'}}/>}
+              leftIcon={<ImageLens style={{fill: 'DarkBlue', height: '16px'}}/>}
               onClick={() => filterTips('crimeType', 'Shooting')}
               style={style}
             />
             <ListItem
               primaryText="Illegal Gun Possession / Sale"
-              leftIcon={< ImageLens style={{fill: 'DarkOrange'}}/>}
+              leftIcon={<ImageLens style={{fill: 'DarkOrange', height: '16px'}}/>}
               onClick={() => filterTips('crimeType', 'Illegal Gun Possession / Sale')}
               style={style}
             />
             <ListItem
               primaryText="Rape / Sexual Assault"
-              leftIcon={< ImageLens style={{fill: 'DarkSlateGrey'}}/>}
+              leftIcon={<ImageLens style={{fill: 'DarkSlateGrey', height: '16px'}}/>}
               onClick={() => filterTips('crimeType', 'Rape / Sexual Assault')}
               style={style}
             />
             <ListItem
               primaryText="Robbery"
-              leftIcon={< ImageLens style={{fill: 'Gold'}}/>}
+              leftIcon={<ImageLens style={{fill: 'Gold', height: '16px'}}/>}
               onClick={() => filterTips('crimeType', 'Robbery')}
               style={style}
             />
             <ListItem
               primaryText="Assault"
-              leftIcon={< ImageLens style={{fill: 'DodgerBlue'}}/>}
+              leftIcon={<ImageLens style={{fill: 'DodgerBlue', height: '16px'}}/>}
               onClick={() => filterTips('crimeType', 'Assault')}
               style={style}
             />
             <ListItem
               primaryText="Drug Sale / Possession"
-              leftIcon={< ImageLens style={{fill: 'SaddleBrown'}}/>}
+              leftIcon={<ImageLens style={{fill: 'SaddleBrown', height: '16px'}}/>}
               onClick={() => filterTips('crimeType', 'Drug Sale / Possession')}
               style={style}
             />
             <ListItem
               primaryText="Other"
-              leftIcon={< ImageLens style={{fill: 'LimeGreen'}}/>}
+              leftIcon={<ImageLens style={{fill: 'LimeGreen', height: '16px'}}/>}
               onClick={() => filterTips('crimeType', 'Other')}
+              style={style}
+            />
+            <ListItem
+              primaryText="Other"
+              leftIcon={<ImageLens style={{fill: 'LimeGreen', height: '16px'}}/>}
+              onClick={() => filterTips('crimeType', 'Other2')}
+              style={style}
+            />
+            <ListItem
+              primaryText="Other"
+              leftIcon={<ImageLens style={{fill: 'LimeGreen', height: '16px'}}/>}
+              onClick={() => filterTips('crimeType', 'Other3')}
               style={style}
             />
           </List>
