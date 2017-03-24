@@ -22,7 +22,7 @@ class Mailbox extends Component {
       case 'detail':
         return <TipDetail details={this.props.tipDetail} />
       case 'form':
-        return <TipLongForm />
+        return <TipLongForm uid={this.props.uid} />
       default:
         console.error('Invalid Right Panel', 'mailBoxRightPanel must be mailbox, detail or form')
     }

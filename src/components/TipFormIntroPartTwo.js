@@ -60,4 +60,8 @@ const TipFormIntroPartTwo = (props) => {
     );
 }
 
+TipFormIntroPartTwo.propTypes = {
+  addToStepContent: React.PropTypes.func.isRequired
+}
+
 export default TipFormIntroPartTwo

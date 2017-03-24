@@ -53,4 +53,10 @@ const TipFormFinal = (props) => {
     );
 }
 
+TipFormFinal.propTypes = {
+  handleTextChange: React.PropTypes.func.isRequired,
+  handleSelectChange: React.PropTypes.func.isRequired,
+  handleCheckboxChange: React.PropTypes.func.isRequired
+}
+
 export default TipFormFinal

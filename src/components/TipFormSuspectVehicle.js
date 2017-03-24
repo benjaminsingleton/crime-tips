@@ -129,4 +129,10 @@ const TipFormSuspectVehicle = (props) => {
     )
 }
 
+TipFormSuspectVehicle.propTypes = {
+  handleTextChange: React.PropTypes.func.isRequired,
+  handleSelectChange: React.PropTypes.func.isRequired,
+  handleCheckboxChange: React.PropTypes.func.isRequired
+}
+
 export default TipFormSuspectVehicle

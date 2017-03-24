@@ -168,4 +168,10 @@ const TipFormSuspectLocation = (props) => {
     )
 }
 
+TipFormSuspectLocation.propTypes = {
+  handleTextChange: React.PropTypes.func.isRequired,
+  handleSelectChange: React.PropTypes.func.isRequired,
+  handleCheckboxChange: React.PropTypes.func.isRequired
+}
+
 export default TipFormSuspectLocation

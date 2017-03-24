@@ -170,6 +170,7 @@ class Dashboard extends Component {
       <Layout uid={this.props.uid} logout={this.props.logout}>
         <DashboardMetrics counts={counts} />
         <Mailbox
+          uid={this.props.uid}
           tips={tips}
           tipsToDisplay={tipsToDisplay}
           unreadCount={counts.unreadCount}

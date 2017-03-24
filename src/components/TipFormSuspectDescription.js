@@ -164,4 +164,9 @@ const TipFormSuspectDescription = (props) => {
     )
 }
 
+TipFormSuspectDescription.propTypes = {
+  handleTextChange: React.PropTypes.func.isRequired,
+  handleSelectChange: React.PropTypes.func.isRequired,
+}
+
 export default TipFormSuspectDescription
