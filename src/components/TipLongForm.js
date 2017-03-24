@@ -1,5 +1,8 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import base from '../base'
+import {Card, CardHeader, CardText, CardActions} from 'material-ui/Card';
+import RaisedButton from 'material-ui/RaisedButton';
+import Divider from 'material-ui/Divider';
 
 import TipFormIntro from '../components/TipFormIntro'
 import TipFormSuspectDescription from '../components/TipFormSuspectDescription'
@@ -12,223 +15,160 @@ import TipFormFinal from '../components/TipFormFinal'
 
 class TipLongForm extends Component {
 
-    constructor () {
-        super()
-        this.state = {
-            tip: {},
-            panelDisplay: {
-                1: true,
-                2: false,
-                3: false,
-                4: false,
-                5: false,
-                6: false,
-                7: false,
-                8: false
-            }
-        }
-
-        this.handleInputChange = this.handleInputChange.bind(this);
-        this.createTip = this.createTip.bind(this)
-        this.togglePanel = this.togglePanel.bind(this)
+  constructor() {
+    super()
+    this.state = {
+      tip: {},
+      panelDisplay: {
+        1: true,
+        2: false,
+        3: false,
+        4: false,
+        5: false,
+        6: false,
+        7: false,
+        8: false
+      }
     }
 
-    handleInputChange(event) {
-        const target = event.target;
-        const value = target.type === 'checkbox' ? target.checked : target.value;
-        const name = target.name;
+    this.handleSelectChange = this.handleSelectChange.bind(this);
+    this.handleTextChange = this.handleTextChange.bind(this);
+    this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
+    this.createTip = this.createTip.bind(this)
+    this.togglePanel = this.togglePanel.bind(this)
+  }
 
-        const tip = {...this.state.tip}
+  handleSelectChange(name, event, index, value) {
+    const tip = {...this.state.tip}
+    tip[name] = value
+    this.setState({tip})
+  }
 
-        tip[name] = value
+  handleTextChange(name, event) {
+    const tip = {...this.state.tip}
+    tip[name] = event.target.value
+    this.setState({tip})
+  }
 
-        this.setState({ tip })
+  handleCheckboxChange(name, event, isInputChecked) {
+    const tip = {...this.state.tip}
+    tip[name] = isInputChecked
+    this.setState({tip})
+  }
+
+  togglePanel(panelNumber) {
+    const panelDisplay = {...this.state.panelDisplay}
+    panelDisplay[panelNumber] = !panelDisplay[panelNumber]
+    this.setState({panelDisplay})
+  }
+
+  createTip(event) {
+    event.preventDefault();
+    var tip = {...this.state.tip}
+
+    const tipDefaultProperties = {
+      timestamp: Date.now(),
+      readStatus: 'unread',
+      attachment: false,
+      type: 'phone',
+      uid: this.props.uid
     }
+    tip = Object.assign(tip, tipDefaultProperties);
+    base.push('tips', {data: tip});
+    this.setState({tip: {}});
+  }
 
-    togglePanel(panelNumber) {
-
-        const panelDisplay = {...this.state.panelDisplay}
-
-        panelDisplay[panelNumber] = !panelDisplay[panelNumber]
-
-        this.setState({ panelDisplay })
-    }
-
-    createTip(event) {
-        event.preventDefault();
-        // create object to store tip data
-        var tip = {...this.state.tip}
-
-        const tipDefaultProperties = {
-            timestamp: Date.now(),
-            readStatus: 'unread',
-            attachment: false,
-        }
-        
-        tip = Object.assign(tip, tipDefaultProperties);
-            
-        // push tip object to firebase
-        base.push('tips', {data: tip});
-        // clear the form and render success
-        this.setState({ 
-            tip: {},
-        });
-    }
-
-    render() {
-        const panelDisplay = {...this.state.panelDisplay}
-        return (
-            <div className="col-lg-9 animated fadeInRight">
-                <div className="mail-box-header">
-                    <div className="pull-right tooltip-demo">
-                        <a className="btn btn-white btn-sm" 
-                            data-toggle="tooltip" 
-                            data-placement="top" 
-                            title="Move to draft folder">
-                            <i className="fa fa-pencil"></i> Draft
-                        </a>
-                        <a className="btn btn-danger btn-sm" 
-                            data-toggle="tooltip" 
-                            data-placement="top" 
-                            title="Discard email">
-                            <i className="fa fa-times"></i> Discard
-                        </a>
-                    </div>
-                    <h2>
-                        New Crime Tip
-                    </h2>
-                </div>
-                <div className="mail-box">
-                    <div className="mail-body">
-                        <div className="panel-body">
-                            <div className="panel-group">
-                                <div className="panel panel-default">
-                                    <div className="panel-heading">
-                                        <h5 className="panel-title">
-                                            <a onClick={() => this.togglePanel(1)}>1. Tip Summary</a>
-                                        </h5>
-                                    </div>
-                                    <div className={"panel-collapse collapse " + (panelDisplay[1] ? "in" : "")}>
-                                        <div className="panel-body">
-                                            <TipFormIntro handleInputChange={this.handleInputChange} tip={this.state.tip} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="panel panel-default">
-                                    <div className="panel-heading">
-                                        <h4 className="panel-title">
-                                            <a onClick={() => this.togglePanel(2)}>2. Suspect Description</a>
-                                        </h4>
-                                    </div>
-                                    <div className={"panel-collapse collapse " + (panelDisplay[2] ? "in" : "")}>
-                                        <div className="panel-body">
-                                            <TipFormSuspectDescription handleInputChange={this.handleInputChange} tip={this.state.tip} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="panel panel-default">
-                                    <div className="panel-heading">
-                                        <h4 className="panel-title">
-                                            <a onClick={() => this.togglePanel(3)}>3. Suspect Location</a>
-                                        </h4>
-                                    </div>
-                                    <div className={"panel-collapse collapse " + (panelDisplay[3] ? "in" : "")}>
-                                        <div className="panel-body">
-                                            <TipFormSuspectLocation handleInputChange={this.handleInputChange} tip={this.state.tip} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="panel panel-default">
-                                    <div className="panel-heading">
-                                        <h4 className="panel-title">
-                                            <a onClick={() => this.togglePanel(4)}>4. Suspect Employment</a>
-                                        </h4>
-                                    </div>
-                                    <div className={"panel-collapse collapse " + (panelDisplay[4] ? "in" : "")}>
-                                        <div className="panel-body">
-                                            <TipFormSuspectEmployment handleInputChange={this.handleInputChange} tip={this.state.tip} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="panel panel-default">
-                                    <div className="panel-heading">
-                                        <h4 className="panel-title">
-                                            <a onClick={() => this.togglePanel(5)}>5. Suspect Vehicle</a>
-                                        </h4>
-                                    </div>
-                                    <div className={"panel-collapse collapse " + (panelDisplay[5] ? "in" : "")}>
-                                        <div className="panel-body">
-                                            <TipFormSuspectVehicle handleInputChange={this.handleInputChange} tip={this.state.tip} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="panel panel-default">
-                                    <div className="panel-heading">
-                                        <h4 className="panel-title">
-                                            <a onClick={() => this.togglePanel(6)}>6. Drugs</a>
-                                        </h4>
-                                    </div>
-                                    <div className={"panel-collapse collapse " + (panelDisplay[6] ? "in" : "")}>
-                                        <div className="panel-body">
-                                            <TipFormDrugs handleInputChange={this.handleInputChange} tip={this.state.tip} />
-                                        </div>
-                                    </div>
-                                </div>
-                                 <div className="panel panel-default">
-                                    <div className="panel-heading">
-                                        <h4 className="panel-title">
-                                            <a onClick={() => this.togglePanel(7)}>7. Media</a>
-                                        </h4>
-                                    </div>
-                                    <div className={"panel-collapse collapse " + (panelDisplay[7] ? "in" : "")}>
-                                        <div className="panel-body">
-                                            <TipFormMedia handleInputChange={this.handleInputChange} tip={this.state.tip} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="panel panel-default">
-                                    <div className="panel-heading">
-                                        <h4 className="panel-title">
-                                            <a onClick={() => this.togglePanel(8)}>8. Conclusion</a>
-                                        </h4>
-                                    </div>
-                                    <div className={"panel-collapse collapse " + (panelDisplay[8] ? "in" : "")}>
-                                        <div className="panel-body">
-                                            <TipFormFinal handleInputChange={this.handleInputChange} tip={this.state.tip} />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="mail-body text-right tooltip-demo">
-                        <a 
-                            className="btn btn-white btn-sm" 
-                            data-toggle="tooltip" 
-                            data-placement="top" 
-                            title="Discard tips">
-                            <i className="fa fa-times"></i> Discard
-                        </a>
-                        <a 
-                            className="btn btn-white btn-sm" 
-                            data-toggle="tooltip" 
-                            data-placement="top" 
-                            title="Move to draft folder">
-                            <i className="fa fa-pencil"></i> Draft
-                        </a>
-                        <a 
-                            className="btn btn-sm btn-primary" 
-                            data-toggle="tooltip" 
-                            data-placement="top" 
-                            title="Save">
-                            Save
-                        </a>
-                    </div>
-                    <div className="clearfix"></div>
-                </div>
-            </div>
-        )
-    }
+  render() {
+    return (
+      <div className="col-xs-12 col-sm-8 col-md-9 col-lg-9">
+        <Card>
+          <CardText>
+            <h2>New Crime Tip</h2>
+          </CardText>
+          <Divider />
+          <Card expanded={this.state.panelDisplay[1]} onExpandChange={() => this.togglePanel(1)}>
+            <CardHeader title="1. Tip Summary" actAsExpander={true} showExpandableButton={true} />
+            <CardText expandable={true}>
+              <TipFormIntro 
+                tip={this.state.tip}
+                handleSelectChange={this.handleSelectChange} 
+                handleTextChange={this.handleTextChange} />
+            </CardText>
+          </Card>
+          <Card expanded={this.state.panelDisplay[2]} onExpandChange={() => this.togglePanel(2)}>
+            <CardHeader title="2. Suspect Description" actAsExpander={true} showExpandableButton={true} />
+            <CardText expandable={true}>
+              <TipFormSuspectDescription 
+                tip={this.state.tip}
+                handleSelectChange={this.handleSelectChange} 
+                handleTextChange={this.handleTextChange} />
+            </CardText>
+          </Card>
+          <Card expanded={this.state.panelDisplay[3]} onExpandChange={() => this.togglePanel(3)}>
+            <CardHeader title="3. Suspect Location" actAsExpander={true} showExpandableButton={true} />
+            <CardText expandable={true}>
+              <TipFormSuspectLocation 
+                tip={this.state.tip}
+                handleSelectChange={this.handleSelectChange} 
+                handleTextChange={this.handleTextChange} 
+                handleCheckboxChange={this.handleCheckboxChange} />
+            </CardText>
+          </Card>
+          <Card expanded={this.state.panelDisplay[4]} onExpandChange={() => this.togglePanel(4)}>
+            <CardHeader title="4. Suspect Employment" actAsExpander={true} showExpandableButton={true} />
+            <CardText expandable={true}>
+              <TipFormSuspectEmployment 
+                tip={this.state.tip}
+                handleSelectChange={this.handleSelectChange}
+                handleTextChange={this.handleTextChange} 
+                handleCheckboxChange={this.handleCheckboxChange} />
+            </CardText>
+          </Card>
+          <Card expanded={this.state.panelDisplay[5]} onExpandChange={() => this.togglePanel(5)}>
+            <CardHeader title="5. Suspect Vehicle" actAsExpander={true} showExpandableButton={true} />
+            <CardText expandable={true}>
+              <TipFormSuspectVehicle
+                tip={this.state.tip}
+                handleSelectChange={this.handleSelectChange} 
+                handleTextChange={this.handleTextChange} 
+                handleCheckboxChange={this.handleCheckboxChange} />
+            </CardText>
+          </Card>
+          <Card expanded={this.state.panelDisplay[6]} onExpandChange={() => this.togglePanel(6)}>
+            <CardHeader title="6. Drugs" actAsExpander={true} showExpandableButton={true} />
+            <CardText expandable={true}>
+              <TipFormDrugs
+                tip={this.state.tip}
+                handleSelectChange={this.handleSelectChange} 
+                handleTextChange={this.handleTextChange} 
+                handleCheckboxChange={this.handleCheckboxChange} />
+            </CardText>
+          </Card>
+          <Card expanded={this.state.panelDisplay[7]} onExpandChange={() => this.togglePanel(7)}>
+            <CardHeader title="7. Media" actAsExpander={true} showExpandableButton={true} />
+            <CardText expandable={true}>
+              <TipFormMedia tip={this.state.tip} />
+            </CardText>
+          </Card>
+          <Card expanded={this.state.panelDisplay[8]} onExpandChange={() => this.togglePanel(8)}>
+            <CardHeader title="8. Conclusion" actAsExpander={true} showExpandableButton={true} />
+            <CardText expandable={true}>
+              <TipFormFinal
+                tip={this.state.tip}
+                handleSelectChange={this.handleSelectChange} 
+                handleTextChange={this.handleTextChange} 
+                handleCheckboxChange={this.handleCheckboxChange} />
+            </CardText>
+          </Card>
+          <CardActions style={{textAlign: 'right'}}>
+            <RaisedButton label="Discard" default={true}/>
+            <RaisedButton label="Draft" default={true}/>
+            <RaisedButton label="Save" default={true}/>
+          </CardActions>
+        </Card>
+      </div>
+    )
+  }
 }
 
 export default TipLongForm

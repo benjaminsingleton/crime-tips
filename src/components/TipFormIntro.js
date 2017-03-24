@@ -59,8 +59,8 @@ const TipFormIntro = (props) => {
 }
 
 TipFormIntro.propTypes = {
-    handleSelectChange: React.PropTypes.func.isRequired,
-    handleTextChange: React.PropTypes.func.isRequired
+  handleSelectChange: React.PropTypes.func.isRequired,
+  handleTextChange: React.PropTypes.func.isRequired
 }
 
 export default TipFormIntro

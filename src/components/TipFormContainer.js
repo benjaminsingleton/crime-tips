@@ -14,16 +14,12 @@ const TipFormContainer = (props) => {
       <CardText>
         {props.noOptionalMsg
           ? null
-          : <div
-            style={{
-            color: 'rgba(0,0,0,0.541176)',
-            fontSize: '14px',
-            marginBottom: '24px'
-          }}>
-            All of our questions are
-            <b>optional</b>
-            so feel free to skip any questions you can’t answer.
-          </div>
+          : <p style={{
+              color: 'rgba(0,0,0,0.541176)',
+              fontSize: '14px',
+              marginBottom: '24px'}}>
+            All of our questions are <b>optional</b> so feel free to skip any questions you can’t answer.
+          </p>
         }
         {props.children}
       </CardText>

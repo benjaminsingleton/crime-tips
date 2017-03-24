@@ -83,4 +83,10 @@ const TipFormSuspectEmployment = (props) => {
     );
 }
 
+TipFormSuspectEmployment.propTypes = {
+  handleTextChange: React.PropTypes.func.isRequired,
+  handleSelectChange: React.PropTypes.func.isRequired,
+  handleCheckboxChange: React.PropTypes.func.isRequired
+}
+
 export default TipFormSuspectEmployment
