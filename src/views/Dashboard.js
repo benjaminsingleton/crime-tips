@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import base from '../base'
-import {pick, isEmpty} from 'underscore'
+import _ from 'underscore'
 
 import Layout from '../components/Layout'
 import DashboardMetrics from '../components/DashboardMetrics'
@@ -13,7 +13,7 @@ class Dashboard extends Component {
     super()
     this.state = {
       tips: {},
-      tipsToDisplay: {},
+      tipsToDisplay: null,
       selectedTipKeys: [],
       tipDetail: null,
       mailboxRightPanel: 'mailbox'
@@ -67,7 +67,7 @@ class Dashboard extends Component {
 
   addSelectedItem(selectedRows) {
     // Adds keys of items checked in mailbox
-    const tipsToDisplay = isEmpty(this.state.tipsToDisplay)
+    const tipsToDisplay = _.isEmpty(this.state.tipsToDisplay)
       ? this.reverseTips(this.state.tips)
       : this.state.tipsToDisplay
 
@@ -120,10 +120,10 @@ class Dashboard extends Component {
   filterTips(criteria, value) {
     let filteredTips
     if (criteria === 'archived' && value === true) {
-      filteredTips = pick(this.state.tips, key => key['archived'] === true)
+      filteredTips = _.pick(this.state.tips, key => key['archived'] === true)
     } else {
-      let notArchivedTips = pick(this.state.tips, key => key['archived'] === false)
-      filteredTips = pick(notArchivedTips, key => key[criteria] === value)
+      let notArchivedTips = _.pick(this.state.tips, key => key['archived'] === false)
+      filteredTips = _.pick(notArchivedTips, key => key[criteria] === value)
     }
     const tipsToDisplay = this.reverseTips(filteredTips);
 
@@ -137,10 +137,12 @@ class Dashboard extends Component {
       this.setState({tipsToDisplay: null})
     } else {
       const tips = {...this.state.tips}
-      const matches = Object.keys(tips).filter(key => tips[key].tipText.indexOf(term) !== -1)
+      const matches = Object.keys(tips).filter(key => tips[key].tipText.toLowerCase().indexOf(term.toLowerCase()) !== -1)
+      console.log('matches', matches)
       
       const tipsToDisplay = {}
       matches.reverse().forEach((key) => tipsToDisplay[key] = tips[key])
+      console.log('display', tipsToDisplay)
 
       this.setState({tipsToDisplay})
     }
@@ -150,8 +152,8 @@ class Dashboard extends Component {
 
     const {tips} = this.state;
 
-    const tipsToDisplay = isEmpty(this.state.tipsToDisplay)
-      ? this.reverseTips(pick(tips, key => key['archived'] === false))
+    const tipsToDisplay = _.isNull(this.state.tipsToDisplay)
+      ? this.reverseTips(_.pick(tips, key => key['archived'] === false))
       : this.state.tipsToDisplay
 
     const counts = {
@@ -159,6 +161,8 @@ class Dashboard extends Component {
       lastTwentyFourHourTipCount: Object.keys(tips).filter(key => tips[key].dateTime >= oneDayAgoTimestamp()).length,
       thisYearTipCount: Object.keys(tips).filter(key => tips[key].dateTime >= firstOfThisYearTimestamp()).length
     }
+
+    const tipSearch = _.debounce((term) => { this.tipSearch(term) }, 300);
 
     return (
       <Layout uid={this.props.uid} logout={this.props.logout}>
@@ -175,7 +179,7 @@ class Dashboard extends Component {
           mailboxRightPanel={this.state.mailboxRightPanel}
           openTipLongForm={this.openTipLongForm}
           selectedTipKeys={this.state.selectedTipKeys}
-          tipSearch={this.tipSearch} />
+          tipSearch={tipSearch} />
       </Layout>
     )
   }
