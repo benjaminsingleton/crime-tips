@@ -24,6 +24,7 @@ class Dashboard extends Component {
     this.filterTips = this.filterTips.bind(this);
     this.openTipLongForm = this.openTipLongForm.bind(this);
     this.reverseTips = this.reverseTips.bind(this)
+    this.tipSearch = this.tipSearch.bind(this)
   }
 
   componentWillMount() {
@@ -79,9 +80,7 @@ class Dashboard extends Component {
   markTipAs(criteria) {
     const user = this.props.uid;
     const timestamp = Date.now()
-    const tips = {
-      ...this.state.tips
-    };
+    const tips = {...this.state.tips};
 
     // toggle criteria boolean value and log activity
     function updateItem(criteria, key) {
@@ -133,6 +132,20 @@ class Dashboard extends Component {
 
   openTipLongForm = () => this.setState({mailboxRightPanel: 'form'});
 
+  tipSearch(term) {
+    if (term === '') {
+      this.setState({tipsToDisplay: null})
+    } else {
+      const tips = {...this.state.tips}
+      const matches = Object.keys(tips).filter(key => tips[key].tipText.indexOf(term) !== -1)
+      
+      const tipsToDisplay = {}
+      matches.reverse().forEach((key) => tipsToDisplay[key] = tips[key])
+
+      this.setState({tipsToDisplay})
+    }
+  }
+
   render() {
 
     const {tips} = this.state;
@@ -149,7 +162,7 @@ class Dashboard extends Component {
 
     return (
       <Layout uid={this.props.uid} logout={this.props.logout}>
-        <DashboardMetrics counts={counts}/>
+        <DashboardMetrics counts={counts} />
         <Mailbox
           tips={tips}
           tipsToDisplay={tipsToDisplay}
@@ -161,7 +174,8 @@ class Dashboard extends Component {
           filterTips={this.filterTips}
           mailboxRightPanel={this.state.mailboxRightPanel}
           openTipLongForm={this.openTipLongForm}
-          selectedTipKeys={this.state.selectedTipKeys}/>
+          selectedTipKeys={this.state.selectedTipKeys}
+          tipSearch={this.tipSearch} />
       </Layout>
     )
   }
