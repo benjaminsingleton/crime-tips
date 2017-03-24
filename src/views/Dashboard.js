@@ -16,7 +16,8 @@ class Dashboard extends Component {
       tipsToDisplay: null,
       selectedTipKeys: [],
       tipDetail: null,
-      mailboxRightPanel: 'mailbox'
+      mailboxRightPanel: 'mailbox',
+      searchTerm: ''
     }
     this.showTipDetail = this.showTipDetail.bind(this);
     this.addSelectedItem = this.addSelectedItem.bind(this);
@@ -24,7 +25,7 @@ class Dashboard extends Component {
     this.filterTips = this.filterTips.bind(this);
     this.openTipLongForm = this.openTipLongForm.bind(this);
     this.reverseTips = this.reverseTips.bind(this)
-    this.tipSearch = this.tipSearch.bind(this)
+    this.searchTips = this.searchTips.bind(this)
   }
 
   componentWillMount() {
@@ -118,6 +119,7 @@ class Dashboard extends Component {
   }
 
   filterTips(criteria, value) {
+    console.log(criteria, value)
     let filteredTips
     if (criteria === 'archived' && value === true) {
       filteredTips = _.pick(this.state.tips, key => key['archived'] === true)
@@ -127,24 +129,26 @@ class Dashboard extends Component {
     }
     const tipsToDisplay = this.reverseTips(filteredTips);
 
-    this.setState({tipsToDisplay, mailboxRightPanel: 'mailbox'})
+    this.setState({
+      tipsToDisplay, 
+      mailboxRightPanel: 'mailbox', 
+      searchTerm: ''
+    })
   }
 
   openTipLongForm = () => this.setState({mailboxRightPanel: 'form'});
 
-  tipSearch(term) {
-    if (term === '') {
-      this.setState({tipsToDisplay: null})
+  searchTips(searchTerm) {
+    if (searchTerm === '') {
+      this.setState({searchTerm: '', tipsToDisplay: null})
     } else {
+      console.log(searchTerm)
       const tips = {...this.state.tips}
-      const matches = Object.keys(tips).filter(key => tips[key].tipText.toLowerCase().indexOf(term.toLowerCase()) !== -1)
-      console.log('matches', matches)
+      const matches = Object.keys(tips).filter(key => tips[key].tipText.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1)
       
       const tipsToDisplay = {}
       matches.reverse().forEach((key) => tipsToDisplay[key] = tips[key])
-      console.log('display', tipsToDisplay)
-
-      this.setState({tipsToDisplay})
+      this.setState({searchTerm, tipsToDisplay})
     }
   }
 
@@ -162,8 +166,6 @@ class Dashboard extends Component {
       thisYearTipCount: Object.keys(tips).filter(key => tips[key].dateTime >= firstOfThisYearTimestamp()).length
     }
 
-    const tipSearch = _.debounce((term) => { this.tipSearch(term) }, 300);
-
     return (
       <Layout uid={this.props.uid} logout={this.props.logout}>
         <DashboardMetrics counts={counts} />
@@ -179,7 +181,8 @@ class Dashboard extends Component {
           mailboxRightPanel={this.state.mailboxRightPanel}
           openTipLongForm={this.openTipLongForm}
           selectedTipKeys={this.state.selectedTipKeys}
-          tipSearch={tipSearch} />
+          searchTips={this.searchTips} 
+          searchTerm={this.state.searchTerm} />
       </Layout>
     )
   }

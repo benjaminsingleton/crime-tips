@@ -16,7 +16,8 @@ class Mailbox extends Component {
             addSelectedItem={this.props.addSelectedItem}
             markTipAs={this.props.markTipAs}
             tipsToDisplay={this.props.tipsToDisplay}
-            tipSearch={this.props.tipSearch} />
+            searchTips={this.props.searchTips}
+            searchTerm={this.props.searchTerm} />
         )
       case 'detail':
         return <TipDetail details={this.props.tipDetail} />
