@@ -35,7 +35,8 @@ class Mailbox extends Component {
         <MailboxLeftPanel
           unreadCount={this.props.unreadCount}
           filterTips={this.props.filterTips}
-          openTipLongForm={this.props.openTipLongForm}/> {this.renderRightPanel()}
+          openTipLongForm={this.props.openTipLongForm}/> 
+        {this.renderRightPanel()}
       </div>
     )
   }
