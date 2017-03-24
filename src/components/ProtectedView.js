@@ -8,7 +8,7 @@ class ProtectedView extends Component {
   constructor() {
     super();
     this.state = {
-      uid: null,
+      uid: sessionStorage.getItem('uid') || null,
       email: '',
       password: ''
     }
@@ -36,13 +36,17 @@ class ProtectedView extends Component {
       console.error(err)
       return;
     }
+    console.log(authData.uid)
+    sessionStorage.setItem('uid', authData.uid);
     this.setState({uid: authData.uid})
     browserHistory.push('/admin')
   }
 
   logout() {
-    base.unauth();
+    sessionStorage.removeItem('uid');
     this.setState({uid: null})
+    console.log('logged out')
+    base.unauth();
     browserHistory.push('/logout')
   }
 

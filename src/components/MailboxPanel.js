@@ -18,7 +18,7 @@ import {tipTimeFormat} from '../helpers/helpers'
 
 const MailboxPanel = (props) => {
 
-  const {markTipAs, addSelectedItem, tipsToDisplay, searchTerm, searchTips} = this.props;
+  const {markTipAs, addSelectedItem, tipsToDisplay, searchTerm, searchTips} = props;
 
   return (
     <div className="col-xs-12 col-sm-8 col-md-9 col-lg-9">

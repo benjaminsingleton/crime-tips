@@ -22,7 +22,7 @@ class Navigation extends Component {
       <div>
         <AppBar
           title="Gotham Police Crime Tips"
-          iconElementRight={this.props.uid ? <FlatButton label="Log Out" href="logout"/> : null}
+          iconElementRight={this.props.uid ? <FlatButton label="Log Out" onClick={this.props.logout}/> : null}
           onLeftIconButtonTouchTap={this.handleToggle}
           zDepth={0}/>
         <Drawer
