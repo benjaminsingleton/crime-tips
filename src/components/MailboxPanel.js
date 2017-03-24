@@ -18,7 +18,7 @@ import {tipTimeFormat} from '../helpers/helpers'
 
 const MailboxPanel = (props) => {
 
-  const {markTipAs, addSelectedItem, tipsToDisplay} = props;
+  const {markTipAs, addSelectedItem, tipsToDisplay, tipSearch} = props;
 
   return (
     <div className="col-xs-12 col-sm-8 col-md-9 col-lg-9">
@@ -30,7 +30,8 @@ const MailboxPanel = (props) => {
           <form style={{float: 'right'}}>
             <TextField
               hintText="Search"
-              style={{margin: '0 5px'}}/>
+              style={{margin: '0 5px'}}
+              onChange={(e) => tipSearch(e.target.value)} />
           </form>
           <IconButton
             style={{float: 'right', margin: '0 20px'}}

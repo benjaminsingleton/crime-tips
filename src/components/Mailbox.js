@@ -7,18 +7,23 @@ import TipLongForm from './TipLongForm'
 class Mailbox extends Component {
 
   renderRightPanel() {
-    if (this.props.mailboxRightPanel === 'mailbox') {
-      return (<MailboxPanel
-        showTipDetail={this.props.showTipDetail}
-        addSelectedItem={this.props.addSelectedItem}
-        markTipAs={this.props.markTipAs}
-        tipsToDisplay={this.props.tipsToDisplay}/>);
-    } else if (this.props.mailboxRightPanel === 'detail') {
-      return (<TipDetail details={this.props.tipDetail}/>);
-    } else if (this.props.mailboxRightPanel === 'form') {
-      return (<TipLongForm/>);
-    } else {
-      throw Error('Invalid Right Panel', 'mailBoxRightPanel must be mailbox, detail or form')
+
+    switch(this.props.mailboxRightPanel) {
+      case 'mailbox':
+        return (
+          <MailboxPanel
+            showTipDetail={this.props.showTipDetail}
+            addSelectedItem={this.props.addSelectedItem}
+            markTipAs={this.props.markTipAs}
+            tipsToDisplay={this.props.tipsToDisplay}
+            tipSearch={this.props.tipSearch} />
+        )
+      case 'detail':
+        return <TipDetail details={this.props.tipDetail} />
+      case 'form':
+        return <TipLongForm />
+      default:
+        console.error('Invalid Right Panel', 'mailBoxRightPanel must be mailbox, detail or form')
     }
   }
 
