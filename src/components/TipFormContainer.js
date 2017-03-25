@@ -37,7 +37,7 @@ const TipFormContainer = (props) => {
             primary={true}
             onClick={() => props.changeStep('next')}/>}
         {props.showSubmit
-          ? <RaisedButton label="Submit" primary={true} onClick={() => props.createTip()}/>
+          ? <RaisedButton label="Submit" primary={true} onTouchTap={(e) => props.createTip(e)}/>
           : null}
       </CardActions>
     </Card>

@@ -64,7 +64,7 @@ const MailboxPanel = (props) => {
         <div style={{clear: 'both'}}></div>
         <Table
           multiSelectable={true}
-          >
+          onRowSelection={(selectedRows) => addSelectedItem(selectedRows)} >
           <TableHeader displaySelectAll={false}>
             <TableRow>
               <TableHeaderColumn style={{width: '10%'}}>Status</TableHeaderColumn>

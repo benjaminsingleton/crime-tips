@@ -82,18 +82,18 @@ class SubmitATip extends Component {
   }
 
   createTip(event) {
+    console.log(event)
     event.preventDefault();
-    // create object to store tip data
-    var tip = {
-      ...this.state.tip
-    }
+
+    var tip = {...this.state.tip}
 
     const tipDefaultProperties = {
       timestamp: Date.now(),
       readStatus: 'unread',
       attachment: false,
       archived: false,
-      important: false
+      important: false,
+      tipType: 'web'
     }
 
     tip = Object.assign(tip, tipDefaultProperties);
@@ -101,10 +101,10 @@ class SubmitATip extends Component {
     // push tip object to firebase
     base.push('tips', {data: tip});
 
-    var stepIndex = this.state.stepIndex
-    this.setState({
-      stepIndex: stepIndex++
-    });
+    console.log(this.state.stepIndex)
+    console.log(this.state.stepIndex++)
+
+    this.setState({ stepIndex: this.state.stepIndex++});
   }
 
   resetForm() {
@@ -242,9 +242,15 @@ class SubmitATip extends Component {
         )
       case 'success':
         return (
-          <h3 className="text-center">
-            Thanks! <a onClick={this.resetForm}>Click here</a>to write another tip.
-          </h3>
+          <TipFormContainer
+            title="Thanks!"
+            noNextButton={true}
+            noPreviousButton={true}
+            noOptionalMsg={true}>
+            <p>You've done your community a great service!</p>
+            <br />
+            <p><a style={{color: '#0000EE'}} onClick={this.resetForm}>Click here</a> to write another tip.</p>
+          </TipFormContainer>
         )
       default:
         console.error('renderDisplay failed')
