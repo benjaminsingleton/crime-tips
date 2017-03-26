@@ -26,7 +26,11 @@ class SubmitATip extends Component {
         tipsterHasMedia: false
       },
       stepIndex: 0,
-      stepContent: ['initial', 'second', 'final', 'success']
+      stepContent: ['initial', 'second', 'final', 'success'],
+      errorText: {
+        crimeType: null,
+        tipText: null
+      }
     }
     this.baseState = this.state
 
@@ -97,12 +101,7 @@ class SubmitATip extends Component {
     }
 
     tip = Object.assign(tip, tipDefaultProperties);
-
-    // push tip object to firebase
     base.push('tips', {data: tip});
-
-    console.log(this.state.stepIndex)
-    console.log(this.state.stepIndex++)
 
     this.setState({ stepIndex: this.state.stepIndex++});
   }
@@ -115,19 +114,31 @@ class SubmitATip extends Component {
     var stepIndex = this.state.stepIndex
 
     if (direction === 'next') {
-      stepIndex++;
+      if (stepIndex === 0) {
+        const crimeTypeError = (this.state.tip.crimeType == null)
+        const tipTextError = (this.state.tip.tipText == null || this.state.tip.tipText.length < 20)
+        console.log('crimeTypeError', crimeTypeError)
+        console.log('tipTextError', tipTextError)
+        if (crimeTypeError || tipTextError) {
+          const errorText = {...this.state.errorText}
+          crimeTypeError && (errorText['crimeType'] = 'This field is required')
+          tipTextError && (errorText['tipText'] = 'Your description is too brief. 20 characters minimum.')
+          this.setState({errorText})
+        } else {
+          stepIndex++;
+        }
+      } else {
+        stepIndex++;
+      }
     } else if (direction === 'previous') {
       stepIndex--;
     };
-
     this.setState({stepIndex})
   }
 
   addToStepContent(name, event, isInputChecked) {
     const stepContent = this.state.stepContent
-    const tip = {
-      ...this.state.tip
-    }
+    const tip = {...this.state.tip}
 
     if (!stepContent.includes(name)) {
       stepContent.splice(-2, 0, name) // add step in 3rd to last place (behind final, success)
@@ -156,7 +167,8 @@ class SubmitATip extends Component {
               handleSelectChange={this.handleSelectChange}
               handleTextChange={this.handleTextChange}
               tip={this.state.tip}
-              noOptionalMsg={true}/>
+              noOptionalMsg={true}
+              errorText={this.state.errorText}/>
           </TipFormContainer>
         )
       case 'second':
