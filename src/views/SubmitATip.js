@@ -170,6 +170,7 @@ class SubmitATip extends Component {
               handleTextChange={this.handleTextChange}
               tip={this.state.tip}
               noOptionalMsg={true}
+              isAdmin={false}
               errorText={this.state.errorText}/>
           </TipFormContainer>
         )
