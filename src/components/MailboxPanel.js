@@ -26,10 +26,10 @@ const MailboxPanel = (props) => {
                       {tipsToDisplay[key].important ? <ActionGrade/> : null}
                     </TableRowColumn>
                     <TableRowColumn style={{width: '20%'}}>
-                      {tipsToDisplay[key].crimeType}
+                      <a>{tipsToDisplay[key].crimeType}</a>
                     </TableRowColumn>
                     <TableRowColumn style={{width: '45%'}}>
-                      {tipsToDisplay[key].tipText}
+                      <a>{tipsToDisplay[key].tipText}</a>
                     </TableRowColumn>
                     <TableRowColumn style={{width: '10%'}}>
                       {tipsToDisplay[key].attachment ? <EditorAttachFile style={{height: '20px', width: '20px'}}/> : null}

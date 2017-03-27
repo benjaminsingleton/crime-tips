@@ -17,7 +17,8 @@ class Mailbox extends Component {
             markTipAs={this.props.markTipAs}
             tipsToDisplay={this.props.tipsToDisplay}
             searchTips={this.props.searchTips}
-            searchTerm={this.props.searchTerm} />
+            searchTerm={this.props.searchTerm}
+            isAdmin={true} />
         )
       case 'detail':
         return <TipDetail details={this.props.tipDetail} />
