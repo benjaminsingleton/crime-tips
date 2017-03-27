@@ -117,8 +117,6 @@ class SubmitATip extends Component {
       if (stepIndex === 0) {
         const crimeTypeError = (this.state.tip.crimeType == null)
         const tipTextError = (this.state.tip.tipText == null || this.state.tip.tipText.length < 20)
-        console.log('crimeTypeError', crimeTypeError)
-        console.log('tipTextError', tipTextError)
         if (crimeTypeError || tipTextError) {
           const errorText = {...this.state.errorText}
           crimeTypeError && (errorText['crimeType'] = 'This field is required')
