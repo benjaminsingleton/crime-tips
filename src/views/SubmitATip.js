@@ -18,6 +18,12 @@ class SubmitATip extends Component {
     super()
     this.state = {
       tip: {
+        timestamp: Date.now(),
+        readStatus: 'unread',
+        attachment: false,
+        archived: false,
+        important: false,
+        tipType: 'web',
         tipsterKnowsSuspectDescription: false,
         tipsterKnowsSuspectLocation: false,
         tipsterKnowsSuspectEmployment: false,
@@ -43,50 +49,46 @@ class SubmitATip extends Component {
     this.handleSelectChange = this.handleSelectChange.bind(this)
     this.handleTextChange = this.handleTextChange.bind(this)
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this)
+    this.handleDatePickerChange = this.handleDatePickerChange.bind(this)
   }
 
   handleSelectChange(name, event, index, value) {
-    const tip = {
-      ...this.state.tip
-    }
+    const tip = {...this.state.tip}
     tip[name] = value
     this.setState({tip})
   }
 
   handleTextChange(name, event) {
-    const tip = {
-      ...this.state.tip
-    }
+    const tip = {...this.state.tip}
     tip[name] = event.target.value
     this.setState({tip})
   }
 
   handleCheckboxChange(name, event, isInputChecked) {
-    const tip = {
-      ...this.state.tip
-    }
+    const tip = {...this.state.tip}
     tip[name] = isInputChecked
+    this.setState({tip})
+  }
+
+  handleDatePickerChange(name, nothing, date) {
+    const tip = {...this.state.tip}
+    console.log(name, date)
+    tip[name] = date
     this.setState({tip})
   }
 
   handleInputChange(event) {
     const target = event.target;
-    const value = target.type === 'checkbox'
-      ? target.checked
-      : target.value;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
 
-    const tip = {
-      ...this.state.tip
-    }
-
+    const tip = {...this.state.tip}
     tip[name] = value
 
     this.setState({tip})
   }
 
   createTip(event) {
-    console.log(event)
     event.preventDefault();
 
     var tip = {...this.state.tip}
@@ -124,6 +126,8 @@ class SubmitATip extends Component {
           this.setState({errorText})
         } else {
           stepIndex++;
+          this.setState({errorText: {crimeType: null, tipText: null}})
+          
         }
       } else {
         stepIndex++;
@@ -186,6 +190,7 @@ class SubmitATip extends Component {
             <TipFormSuspectDescription
               handleSelectChange={this.handleSelectChange}
               handleTextChange={this.handleTextChange}
+              handleDatePickerChange={this.handleDatePickerChange}
               tip={this.state.tip}/>
           </TipFormContainer>
         )
