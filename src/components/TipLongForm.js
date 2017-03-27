@@ -161,9 +161,9 @@ class TipLongForm extends Component {
             </CardText>
           </Card>
           <CardActions style={{textAlign: 'right'}}>
-            <RaisedButton label="Discard" default={true}/>
-            <RaisedButton label="Draft" default={true}/>
-            <RaisedButton label="Save" default={true}/>
+            <RaisedButton label="Discard" secondary={true} />
+            <RaisedButton label="Save Draft" default={true} />
+            <RaisedButton label="Submit" primary={true} onClick={(e) => this.createTip(e)} />
           </CardActions>
         </Card>
       </div>
