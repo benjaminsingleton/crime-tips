@@ -18,6 +18,12 @@ class SubmitATip extends Component {
     super()
     this.state = {
       tip: {
+        timestamp: Date.now(),
+        readStatus: 'unread',
+        attachment: false,
+        archived: false,
+        important: false,
+        tipType: 'web',
         tipsterKnowsSuspectDescription: false,
         tipsterKnowsSuspectLocation: false,
         tipsterKnowsSuspectEmployment: false,
@@ -26,7 +32,11 @@ class SubmitATip extends Component {
         tipsterHasMedia: false
       },
       stepIndex: 0,
-      stepContent: ['initial', 'second', 'final', 'success']
+      stepContent: ['initial', 'second', 'final', 'success'],
+      errorText: {
+        crimeType: null,
+        tipText: null
+      }
     }
     this.baseState = this.state
 
@@ -39,43 +49,40 @@ class SubmitATip extends Component {
     this.handleSelectChange = this.handleSelectChange.bind(this)
     this.handleTextChange = this.handleTextChange.bind(this)
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this)
+    this.handleDatePickerChange = this.handleDatePickerChange.bind(this)
   }
 
   handleSelectChange(name, event, index, value) {
-    const tip = {
-      ...this.state.tip
-    }
+    const tip = {...this.state.tip}
     tip[name] = value
     this.setState({tip})
   }
 
   handleTextChange(name, event) {
-    const tip = {
-      ...this.state.tip
-    }
+    const tip = {...this.state.tip}
     tip[name] = event.target.value
     this.setState({tip})
   }
 
   handleCheckboxChange(name, event, isInputChecked) {
-    const tip = {
-      ...this.state.tip
-    }
+    const tip = {...this.state.tip}
     tip[name] = isInputChecked
+    this.setState({tip})
+  }
+
+  handleDatePickerChange(name, nothing, date) {
+    const tip = {...this.state.tip}
+    console.log(name, date)
+    tip[name] = date
     this.setState({tip})
   }
 
   handleInputChange(event) {
     const target = event.target;
-    const value = target.type === 'checkbox'
-      ? target.checked
-      : target.value;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
 
-    const tip = {
-      ...this.state.tip
-    }
-
+    const tip = {...this.state.tip}
     tip[name] = value
 
     this.setState({tip})
@@ -83,28 +90,22 @@ class SubmitATip extends Component {
 
   createTip(event) {
     event.preventDefault();
-    // create object to store tip data
-    var tip = {
-      ...this.state.tip
-    }
+
+    var tip = {...this.state.tip}
 
     const tipDefaultProperties = {
       timestamp: Date.now(),
       readStatus: 'unread',
       attachment: false,
       archived: false,
-      important: false
+      important: false,
+      tipType: 'web'
     }
 
     tip = Object.assign(tip, tipDefaultProperties);
-
-    // push tip object to firebase
     base.push('tips', {data: tip});
 
-    var stepIndex = this.state.stepIndex
-    this.setState({
-      stepIndex: stepIndex++
-    });
+    this.setState({ stepIndex: this.state.stepIndex++});
   }
 
   resetForm() {
@@ -115,19 +116,31 @@ class SubmitATip extends Component {
     var stepIndex = this.state.stepIndex
 
     if (direction === 'next') {
-      stepIndex++;
+      if (stepIndex === 0) {
+        const crimeTypeError = (this.state.tip.crimeType == null)
+        const tipTextError = (this.state.tip.tipText == null || this.state.tip.tipText.length < 20)
+        if (crimeTypeError || tipTextError) {
+          const errorText = {...this.state.errorText}
+          crimeTypeError && (errorText['crimeType'] = 'This field is required')
+          tipTextError && (errorText['tipText'] = 'Your description is too brief. 20 characters minimum.')
+          this.setState({errorText})
+        } else {
+          stepIndex++;
+          this.setState({errorText: {crimeType: null, tipText: null}})
+          
+        }
+      } else {
+        stepIndex++;
+      }
     } else if (direction === 'previous') {
       stepIndex--;
     };
-
     this.setState({stepIndex})
   }
 
   addToStepContent(name, event, isInputChecked) {
     const stepContent = this.state.stepContent
-    const tip = {
-      ...this.state.tip
-    }
+    const tip = {...this.state.tip}
 
     if (!stepContent.includes(name)) {
       stepContent.splice(-2, 0, name) // add step in 3rd to last place (behind final, success)
@@ -156,7 +169,8 @@ class SubmitATip extends Component {
               handleSelectChange={this.handleSelectChange}
               handleTextChange={this.handleTextChange}
               tip={this.state.tip}
-              noOptionalMsg={true}/>
+              noOptionalMsg={true}
+              errorText={this.state.errorText}/>
           </TipFormContainer>
         )
       case 'second':
@@ -176,6 +190,7 @@ class SubmitATip extends Component {
             <TipFormSuspectDescription
               handleSelectChange={this.handleSelectChange}
               handleTextChange={this.handleTextChange}
+              handleDatePickerChange={this.handleDatePickerChange}
               tip={this.state.tip}/>
           </TipFormContainer>
         )
@@ -242,9 +257,15 @@ class SubmitATip extends Component {
         )
       case 'success':
         return (
-          <h3 className="text-center">
-            Thanks! <a onClick={this.resetForm}>Click here</a>to write another tip.
-          </h3>
+          <TipFormContainer
+            title="Thanks!"
+            noNextButton={true}
+            noPreviousButton={true}
+            noOptionalMsg={true}>
+            <p>You've done your community a great service!</p>
+            <br />
+            <p><a style={{color: '#0000EE'}} onClick={this.resetForm}>Click here</a> to write another tip.</p>
+          </TipFormContainer>
         )
       default:
         console.error('renderDisplay failed')
