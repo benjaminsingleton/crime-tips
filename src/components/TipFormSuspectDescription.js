@@ -28,10 +28,11 @@ const TipFormSuspectDescription = (props) => {
             <br />
             <div className="prompt">What is the suspect's exact date of birth?</div>
             <div>
-                <DatePicker 
+                <DatePicker
+                    autoOk={true}
                     hintText="Pick a date"
                     value={props.tip.suspectDateOfBirth}
-                    onChange={props.handleTextChange.bind(null, "suspectDateOfBirth")}
+                    onChange={props.handleDatePickerChange.bind(null, "suspectDateOfBirth")}
                 />
             </div>
             <br />

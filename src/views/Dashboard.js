@@ -14,6 +14,10 @@ class Dashboard extends Component {
     this.state = {
       tips: {},
       tipsToDisplay: null,
+      tipsToDisplayStatus: {
+        'criteria': 'archived',
+        'value': false
+      },
       selectedTipKeys: [],
       tipDetail: null,
       mailboxRightPanel: 'mailbox',
@@ -26,6 +30,8 @@ class Dashboard extends Component {
     this.openTipLongForm = this.openTipLongForm.bind(this);
     this.reverseTips = this.reverseTips.bind(this)
     this.searchTips = this.searchTips.bind(this)
+    this.displayTips = this.displayTips.bind(this)
+    this.searchResults = this.searchResults.bind(this)
   }
 
   componentWillMount() {
@@ -39,9 +45,7 @@ class Dashboard extends Component {
 
   showTipDetail(key) {
     // Tip marked as read when clicked
-    const tips = {
-      ...this.state.tips
-    };
+    const tips = {...this.state.tips};
     tips[key].readStatus = 'read'
 
     // Log activity to 'logs' and 'users/uid' for auditing purposes
@@ -66,12 +70,14 @@ class Dashboard extends Component {
     this.setState({tips: tips, tipDetail: tips[key], mailboxRightPanel: 'detail'});
   }
 
-  addSelectedItem(selectedRows) {
-    // Adds keys of items checked in mailbox
-    const tipsToDisplay = _.isEmpty(this.state.tipsToDisplay)
-      ? this.reverseTips(this.state.tips)
-      : this.state.tipsToDisplay
+  displayTips() {
+    const criteria = this.state.tipsToDisplayStatus['criteria']
+    const value = this.state.tipsToDisplayStatus['value']
+    return this.reverseTips(_.pick(this.state.tips, key => key[criteria]===value))
+  }
 
+  addSelectedItem(selectedRows) {
+    const tipsToDisplay = (this.state.searchTerm === '') ? this.displayTips() : this.searchResults()
     const selectedTipKeys = []
     selectedRows.map((index) => selectedTipKeys.push(Object.keys(tipsToDisplay)[index]))
 
@@ -87,6 +93,10 @@ class Dashboard extends Component {
     function updateItem(criteria, key) {
       const status = !tips[key][criteria]
       tips[key][criteria] = status
+
+      if (criteria==='archived' && status ===true) {
+        tips[key]['important'] = false
+      }
 
       base.push(`logs/`, {
         data: {
@@ -109,7 +119,7 @@ class Dashboard extends Component {
 
     this.state.selectedTipKeys.map(key => updateItem(criteria, key))
 
-    this.setState({tips: tips, selectedTipKeys: []});
+    this.setState({tips, selectedTipKeys: []});
   }
 
   reverseTips(tipObj) {
@@ -119,46 +129,34 @@ class Dashboard extends Component {
   }
 
   filterTips(criteria, value) {
-    console.log(criteria, value)
-    let filteredTips
-    if (criteria === 'archived' && value === true) {
-      filteredTips = _.pick(this.state.tips, key => key['archived'] === true)
-    } else {
-      let notArchivedTips = _.pick(this.state.tips, key => key['archived'] === false)
-      filteredTips = _.pick(notArchivedTips, key => key[criteria] === value)
-    }
-    const tipsToDisplay = this.reverseTips(filteredTips);
-
-    this.setState({
-      tipsToDisplay, 
-      mailboxRightPanel: 'mailbox', 
+    this.setState({ 
+      tipsToDisplayStatus: {
+        'criteria': criteria,
+        'value': value
+      },
+      mailboxRightPanel: 'mailbox',
       searchTerm: ''
-    })
+     });
   }
 
   openTipLongForm = () => this.setState({mailboxRightPanel: 'form'});
 
-  searchTips(searchTerm) {
-    if (searchTerm === '') {
-      this.setState({searchTerm: '', tipsToDisplay: null})
-    } else {
-      console.log(searchTerm)
-      const tips = {...this.state.tips}
-      const matches = Object.keys(tips).filter(key => tips[key].tipText.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1)
-      
-      const tipsToDisplay = {}
-      matches.reverse().forEach((key) => tipsToDisplay[key] = tips[key])
-      this.setState({searchTerm, tipsToDisplay})
-    }
+  searchTips = (searchTerm) => this.setState({searchTerm});
+
+  searchResults() {
+    const matches = Object.keys(this.state.tips)
+                          .filter(key => this.state.tips[key].tipText
+                                                              .toLowerCase()
+                                                              .indexOf(this.state.searchTerm.toLowerCase()) !== -1)
+    const tipsToDisplay = {}
+    matches.reverse().forEach((key) => tipsToDisplay[key] = this.state.tips[key])
+    return tipsToDisplay
   }
 
   render() {
 
     const {tips} = this.state;
-
-    const tipsToDisplay = _.isNull(this.state.tipsToDisplay)
-      ? this.reverseTips(_.pick(tips, key => key['archived'] === false))
-      : this.state.tipsToDisplay
+    const tipsToDisplay = (this.state.searchTerm === '') ? this.displayTips() : this.searchResults()
 
     const counts = {
       unreadCount: Object.keys(tips).filter(key => tips[key].readStatus === 'unread').length,

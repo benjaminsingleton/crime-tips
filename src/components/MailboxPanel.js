@@ -20,6 +20,25 @@ const MailboxPanel = (props) => {
 
   const {markTipAs, addSelectedItem, tipsToDisplay, searchTerm, searchTips} = props;
 
+  const tipRows = Object.keys(tipsToDisplay).map(key => 
+                  <TableRow key={key}>
+                    <TableRowColumn style={{width: '10%'}}>
+                      {tipsToDisplay[key].important ? <ActionGrade/> : null}
+                    </TableRowColumn>
+                    <TableRowColumn style={{width: '20%'}}>
+                      {tipsToDisplay[key].crimeType}
+                    </TableRowColumn>
+                    <TableRowColumn style={{width: '45%'}}>
+                      {tipsToDisplay[key].tipText}
+                    </TableRowColumn>
+                    <TableRowColumn style={{width: '10%'}}>
+                      {tipsToDisplay[key].attachment ? <EditorAttachFile style={{height: '20px', width: '20px'}}/> : null}
+                    </TableRowColumn>
+                    <TableRowColumn style={{width: '15%', textAlign: 'right'}}>
+                      {tipTimeFormat(tipsToDisplay[key].dateTime)}
+                    </TableRowColumn>
+                  </TableRow>)
+
   return (
     <div className="col-xs-12 col-sm-8 col-md-9 col-lg-9">
     <Card>
@@ -34,18 +53,18 @@ const MailboxPanel = (props) => {
         </form>
         <IconButton
           style={{float: 'right', margin: '0 20px'}}
-          onClick={() => markTipAs('archived')}>
+          onTouchTap={() => markTipAs('archived')}>
           <ContentArchive/>
         </IconButton>
         <IconButton
-          onClick={() => markTipAs('important')}
+          onTouchTap={() => markTipAs('important')}
           style={{float: 'right'}}>
           <ActionGrade/>
         </IconButton>
         <div style={{clear: 'both'}}></div>
         <Table
           multiSelectable={true}
-          onRowSelection={(selectedRows) => addSelectedItem(selectedRows)}>
+          onRowSelection={(selectedRows) => addSelectedItem(selectedRows)} >
           <TableHeader displaySelectAll={false}>
             <TableRow>
               <TableHeaderColumn style={{width: '10%'}}>Status</TableHeaderColumn>
@@ -56,32 +75,7 @@ const MailboxPanel = (props) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {(tipsToDisplay.length === 0) 
-              ? null 
-              : Object.keys(tipsToDisplay).map(key => (
-                  <TableRow key={key} selected={tipsToDisplay[key].selected}>
-                    <TableRowColumn style={{width: '10%'}}>
-                      {tipsToDisplay[key].important
-                        ? <ActionGrade/>
-                        : null}
-                    </TableRowColumn>
-                    <TableRowColumn style={{width: '20%'}}>
-                      {tipsToDisplay[key].crimeType}
-                    </TableRowColumn>
-                    <TableRowColumn style={{width: '45%'}}>
-                      {tipsToDisplay[key].tipText}
-                    </TableRowColumn>
-                    <TableRowColumn style={{width: '10%'}}>
-                      {tipsToDisplay[key].attachment
-                        ? <EditorAttachFile style={{height: '20px', width: '20px'}}/>
-                        : null}
-                    </TableRowColumn>
-                    <TableRowColumn style={{width: '15%', textAlign: 'right'}}>
-                      {tipTimeFormat(tipsToDisplay[key].dateTime)}
-                    </TableRowColumn>
-                  </TableRow>
-                ))
-            }
+            {(tipsToDisplay.length === 0) ? null : tipRows}
           </TableBody>
         </Table>
       </CardText>
