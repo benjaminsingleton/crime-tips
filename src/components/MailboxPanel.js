@@ -26,16 +26,20 @@ const MailboxPanel = (props) => {
                       {tipsToDisplay[key].important ? <ActionGrade/> : null}
                     </TableRowColumn>
                     <TableRowColumn style={{width: '20%'}}>
-                      <a>{tipsToDisplay[key].crimeType}</a>
+                      <a onClick={() => props.showTipDetail(key)}>{tipsToDisplay[key].crimeType}</a>
                     </TableRowColumn>
                     <TableRowColumn style={{width: '45%'}}>
-                      <a>{tipsToDisplay[key].tipText}</a>
+                      <a onClick={() => props.showTipDetail(key)}>{tipsToDisplay[key].tipText}</a>
                     </TableRowColumn>
                     <TableRowColumn style={{width: '10%'}}>
-                      {tipsToDisplay[key].attachment ? <EditorAttachFile style={{height: '20px', width: '20px'}}/> : null}
+                      <a onClick={() => props.showTipDetail(key)}>
+                        {tipsToDisplay[key].attachment ? <EditorAttachFile style={{height: '20px', width: '20px'}}/> : null}
+                      </a>
                     </TableRowColumn>
                     <TableRowColumn style={{width: '15%', textAlign: 'right'}}>
-                      {tipTimeFormat(tipsToDisplay[key].dateTime)}
+                      <a onClick={() => props.showTipDetail(key)}>
+                        {tipTimeFormat(tipsToDisplay[key].dateTime)}
+                      </a>
                     </TableRowColumn>
                   </TableRow>)
 

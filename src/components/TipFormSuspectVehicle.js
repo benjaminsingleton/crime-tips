@@ -59,8 +59,8 @@ const TipFormSuspectVehicle = (props) => {
             <div>
                 <TextField
                     hintText="AB1234"
-                    value={props.tip.suspectVehicleYear}
-                    onChange={props.handleTextChange.bind(null, "suspectVehicleYear")}
+                    value={props.tip.suspectVehiclePlateNumber}
+                    onChange={props.handleTextChange.bind(null, "suspectVehiclePlateNumber")}
                 />
                 </div>
             <br />

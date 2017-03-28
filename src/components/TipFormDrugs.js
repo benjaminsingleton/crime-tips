@@ -25,8 +25,8 @@ const TipFormDrugs = (props) => {
       <div>
         <SelectField
           hintText="Select an option"
-          value={props.tip.drugTypes}
-          onChange={props.handleSelectChange.bind(null, "drugTypes")}>
+          value={props.tip.drugSaleMethod}
+          onChange={props.handleSelectChange.bind(null, "drugSaleMethod")}>
           <MenuItem value="On the street" primaryText="On the street"/>
           <MenuItem value="In an apartment / house" primaryText="In an apartment / house"/>
           <MenuItem value="From a vehicle" primaryText="From a vehicle"/>

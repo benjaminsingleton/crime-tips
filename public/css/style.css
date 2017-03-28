@@ -26,6 +26,13 @@ h1 {
     font-size: 16px;
 }
 
+.detail-prompt {
+    font-family: Roboto;
+    margin: 14px 0px 8px 0px;
+    font-size: 14px;
+    color: #616161;
+}
+
 .requiredText {
     color: #FF5252;
     font-size: 18px;
@@ -39,6 +46,8 @@ h1 {
 .alignRight {
 	float: right;
 }
+
+a { cursor: pointer; }
 
 /*#dashboard-metrics {
     padding-bottom: 0px;
