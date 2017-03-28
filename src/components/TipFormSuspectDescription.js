@@ -79,8 +79,8 @@ const TipFormSuspectDescription = (props) => {
             <div>
                 <SelectField
                     hintText="Select a height"
-                    value={props.tip.suspectRace}
-                    onChange={props.handleSelectChange.bind(null, "suspectRace")}
+                    value={props.tip.suspectHeight}
+                    onChange={props.handleSelectChange.bind(null, "suspectHeight")}
                     >
                     <MenuItem value="4' 8''" primaryText="4' 8''" />
                     <MenuItem value="4' 10''" primaryText="4' 10''" />

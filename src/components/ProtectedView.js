@@ -36,7 +36,6 @@ class ProtectedView extends Component {
       console.error(err)
       return;
     }
-    console.log(authData.uid)
     sessionStorage.setItem('uid', authData.uid);
     this.setState({uid: authData.uid})
     browserHistory.push('/admin')
@@ -45,17 +44,18 @@ class ProtectedView extends Component {
   logout() {
     sessionStorage.removeItem('uid');
     this.setState({uid: null})
-    console.log('logged out')
     base.unauth();
     browserHistory.push('/logout')
   }
 
   renderLogin() {
-    return (<Login
-      email={this.state.email}
-      password={this.state.password}
-      authenticate={this.authenticate}
-      handleTextChange={this.handleTextChange}/>)
+    return (
+      <Login
+        email={this.state.email}
+        password={this.state.password}
+        authenticate={this.authenticate}
+        handleTextChange={this.handleTextChange}/>
+      )
   }
 
   render() {
