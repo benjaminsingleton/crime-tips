@@ -79,6 +79,11 @@ class TipLongForm extends Component {
   }
 
   render() {
+    const style = {
+      card: {margin: '10px'},
+      header: {backgroundColor: '#E0E0E0'}
+    }
+
     return (
       <div className="col-xs-12 col-sm-8 col-md-9 col-lg-9">
         <Card>
@@ -86,8 +91,8 @@ class TipLongForm extends Component {
             <h2>New Crime Tip</h2>
           </CardText>
           <Divider />
-          <Card expanded={this.state.panelDisplay[1]} onExpandChange={() => this.togglePanel(1)}>
-            <CardHeader title="1. Tip Summary" actAsExpander={true} showExpandableButton={true} />
+          <Card expanded={this.state.panelDisplay[1]} onExpandChange={() => this.togglePanel(1)} style={style.card}>
+            <CardHeader title="1. Tip Summary" actAsExpander={true} showExpandableButton={true} style={style.header} />
             <CardText expandable={true}>
               <TipFormIntro 
                 tip={this.state.tip}
@@ -95,8 +100,8 @@ class TipLongForm extends Component {
                 handleTextChange={this.handleTextChange} />
             </CardText>
           </Card>
-          <Card expanded={this.state.panelDisplay[2]} onExpandChange={() => this.togglePanel(2)}>
-            <CardHeader title="2. Suspect Description" actAsExpander={true} showExpandableButton={true} />
+          <Card expanded={this.state.panelDisplay[2]} onExpandChange={() => this.togglePanel(2)} style={style.card}>
+            <CardHeader title="2. Suspect Description" actAsExpander={true} showExpandableButton={true} style={style.header} />
             <CardText expandable={true}>
               <TipFormSuspectDescription 
                 tip={this.state.tip}
@@ -104,8 +109,8 @@ class TipLongForm extends Component {
                 handleTextChange={this.handleTextChange} />
             </CardText>
           </Card>
-          <Card expanded={this.state.panelDisplay[3]} onExpandChange={() => this.togglePanel(3)}>
-            <CardHeader title="3. Suspect Location" actAsExpander={true} showExpandableButton={true} />
+          <Card expanded={this.state.panelDisplay[3]} onExpandChange={() => this.togglePanel(3)} style={style.card}>
+            <CardHeader title="3. Suspect Location" actAsExpander={true} showExpandableButton={true} style={style.header} />
             <CardText expandable={true}>
               <TipFormSuspectLocation 
                 tip={this.state.tip}
@@ -114,8 +119,8 @@ class TipLongForm extends Component {
                 handleCheckboxChange={this.handleCheckboxChange} />
             </CardText>
           </Card>
-          <Card expanded={this.state.panelDisplay[4]} onExpandChange={() => this.togglePanel(4)}>
-            <CardHeader title="4. Suspect Employment" actAsExpander={true} showExpandableButton={true} />
+          <Card expanded={this.state.panelDisplay[4]} onExpandChange={() => this.togglePanel(4)} style={style.card}>
+            <CardHeader title="4. Suspect Employment" actAsExpander={true} showExpandableButton={true} style={style.header} />
             <CardText expandable={true}>
               <TipFormSuspectEmployment 
                 tip={this.state.tip}
@@ -124,8 +129,8 @@ class TipLongForm extends Component {
                 handleCheckboxChange={this.handleCheckboxChange} />
             </CardText>
           </Card>
-          <Card expanded={this.state.panelDisplay[5]} onExpandChange={() => this.togglePanel(5)}>
-            <CardHeader title="5. Suspect Vehicle" actAsExpander={true} showExpandableButton={true} />
+          <Card expanded={this.state.panelDisplay[5]} onExpandChange={() => this.togglePanel(5)} style={style.card}>
+            <CardHeader title="5. Suspect Vehicle" actAsExpander={true} showExpandableButton={true} style={style.header} />
             <CardText expandable={true}>
               <TipFormSuspectVehicle
                 tip={this.state.tip}
@@ -134,8 +139,8 @@ class TipLongForm extends Component {
                 handleCheckboxChange={this.handleCheckboxChange} />
             </CardText>
           </Card>
-          <Card expanded={this.state.panelDisplay[6]} onExpandChange={() => this.togglePanel(6)}>
-            <CardHeader title="6. Drugs" actAsExpander={true} showExpandableButton={true} />
+          <Card expanded={this.state.panelDisplay[6]} onExpandChange={() => this.togglePanel(6)} style={style.card}>
+            <CardHeader title="6. Drugs" actAsExpander={true} showExpandableButton={true} style={style.header} />
             <CardText expandable={true}>
               <TipFormDrugs
                 tip={this.state.tip}
@@ -144,14 +149,14 @@ class TipLongForm extends Component {
                 handleCheckboxChange={this.handleCheckboxChange} />
             </CardText>
           </Card>
-          <Card expanded={this.state.panelDisplay[7]} onExpandChange={() => this.togglePanel(7)}>
-            <CardHeader title="7. Media" actAsExpander={true} showExpandableButton={true} />
+          <Card expanded={this.state.panelDisplay[7]} onExpandChange={() => this.togglePanel(7)} style={style.card}>
+            <CardHeader title="7. Media" actAsExpander={true} showExpandableButton={true} style={style.header} />
             <CardText expandable={true}>
               <TipFormMedia tip={this.state.tip} />
             </CardText>
           </Card>
-          <Card expanded={this.state.panelDisplay[8]} onExpandChange={() => this.togglePanel(8)}>
-            <CardHeader title="8. Conclusion" actAsExpander={true} showExpandableButton={true} />
+          <Card expanded={this.state.panelDisplay[8]} onExpandChange={() => this.togglePanel(8)} style={style.card}>
+            <CardHeader title="8. Conclusion" actAsExpander={true} showExpandableButton={true} style={style.header} />
             <CardText expandable={true}>
               <TipFormFinal
                 tip={this.state.tip}
