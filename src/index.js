@@ -14,6 +14,8 @@ import LoggedOut from './views/LoggedOut';
 import ForgotPassword from './views/ForgotPassword';
 import NoMatch from './views/NoMatch';
 import ProtectedView from './components/ProtectedView'
+import PrivateRoute from './components/PrivateRoute'
+
 
 import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
@@ -33,6 +35,7 @@ ReactDOM.render(
 		<div>
 			<Switch>
 				<Route exact path="/" component={SubmitATip} />
+				<PrivateRoute path="/admin" component={Dashboard} />
 				<Route component={ProtectedView}>
 					<Route path="login" component={Login} />
 					<Route path="admin" component={Dashboard} />
