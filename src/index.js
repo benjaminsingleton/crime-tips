@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Router, Route, browserHistory } from 'react-router'
+import { BrowserRouter, Route, Switch } from 'react-router-dom'
 
 import {blue700, blue500, blue100, redA200} from 'material-ui/styles/colors';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
@@ -29,17 +29,22 @@ const muiTheme = getMuiTheme({
 
 ReactDOM.render(
 	<MuiThemeProvider muiTheme={muiTheme}>
-	<Router history={browserHistory}>
-		<Route path="/" component={SubmitATip} />
-		<Route component={ProtectedView}>
-			<Route path="login" component={Login} />
-			<Route path="admin" component={Dashboard} />
-			<Route path="settings" component={UserSettings} />
-		</Route>
-		<Route path="logout" component={LoggedOut} />
-		<Route path="forgot_password" component={ForgotPassword} />
-		<Route path="*" component={NoMatch} />
-  	</Router>
+	<BrowserRouter>
+		<div>
+			<Switch>
+				<Route exact path="/" component={SubmitATip} />
+				<Route component={ProtectedView}>
+					<Route path="login" component={Login} />
+					<Route path="admin" component={Dashboard} />
+					<Route path="tip/:tipId" component={Dashboard} />
+					<Route path="settings" component={UserSettings} />
+				</Route>
+				<Route path="logout" component={LoggedOut} />
+				<Route path="forgot_password" component={ForgotPassword} />
+				<Route component={NoMatch} />
+			</Switch>
+		</div>
+	</BrowserRouter>
 	</MuiThemeProvider>,
   document.getElementById('root')
 );

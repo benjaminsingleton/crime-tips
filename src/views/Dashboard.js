@@ -68,6 +68,8 @@ class Dashboard extends Component {
     });
 
     this.setState({tips: tips, tipDetail: tips[key], mailboxRightPanel: 'detail'});
+
+    this.props.router.push(`tip/${key}`)
   }
 
   displayTips() {

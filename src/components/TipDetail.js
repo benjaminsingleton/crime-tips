@@ -1,15 +1,16 @@
 import React, {Component} from 'react'
+import base from '../base'
 import {tipTimeFormatLong} from '../helpers/helpers'
 import {Card, CardHeader, CardText, CardActions} from 'material-ui/Card';
 import RaisedButton from 'material-ui/RaisedButton';
 import Divider from 'material-ui/Divider';
+import TextField from 'material-ui/TextField';
 
 class TipDetail extends Component {
 
   constructor() {
     super()
     this.state = {
-      tip: {},
       panelDisplay: {
         1: true,
         2: true,
@@ -18,16 +19,32 @@ class TipDetail extends Component {
         5: true,
         6: true,
         7: true,
-        8: true
+        8: true,
+        9: true
       }
     }
     this.togglePanel = this.togglePanel.bind(this)
+    this.handleTextChange = this.handleTextChange.bind(this)
+    this.createUserNote = this.createUserNote.bind(this)
   }
 
   togglePanel(panelNumber) {
     const panelDisplay = {...this.state.panelDisplay}
     panelDisplay[panelNumber] = !panelDisplay[panelNumber]
     this.setState({panelDisplay})
+  }
+
+  handleTextChange = (event) => {this.setState({userNote: event.target.value})}
+
+  createUserNote() {
+    base.push(`tips/${this.props.params.tipId}`, {
+      data: {userNote: event.target.value},
+      then(err){
+        if(!err){
+          console.log('success')
+        }
+      }
+    });
   }
 
   render() {
@@ -140,6 +157,21 @@ class TipDetail extends Component {
               <p><span className="detail-prompt">How did you find out about online crime tips?</span> <b>{details.tipsterWebsiteDiscoveryMethod}</b></p>
               <p><span className="detail-prompt">I want to be contacted by the police.</span> <b>{details.tipsterWantsToBeContacted}</b></p>
               <p><span className="detail-prompt">Please provide contact details.</span> <b>{details.tipsterContactDetails}</b></p>
+            </CardText>
+          </Card>
+          <Card expanded={this.state.panelDisplay[9]} onExpandChange={() => this.togglePanel(9)} style={style.card}>
+            <CardHeader title="** User Notes **" actAsExpander={true} showExpandableButton={true} style={style.header} />
+            <CardText expandable={true}>
+              <TextField
+                hintText="Add note here"
+                multiLine={true}
+                fullWidth={true}
+                value={this.state.userNote}
+                onChange={this.handleTextChange}
+              />
+              <div style={{textAlign: 'right'}}>
+              <RaisedButton label="Add Note" primary={true} onTouchTap={(e) => this.createUserNote(e)}/>
+              </div>
             </CardText>
           </Card>
           <CardActions style={{textAlign: 'right'}}>
