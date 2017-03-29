@@ -45,50 +45,50 @@ const MailboxPanel = (props) => {
 
   return (
     <div className="col-xs-12 col-sm-8 col-md-9 col-lg-9">
-    <Card>
-      <CardText>
-        <h2 style={{ float: 'left'}}>Tip Inbox</h2>
-        <form style={{float: 'right'}}>
-          <TextField
-            hintText="Search tip text"
-            style={{margin: '0 5px'}}
-            value={searchTerm}
-            onChange={(e) => searchTips(e.target.value)} />
-        </form>
-        <IconButton
-          style={{float: 'right', margin: '0 20px'}}
-          onTouchTap={() => markTipAs('archived')}>
-          <ContentArchive/>
-        </IconButton>
-        <IconButton
-          onTouchTap={() => markTipAs('important')}
-          style={{float: 'right'}}>
-          <ActionGrade/>
-        </IconButton>
-        <div style={{clear: 'both'}}></div>
-        <Table
-          multiSelectable={true}
-          onRowSelection={(selectedRows) => addSelectedItem(selectedRows)} >
-          <TableHeader displaySelectAll={false}>
-            <TableRow>
-              <TableHeaderColumn style={{width: '10%'}}>Status</TableHeaderColumn>
-              <TableHeaderColumn style={{width: '20%'}}>Crime Type</TableHeaderColumn>
-              <TableHeaderColumn style={{width: '45%'}}>Tip Text</TableHeaderColumn>
-              <TableHeaderColumn style={{width: '10%'}}>File(s)</TableHeaderColumn>
-              <TableHeaderColumn style={{width: '15%', textAlign: 'right'}}>Date</TableHeaderColumn>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {(tipsToDisplay.length === 0) ? null : tipRows}
-          </TableBody>
-        </Table>
-      </CardText>
-      <CardActions style={{textAlign: 'right'}}>
-        <RaisedButton label="Previous" default={true}/>
-        <RaisedButton label="Next" default={true}/>
-      </CardActions>
-    </Card>
-  </div>
+      <Card>
+        <CardText>
+          <h2 style={{ float: 'left'}}>Tip Inbox</h2>
+          <form style={{float: 'right'}}>
+            <TextField
+              hintText="Search tip text"
+              style={{margin: '0 5px'}}
+              value={searchTerm}
+              onChange={(e) => searchTips(e.target.value)} />
+          </form>
+          <IconButton
+            style={{float: 'right', margin: '0 20px'}}
+            onTouchTap={() => markTipAs('archived')}>
+            <ContentArchive/>
+          </IconButton>
+          <IconButton
+            onTouchTap={() => markTipAs('important')}
+            style={{float: 'right'}}>
+            <ActionGrade/>
+          </IconButton>
+          <div style={{clear: 'both'}}></div>
+          <Table
+            multiSelectable={true}
+            onRowSelection={(selectedRows) => addSelectedItem(selectedRows)} >
+            <TableHeader displaySelectAll={false}>
+              <TableRow>
+                <TableHeaderColumn style={{width: '10%'}}>Status</TableHeaderColumn>
+                <TableHeaderColumn style={{width: '20%'}}>Crime Type</TableHeaderColumn>
+                <TableHeaderColumn style={{width: '45%'}}>Tip Text</TableHeaderColumn>
+                <TableHeaderColumn style={{width: '10%'}}>File(s)</TableHeaderColumn>
+                <TableHeaderColumn style={{width: '15%', textAlign: 'right'}}>Date</TableHeaderColumn>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {(tipsToDisplay.length === 0) ? null : tipRows}
+            </TableBody>
+          </Table>
+        </CardText>
+        <CardActions style={{textAlign: 'right'}}>
+          <RaisedButton label="Previous" default={true}/>
+          <RaisedButton label="Next" default={true}/>
+        </CardActions>
+      </Card>
+    </div>
   )
 }
 

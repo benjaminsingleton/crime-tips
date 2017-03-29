@@ -4,9 +4,9 @@ import {Card, CardHeader, CardText, CardActions} from 'material-ui/Card';
 import RaisedButton from 'material-ui/RaisedButton';
 import Divider from 'material-ui/Divider';
 import TextField from 'material-ui/TextField';
+import {ref} from '../helpers/constants'
 
-class TipDetail extends Component {
-
+export default class TipDetail extends Component {
   constructor() {
     super()
     this.state = {
@@ -36,23 +36,34 @@ class TipDetail extends Component {
   handleTextChange = (event) => {this.setState({userNote: event.target.value})}
 
   createUserNote() {
-    // base.push(`tips/${this.props.params.tipId}`, {
-    //   data: {userNote: event.target.value},
-    //   then(err){
-    //     if(!err){
-    //       console.log('success')
-    //     }
-    //   }
-    // });
+    const timestamp = Date.now()
+    ref.child(`tips/${this.props.tipDetail.key}/userNotes/`).push({
+      note: this.state.userNote,
+      uid: this.props.uid,
+      timestamp: timestamp
+    });
+    this.setState({userNote: ''})
   }
 
   render() {
-    const {details} = this.props;
+    const details = this.props.tips[this.props.tipDetail.key]
 
     const style = {
       card: {margin: '10px'},
       header: {backgroundColor: '#E0E0E0'}
     }
+
+    const userNotes = details.userNotes ? Object.keys(details.userNotes).map(key => 
+                                                        <Card style={style.card}>
+                                                          <CardHeader 
+                                                            title={`${details.userNotes[key].uid} ${details.userNotes[key].timestamp}`} 
+                                                            style={style.header} 
+                                                          />
+                                                          <CardText>
+                                                            <p>{details.userNotes[key].note}</p>
+                                                          </CardText>
+                                                        </Card>)
+                                                      : null
 
     return (
       <div className="col-xs-12 col-sm-8 col-md-9 col-lg-9">
@@ -161,12 +172,14 @@ class TipDetail extends Component {
           <Card expanded={this.state.panelDisplay[9]} onExpandChange={() => this.togglePanel(9)} style={style.card}>
             <CardHeader title="** User Notes **" actAsExpander={true} showExpandableButton={true} style={style.header} />
             <CardText expandable={true}>
+              {userNotes}
               <TextField
-                hintText="Add note here"
+                hintText="Add new note here"
                 multiLine={true}
                 fullWidth={true}
                 value={this.state.userNote}
                 onChange={this.handleTextChange}
+                style={{marginTop: '14px'}}
               />
               <div style={{textAlign: 'right'}}>
               <RaisedButton label="Add Note" primary={true} onTouchTap={(e) => this.createUserNote(e)}/>
@@ -185,7 +198,5 @@ class TipDetail extends Component {
 }
 
 TipDetail.propTypes = {
-  details: React.PropTypes.object.isRequired
+  tipDetail: React.PropTypes.object.isRequired
 }
-
-export default TipDetail;

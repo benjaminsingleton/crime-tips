@@ -21,7 +21,7 @@ class Mailbox extends Component {
             isAdmin={true} />
         )
       case 'detail':
-        return <TipDetail details={this.props.tipDetail} />
+        return <TipDetail tipDetail={this.props.tipDetail} uid={this.props.uid} tips={this.props.tips} />
       case 'form':
         return <TipLongForm uid={this.props.uid} />
       default:
