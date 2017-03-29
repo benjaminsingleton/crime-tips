@@ -1,9 +1,7 @@
 import React, {Component} from 'react'
-import base from '../base'
 import {Card, CardHeader, CardText, CardActions} from 'material-ui/Card';
 import RaisedButton from 'material-ui/RaisedButton';
 import Divider from 'material-ui/Divider';
-
 import TipFormIntro from '../components/TipFormIntro'
 import TipFormSuspectDescription from '../components/TipFormSuspectDescription'
 import TipFormSuspectLocation from '../components/TipFormSuspectLocation'
@@ -12,6 +10,7 @@ import TipFormSuspectVehicle from '../components/TipFormSuspectVehicle'
 import TipFormDrugs from '../components/TipFormDrugs'
 import TipFormMedia from '../components/TipFormMedia'
 import TipFormFinal from '../components/TipFormFinal'
+import {ref} from '../helpers/constants'
 
 class TipLongForm extends Component {
 
@@ -74,7 +73,7 @@ class TipLongForm extends Component {
       uid: this.props.uid
     }
     tip = Object.assign(tip, tipDefaultProperties);
-    base.push('tips', {data: tip});
+    ref.child('tips/').push({tip})
     this.setState({tip: {}});
   }
 

@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import base from '../base'
 import Layout from '../components/Layout'
 import TipFormContainer from '../components/TipFormContainer'
 import TipFormIntro from '../components/TipFormIntro'
@@ -11,8 +10,9 @@ import TipFormSuspectVehicle from '../components/TipFormSuspectVehicle'
 import TipFormDrugs from '../components/TipFormDrugs'
 import TipFormMedia from '../components/TipFormMedia'
 import TipFormFinal from '../components/TipFormFinal'
+import {ref} from '../helpers/constants'
 
-class SubmitATip extends Component {
+class Home extends Component {
 
   constructor() {
     super()
@@ -103,7 +103,7 @@ class SubmitATip extends Component {
     }
 
     tip = Object.assign(tip, tipDefaultProperties);
-    base.push('tips', {data: tip});
+    ref.child('tips/').push({tip})
 
     this.setState({ stepIndex: this.state.stepIndex++});
   }
@@ -290,4 +290,4 @@ class SubmitATip extends Component {
   }
 }
 
-export default SubmitATip;
+export default Home;

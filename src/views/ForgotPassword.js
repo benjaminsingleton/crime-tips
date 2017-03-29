@@ -5,8 +5,6 @@ import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import Divider from 'material-ui/Divider';
 
-import base from '../base'
-
 import Layout from '../components/Layout'
 
 class ForgotPassword extends Component {
@@ -27,9 +25,9 @@ class ForgotPassword extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    base.resetPassword({
-      email: this.state.email
-    }, this.errorHandler);
+    // base.resetPassword({
+    //   email: this.state.email
+    // }, this.errorHandler);
   }
 
   errorHandler(err) {

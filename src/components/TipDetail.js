@@ -1,5 +1,4 @@
 import React, {Component} from 'react'
-import base from '../base'
 import {tipTimeFormatLong} from '../helpers/helpers'
 import {Card, CardHeader, CardText, CardActions} from 'material-ui/Card';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -37,14 +36,14 @@ class TipDetail extends Component {
   handleTextChange = (event) => {this.setState({userNote: event.target.value})}
 
   createUserNote() {
-    base.push(`tips/${this.props.params.tipId}`, {
-      data: {userNote: event.target.value},
-      then(err){
-        if(!err){
-          console.log('success')
-        }
-      }
-    });
+    // base.push(`tips/${this.props.params.tipId}`, {
+    //   data: {userNote: event.target.value},
+    //   then(err){
+    //     if(!err){
+    //       console.log('success')
+    //     }
+    //   }
+    // });
   }
 
   render() {
