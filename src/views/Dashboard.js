@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import base from '../base'
 import _ from 'underscore'
 
 import Layout from '../components/Layout'
@@ -7,6 +6,8 @@ import DashboardMetrics from '../components/DashboardMetrics'
 import Mailbox from '../components/Mailbox'
 
 import {oneDayAgoTimestamp, firstOfThisYearTimestamp} from '../helpers/helpers'
+import {ref} from '../helpers/constants'
+
 
 class Dashboard extends Component {
   constructor() {
@@ -35,13 +36,13 @@ class Dashboard extends Component {
   }
 
   componentWillMount() {
-    this.ref = base.syncState('tips', {
-      context: this,
-      state: 'tips'
-    });
+    ref.child('tips').on('value', function(snapshot) {
+      const tips = snapshot.val()
+      this.setState({tips})
+    }.bind(this));
   }
 
-  componentWillUnmount = () => base.removeBinding(this.ref);
+  componentWillUnmount = () => ref.child('tips').off();
 
   showTipDetail(key) {
     // Tip marked as read when clicked
@@ -51,25 +52,27 @@ class Dashboard extends Component {
     // Log activity to 'logs' and 'users/uid' for auditing purposes
     const user = this.props.uid;
     const timestamp = Date.now()
-    base.push(`logs/`, {
-      data: {
-        user,
+
+    ref.child('logs/').push({
+        user: user,
         tip: key,
         action: 'read',
-        timestamp
-      }
+        timestamp: timestamp
     });
-    base.push(`users/${user}/activity/`, {
-      data: {
+
+    ref.child(`users/${user}/activity/`).push({
         tip: key,
         action: 'read',
-        timestamp
-      }
+        timestamp: timestamp
     });
 
-    this.setState({tips: tips, tipDetail: tips[key], mailboxRightPanel: 'detail'});
+    this.setState({
+      tips: tips, 
+      tipDetail: tips[key], 
+      mailboxRightPanel: 'detail'
+    });
 
-    this.props.router.push(`tip/${key}`)
+    // this.context.router.history.push(`tip/${key}`)   NEEDS TO BE FIGURED OUT
   }
 
   displayTips() {
@@ -100,22 +103,19 @@ class Dashboard extends Component {
         tips[key]['important'] = false
       }
 
-      base.push(`logs/`, {
-        data: {
-          user,
-          tip: key,
-          action: criteria,
-          status,
-          timestamp
-        }
+      ref.child(`logs/`).push({
+        user: user,
+        tip: key,
+        action: criteria,
+        status: status,
+        timestamp: timestamp
       });
-      base.push(`users/${user}/activity/`, {
-        data: {
-          tip: key,
-          action: criteria,
-          status,
-          timestamp
-        }
+
+      ref.child(`users/${user}/activity/`).push({
+        tip: key,
+        action: criteria,
+        status: status,
+        timestamp: timestamp
       });
     };
 
@@ -187,6 +187,10 @@ class Dashboard extends Component {
       </Layout>
     )
   }
+}
+
+Dashboard.contextTypes = {
+  router: React.PropTypes.object
 }
 
 export default Dashboard;

@@ -1,53 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter, Route, Switch } from 'react-router-dom'
-
-import {blue700, blue500, blue100, redA200} from 'material-ui/styles/colors';
-import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-
-import SubmitATip from './views/SubmitATip';
-import Dashboard from './views/Dashboard';
-import UserSettings from './views/UserSettings';
-import Login from './views/Login';
-import LoggedOut from './views/LoggedOut';
-import ForgotPassword from './views/ForgotPassword';
-import NoMatch from './views/NoMatch';
-import ProtectedView from './components/ProtectedView'
-import PrivateRoute from './components/PrivateRoute'
-
-
+import App from './views/index';
 import injectTapEventPlugin from 'react-tap-event-plugin';
+
 injectTapEventPlugin();
 
-const muiTheme = getMuiTheme({
-  palette: {
-    primary1Color: blue700,
-    primary2Color: blue500,
-    primary3Color: blue100,
-    accent1Color: redA200,
-  },
-});
-
 ReactDOM.render(
-	<MuiThemeProvider muiTheme={muiTheme}>
-	<BrowserRouter>
-		<div>
-			<Switch>
-				<Route exact path="/" component={SubmitATip} />
-				<PrivateRoute path="/admin" component={Dashboard} />
-				<Route component={ProtectedView}>
-					<Route path="login" component={Login} />
-					<Route path="admin" component={Dashboard} />
-					<Route path="tip/:tipId" component={Dashboard} />
-					<Route path="settings" component={UserSettings} />
-				</Route>
-				<Route path="logout" component={LoggedOut} />
-				<Route path="forgot_password" component={ForgotPassword} />
-				<Route component={NoMatch} />
-			</Switch>
-		</div>
-	</BrowserRouter>
-	</MuiThemeProvider>,
+  <App />,
   document.getElementById('root')
 );
