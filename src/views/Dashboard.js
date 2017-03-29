@@ -68,7 +68,7 @@ class Dashboard extends Component {
 
     this.setState({
       tips: tips, 
-      tipDetail: tips[key], 
+      tipDetail: {key: key, details: tips[key]}, 
       mailboxRightPanel: 'detail'
     });
 

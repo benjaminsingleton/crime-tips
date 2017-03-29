@@ -8,15 +8,15 @@ import ContentDrafts from 'material-ui/svg-icons/content/drafts';
 import ContentArchive from 'material-ui/svg-icons/content/archive';
 import ImageLens from 'material-ui/svg-icons/image/lens';
 
-const MailboxLeftPanel = (props) => {
-
-  const {filterTips, openTipLongForm} = props;
+const MailboxLeftPanel = ({filterTips, openTipLongForm}) => {
+  
   const style = {
     fontSize: '14px',
     lineHeight: '8px'
   }
 
-  return (  <div className="col-xs-12 col-sm-4 col-md-3 col-lg-3">
+  return (  
+    <div className="col-xs-12 col-sm-4 col-md-3 col-lg-3">
       <Card>
         <CardText>
           <RaisedButton
