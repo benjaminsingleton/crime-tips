@@ -18,18 +18,18 @@ const styles = {
 };
 
 const TipFormMedia = (props) => {
-    return (
-        <div>
-            <RaisedButton
-                label="Upload media"
-                labelPosition="before"
-                containerElement="label"
-                style={styles.button}
-                >
-                <input type="file" style={styles.exampleImageInput} />
-            </RaisedButton>
-        </div>
-    );
+  return (
+    <div>
+      <RaisedButton
+        label="Upload media"
+        labelPosition="before"
+        containerElement="label"
+        style={styles.button}
+      >
+        <input type="file" style={styles.exampleImageInput} />
+      </RaisedButton>
+    </div>
+  );
 }
     
 export default TipFormMedia

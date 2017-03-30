@@ -6,7 +6,7 @@ import DashboardMetrics from '../components/DashboardMetrics'
 import Mailbox from '../components/Mailbox'
 
 import {oneDayAgoTimestamp, firstOfThisYearTimestamp} from '../helpers/helpers'
-import {ref} from '../helpers/constants'
+import {databaseRef} from '../helpers/constants'
 
 
 class Dashboard extends Component {
@@ -36,33 +36,33 @@ class Dashboard extends Component {
   }
 
   componentWillMount() {
-    ref.child('tips').on('value', function(snapshot) {
+    databaseRef.child('tips').on('value', function(snapshot) {
       const tips = snapshot.val()
       this.setState({tips})
     }.bind(this));
   }
 
-  componentWillUnmount = () => ref.child('tips').off();
+  componentWillUnmount = () => databaseRef.child('tips').off();
 
   showTipDetail(key) {
     // Tip marked as read when clicked
     const tips = {...this.state.tips};
     tips[key].read = true
 
-    ref.child('tips/' + key).update({read: true})
+    databaseRef.child('tips/' + key).update({read: true})
 
     // Log activity to 'logs' and 'users/uid' for auditing purposes
     const user = this.props.uid;
     const timestamp = Date.now()
 
-    ref.child('logs/').push({
+    databaseRef.child('logs/').push({
         user: user,
         tip: key,
         action: 'read',
         timestamp: timestamp
     });
 
-    ref.child(`users/${user}/activity/`).push({
+    databaseRef.child(`users/${user}/activity/`).push({
         tip: key,
         action: 'read',
         timestamp: timestamp
@@ -105,9 +105,9 @@ class Dashboard extends Component {
         tips[key]['important'] = false
       }
 
-      ref.child('tips/' + key).update({...tips[key]})
+      databaseRef.child('tips/' + key).update({...tips[key]})
 
-      ref.child(`logs/`).push({
+      databaseRef.child(`logs/`).push({
         user: user,
         tip: key,
         action: criteria,
@@ -115,7 +115,7 @@ class Dashboard extends Component {
         timestamp: timestamp
       });
 
-      ref.child(`users/${user}/activity/`).push({
+      databaseRef.child(`users/${user}/activity/`).push({
         tip: key,
         action: criteria,
         status: status,

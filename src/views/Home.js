@@ -10,7 +10,7 @@ import TipFormSuspectVehicle from '../components/TipFormSuspectVehicle'
 import TipFormDrugs from '../components/TipFormDrugs'
 import TipFormMedia from '../components/TipFormMedia'
 import TipFormFinal from '../components/TipFormFinal'
-import {ref} from '../helpers/constants'
+import {databaseRef} from '../helpers/constants'
 
 class Home extends Component {
 
@@ -95,7 +95,7 @@ class Home extends Component {
     var tip = {...this.state.tip}
     tip['submitted'] = true
 
-    ref.child('tips/').push({...tip})
+    databaseRef.child('tips/').push({...tip})
     this.changeStep('next')
   }
 

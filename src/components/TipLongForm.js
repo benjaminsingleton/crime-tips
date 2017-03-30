@@ -10,7 +10,7 @@ import TipFormSuspectVehicle from '../components/TipFormSuspectVehicle'
 import TipFormDrugs from '../components/TipFormDrugs'
 import TipFormMedia from '../components/TipFormMedia'
 import TipFormFinal from '../components/TipFormFinal'
-import {ref} from '../helpers/constants'
+import {databaseRef} from '../helpers/constants'
 
 class TipLongForm extends Component {
 
@@ -73,7 +73,7 @@ class TipLongForm extends Component {
       uid: this.props.uid
     }
     tip = Object.assign(tip, tipDefaultProperties);
-    ref.child('tips/').push({tip})
+    databaseRef.child('tips/').push({tip})
     this.setState({tip: {}});
   }
 
