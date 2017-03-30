@@ -96,11 +96,7 @@ class Home extends Component {
     tip['submitted'] = true
 
     ref.child('tips/').push({...tip})
-    console.log(this.state.stepIndex)
-    console.log(this.stepContent)
-    console.log(this.state.stepIndex++)
     this.changeStep('next')
-    console.log(this.state.stepIndex)
   }
 
   resetForm() {
