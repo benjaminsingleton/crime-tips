@@ -26,10 +26,14 @@ const MailboxPanel = (props) => {
                       {tipsToDisplay[key].important ? <ActionGrade/> : null}
                     </TableRowColumn>
                     <TableRowColumn style={{width: '20%'}}>
-                      <a onClick={() => props.showTipDetail(key)}>{tipsToDisplay[key].crimeType}</a>
+                      <a onClick={() => props.showTipDetail(key)}>
+                        {tipsToDisplay[key].read ? tipsToDisplay[key].crimeType : <b>{tipsToDisplay[key].crimeType}</b>}
+                      </a>
                     </TableRowColumn>
                     <TableRowColumn style={{width: '45%'}}>
-                      <a onClick={() => props.showTipDetail(key)}>{tipsToDisplay[key].tipText}</a>
+                      <a onClick={() => props.showTipDetail(key)}>
+                        {tipsToDisplay[key].read ? tipsToDisplay[key].tipText : <b>{tipsToDisplay[key].tipText}</b>}
+                      </a>
                     </TableRowColumn>
                     <TableRowColumn style={{width: '10%'}}>
                       <a onClick={() => props.showTipDetail(key)}>
@@ -38,7 +42,7 @@ const MailboxPanel = (props) => {
                     </TableRowColumn>
                     <TableRowColumn style={{width: '15%', textAlign: 'right'}}>
                       <a onClick={() => props.showTipDetail(key)}>
-                        {tipTimeFormat(tipsToDisplay[key].dateTime)}
+                        {tipsToDisplay[key].read ? tipTimeFormat(tipsToDisplay[key].timestamp) : <b>{tipTimeFormat(tipsToDisplay[key].timestamp)}</b>}
                       </a>
                     </TableRowColumn>
                   </TableRow>)

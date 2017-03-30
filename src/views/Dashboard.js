@@ -47,7 +47,9 @@ class Dashboard extends Component {
   showTipDetail(key) {
     // Tip marked as read when clicked
     const tips = {...this.state.tips};
-    tips[key].readStatus = 'read'
+    tips[key].read = true
+
+    ref.child('tips/' + key).update({read: true})
 
     // Log activity to 'logs' and 'users/uid' for auditing purposes
     const user = this.props.uid;
@@ -102,6 +104,8 @@ class Dashboard extends Component {
       if (criteria==='archived' && status ===true) {
         tips[key]['important'] = false
       }
+
+      ref.child('tips/' + key).update({...tips[key]})
 
       ref.child(`logs/`).push({
         user: user,

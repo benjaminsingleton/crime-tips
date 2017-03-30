@@ -13,7 +13,7 @@ const TipFormIntro = (props) => {
                 <SelectField
                     hintText="Select a crime type"
                     value={props.tip.crimeType}
-                    errorText={props.isAdmin ? props.errorText.crimeType : null}
+                    errorText={props.errorText.crimeType && props.errorText.crimeType}
                     onChange={props.handleSelectChange.bind(null, "crimeType")}
                     >
                     <MenuItem value="Murder" primaryText="Murder" />
@@ -35,7 +35,7 @@ const TipFormIntro = (props) => {
                 multiLine={true}
                 fullWidth={true}
                 value={props.tip.tipText}
-                errorText={props.isAdmin ? props.errorText.crimeType : null}
+                errorText={props.errorText.tipText && props.errorText.tipText}
                 onChange={props.handleTextChange.bind(null, "tipText")}
                 />
             </div>
