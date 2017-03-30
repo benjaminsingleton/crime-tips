@@ -19,7 +19,7 @@ class Home extends Component {
     this.state = {
       tip: {
         timestamp: Date.now(),
-        readStatus: 'unread',
+        read: false,
         attachment: false,
         archived: false,
         important: false,
@@ -29,7 +29,8 @@ class Home extends Component {
         tipsterKnowsSuspectEmployment: false,
         tipsterKnowsSuspectVehicle: false,
         tipsterKnowsAboutDrugs: false,
-        tipsterHasMedia: false
+        tipsterHasMedia: false,
+        submitted: false
       },
       stepIndex: 0,
       stepContent: ['initial', 'second', 'final', 'success'],
@@ -92,20 +93,10 @@ class Home extends Component {
     event.preventDefault();
 
     var tip = {...this.state.tip}
+    tip['submitted'] = true
 
-    const tipDefaultProperties = {
-      timestamp: Date.now(),
-      readStatus: 'unread',
-      attachment: false,
-      archived: false,
-      important: false,
-      tipType: 'web'
-    }
-
-    tip = Object.assign(tip, tipDefaultProperties);
-    ref.child('tips/').push({tip})
-
-    this.setState({ stepIndex: this.state.stepIndex++});
+    ref.child('tips/').push({...tip})
+    this.setState({stepIndex: this.state.stepIndex++});
   }
 
   resetForm() {
@@ -113,26 +104,32 @@ class Home extends Component {
   }
 
   changeStep(direction) {
+    console.log(direction)
     var stepIndex = this.state.stepIndex
 
     if (direction === 'next') {
+      console.log('a')
       if (stepIndex === 0) {
+        console.log('b')
         const crimeTypeError = (this.state.tip.crimeType == null)
         const tipTextError = (this.state.tip.tipText == null || this.state.tip.tipText.length < 20)
         if (crimeTypeError || tipTextError) {
+          console.log('c')
           const errorText = {...this.state.errorText}
           crimeTypeError && (errorText['crimeType'] = 'This field is required')
           tipTextError && (errorText['tipText'] = 'Your description is too brief. 20 characters minimum.')
           this.setState({errorText})
         } else {
+          console.log('d')
           stepIndex++;
           this.setState({errorText: {crimeType: null, tipText: null}})
-          
         }
       } else {
+        console.log('e')
         stepIndex++;
       }
     } else if (direction === 'previous') {
+      console.log('f')
       stepIndex--;
     };
     this.setState({stepIndex})
