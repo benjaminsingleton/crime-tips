@@ -96,7 +96,11 @@ class Home extends Component {
     tip['submitted'] = true
 
     ref.child('tips/').push({...tip})
+    console.log(this.state.stepIndex)
+    console.log(this.stepContent)
+    console.log(this.state.stepIndex++)
     this.changeStep('next')
+    console.log(this.state.stepIndex)
   }
 
   resetForm() {
@@ -105,31 +109,25 @@ class Home extends Component {
 
   changeStep(direction) {
     console.log(direction)
-    var stepIndex = this.state.stepIndex
+    let stepIndex = this.state.stepIndex
 
     if (direction === 'next') {
-      console.log('a')
       if (stepIndex === 0) {
-        console.log('b')
         const crimeTypeError = (this.state.tip.crimeType == null)
         const tipTextError = (this.state.tip.tipText == null || this.state.tip.tipText.length < 20)
         if (crimeTypeError || tipTextError) {
-          console.log('c')
           const errorText = {...this.state.errorText}
           crimeTypeError && (errorText['crimeType'] = 'This field is required')
           tipTextError && (errorText['tipText'] = 'Your description is too brief. 20 characters minimum.')
           this.setState({errorText})
         } else {
-          console.log('d')
           stepIndex++;
           this.setState({errorText: {crimeType: null, tipText: null}})
         }
       } else {
-        console.log('e')
         stepIndex++;
       }
     } else if (direction === 'previous') {
-      console.log('f')
       stepIndex--;
     };
     this.setState({stepIndex})
