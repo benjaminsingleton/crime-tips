@@ -5,6 +5,8 @@ import {blue700, blue500, blue100, redA200} from 'material-ui/styles/colors';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 import Login from './Login'
+import FAQ from './FAQ'
+import About from './About'
 import Home from './Home';
 import Dashboard from './Dashboard';
 import UserSettings from './UserSettings';
@@ -75,6 +77,8 @@ export default class App extends Component {
           <div>
             <Switch>
               <Route path='/' exact component={Home} />
+              <Route path='/about' exact component={About} />
+              <Route path='/faq' exact component={FAQ} />
               <PublicRoute authed={this.state.authed} path='/login' component={Login} />
               <PublicRoute authed={this.state.authed} path='/forgot_password' component={ForgotPassword} />
               <PrivateRoute authed={this.state.authed} uid={this.state.uid} path='/dashboard' component={Dashboard} />
