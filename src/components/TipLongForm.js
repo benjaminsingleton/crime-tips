@@ -17,7 +17,12 @@ class TipLongForm extends Component {
   constructor() {
     super()
     this.state = {
-      tip: {},
+      tip: {
+        read: true,
+        attachment: false,
+        type: 'phone',
+        uid: this.props.uid
+      },
       panelDisplay: {
         1: true,
         2: false,
@@ -33,6 +38,7 @@ class TipLongForm extends Component {
     this.handleSelectChange = this.handleSelectChange.bind(this);
     this.handleTextChange = this.handleTextChange.bind(this);
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
+    this.handleDatePickerChange = this.handleDatePickerChange.bind(this);
     this.createTip = this.createTip.bind(this)
     this.togglePanel = this.togglePanel.bind(this)
   }
@@ -55,6 +61,13 @@ class TipLongForm extends Component {
     this.setState({tip})
   }
 
+  handleDatePickerChange(name, nothing, date) {
+    const tip = {...this.state.tip}
+    console.log(name, date)
+    tip[name] = date
+    this.setState({tip})
+  }
+
   togglePanel(panelNumber) {
     const panelDisplay = {...this.state.panelDisplay}
     panelDisplay[panelNumber] = !panelDisplay[panelNumber]
@@ -64,15 +77,7 @@ class TipLongForm extends Component {
   createTip(event) {
     event.preventDefault();
     var tip = {...this.state.tip}
-
-    const tipDefaultProperties = {
-      timestamp: Date.now(),
-      readStatus: 'unread',
-      attachment: false,
-      type: 'phone',
-      uid: this.props.uid
-    }
-    tip = Object.assign(tip, tipDefaultProperties);
+    tip['timestamp'] = Date.now()
     databaseRef.child('tips/').push({tip})
     this.setState({tip: {}});
   }
@@ -96,7 +101,9 @@ class TipLongForm extends Component {
               <TipFormIntro 
                 tip={this.state.tip}
                 handleSelectChange={this.handleSelectChange} 
-                handleTextChange={this.handleTextChange} />
+                handleTextChange={this.handleTextChange}
+                errorText={false}
+              />
             </CardText>
           </Card>
           <Card expanded={this.state.panelDisplay[2]} onExpandChange={() => this.togglePanel(2)} style={style.card}>
@@ -105,7 +112,9 @@ class TipLongForm extends Component {
               <TipFormSuspectDescription 
                 tip={this.state.tip}
                 handleSelectChange={this.handleSelectChange} 
-                handleTextChange={this.handleTextChange} />
+                handleTextChange={this.handleTextChange} 
+                handleDatePickerChange={this.handleDatePickerChange} 
+              />
             </CardText>
           </Card>
           <Card expanded={this.state.panelDisplay[3]} onExpandChange={() => this.togglePanel(3)} style={style.card}>
@@ -167,7 +176,7 @@ class TipLongForm extends Component {
           <CardActions style={{textAlign: 'right'}}>
             <RaisedButton label="Discard" secondary={true} />
             <RaisedButton label="Save Draft" default={true} />
-            <RaisedButton label="Submit" primary={true} onClick={(e) => this.createTip(e)} />
+            <RaisedButton label="Submit" primary={true} onTouchTap={(e) => this.createTip(e)} />
           </CardActions>
         </Card>
       </div>

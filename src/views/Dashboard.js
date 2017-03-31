@@ -42,6 +42,10 @@ class Dashboard extends Component {
     }.bind(this));
   }
 
+  componentDidMount() {
+    document.body.style.backgroundColor = '#F5F5F5'
+  }
+
   componentWillUnmount = () => databaseRef.child('tips').off();
 
   showTipDetail(key) {
@@ -165,13 +169,13 @@ class Dashboard extends Component {
     const tipsToDisplay = (this.state.searchTerm === '') ? this.displayTips() : this.searchResults()
 
     const counts = {
-      unreadCount: Object.keys(tips).filter(key => tips[key].readStatus === 'unread').length,
-      lastTwentyFourHourTipCount: Object.keys(tips).filter(key => tips[key].dateTime >= oneDayAgoTimestamp()).length,
-      thisYearTipCount: Object.keys(tips).filter(key => tips[key].dateTime >= firstOfThisYearTimestamp()).length
+      unreadCount: Object.keys(tips).filter(key => tips[key].read === false).length,
+      lastTwentyFourHourTipCount: Object.keys(tips).filter(key => tips[key].timestamp >= oneDayAgoTimestamp()).length,
+      thisYearTipCount: Object.keys(tips).filter(key => tips[key].timestamp >= firstOfThisYearTimestamp()).length
     }
 
     return (
-      <Layout uid={this.props.uid} logout={this.props.logout}>
+      <Layout uid={this.props.uid}>
         <DashboardMetrics counts={counts} />
         <Mailbox
           uid={this.props.uid}
