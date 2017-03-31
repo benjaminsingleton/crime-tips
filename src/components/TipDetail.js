@@ -4,7 +4,7 @@ import {Card, CardHeader, CardText, CardActions} from 'material-ui/Card';
 import RaisedButton from 'material-ui/RaisedButton';
 import Divider from 'material-ui/Divider';
 import TextField from 'material-ui/TextField';
-import {ref} from '../helpers/constants'
+import {databaseRef} from '../helpers/constants'
 
 export default class TipDetail extends Component {
   constructor() {
@@ -36,11 +36,10 @@ export default class TipDetail extends Component {
   handleTextChange = (event) => {this.setState({userNote: event.target.value})}
 
   createUserNote() {
-    const timestamp = Date.now()
-    ref.child(`tips/${this.props.tipDetail.key}/userNotes/`).push({
+    databaseRef.child(`tips/${this.props.tipDetail.key}/userNotes/`).push({
       note: this.state.userNote,
       uid: this.props.uid,
-      timestamp: timestamp
+      timestamp: Date.now()
     });
     this.setState({userNote: ''})
   }
