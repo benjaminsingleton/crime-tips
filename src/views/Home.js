@@ -40,7 +40,6 @@ class Home extends Component {
       }
     }
     this.baseState = this.state
-
     this.getStepContent = this.getStepContent.bind(this)
     this.handleInputChange = this.handleInputChange.bind(this)
     this.addToStepContent = this.addToStepContent.bind(this)
@@ -82,19 +81,16 @@ class Home extends Component {
     const target = event.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
-
     const tip = {...this.state.tip}
     tip[name] = value
-
     this.setState({tip})
   }
 
   createTip(event) {
     event.preventDefault();
-
     var tip = {...this.state.tip}
     tip['submitted'] = true
-
+    tip['timestamp'] = Date.now()
     databaseRef.child('tips/').push({...tip})
     this.changeStep('next')
   }

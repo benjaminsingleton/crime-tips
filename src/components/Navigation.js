@@ -4,12 +4,13 @@ import AppBar from 'material-ui/AppBar';
 import FlatButton from 'material-ui/FlatButton';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
+import {logout} from '../helpers/auth'
 
-const AppBarWithLink = ({uid, logout, handleToggle}) => (
+const AppBarWithLink = ({uid, handleToggle}) => (
   <Route render={({history}) => (
     <AppBar
       title="Gotham Police Crime Tips"
-      iconElementRight={uid ? <FlatButton label="Log Out" onClick={logout}/> : null}
+      iconElementRight={uid ? <FlatButton label="Log Out" onTouchTap={logout}/> : null}
       onLeftIconButtonTouchTap={handleToggle}
       onTitleTouchTap={() => {history.push('/')}}
       zDepth={0}
@@ -37,6 +38,10 @@ const SettingsMenuItem = withRouter(({ history }) => (
   <MenuItem onTouchTap={() => {history.push('/settings')}}>My Settings</MenuItem>
 ))
 
+const AccountManagementMenuItem = withRouter(({ history }) => (
+  <MenuItem onTouchTap={() => {history.push('/account_management')}}>Account Management</MenuItem>
+))
+
 class Navigation extends Component {
   constructor() {
     super()
@@ -53,7 +58,7 @@ class Navigation extends Component {
   render() {
     return (
       <div>
-        <AppBarWithLink uid={this.props.uid} logout={this.props.logout} handleToggle={this.handleToggle} />
+        <AppBarWithLink uid={this.props.uid} handleToggle={this.handleToggle} />
         <Drawer
           open={this.state.open}
           onRequestChange={this.closeDrawer}
@@ -62,6 +67,7 @@ class Navigation extends Component {
             ? <div>
                 <HomeMenuItem />
                 <SettingsMenuItem />
+                <AccountManagementMenuItem />
                 <AboutMenuItem />
               </div>
             : <div>
