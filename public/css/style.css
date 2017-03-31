@@ -1,9 +1,10 @@
 body {
-    background: #F5F5F5; 
+    /*background: #F5F5F5; */
+    background: #2196F3;
     margin: 0px;
     box-sizing: border-box;
     min-height: 100vh;
-    border-bottom: solid 20px #9E9E9E;
+    border-bottom: solid 20px #1976d2;
 }
 
 h1 {
@@ -18,6 +19,7 @@ h1 {
 .cardAccentBanner {
     background: #FF5252;
     height: 8px;
+    border-radius: 8px 8px 0 0;
 }
 
 .prompt {

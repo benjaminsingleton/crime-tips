@@ -5,7 +5,7 @@ import Divider from 'material-ui/Divider';
 
 const TipFormContainer = (props) => {
   return (
-    <Card>
+    <Card style={{borderRadius: '8px'}}>
       <div className="cardAccentBanner"></div>
       <CardTitle
         title={props.title}
