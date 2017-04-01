@@ -21,7 +21,6 @@ class TipLongForm extends Component {
         read: true,
         attachment: false,
         type: 'phone',
-        uid: this.props.uid
       },
       panelDisplay: {
         1: true,
@@ -78,6 +77,7 @@ class TipLongForm extends Component {
     event.preventDefault();
     var tip = {...this.state.tip}
     tip['timestamp'] = Date.now()
+    tip['uid'] = this.props.uid
     databaseRef.child('tips/').push({tip})
     this.setState({tip: {}});
   }
