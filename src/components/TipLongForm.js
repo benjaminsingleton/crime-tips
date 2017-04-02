@@ -18,6 +18,7 @@ class TipLongForm extends Component {
     super()
     this.state = {
       tip: {
+        archived: false,
         read: true,
         attachment: false,
         type: 'phone',
@@ -76,10 +77,12 @@ class TipLongForm extends Component {
   createTip(event) {
     event.preventDefault();
     var tip = {...this.state.tip}
+    tip['submitted'] = true
     tip['timestamp'] = Date.now()
     tip['uid'] = this.props.uid
-    databaseRef.child('tips/').push({tip})
+    databaseRef.child('tips/').push({...tip})
     this.setState({tip: {}});
+    this.props.filterTips('archived', false)
   }
 
   render() {
