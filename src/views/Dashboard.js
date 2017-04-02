@@ -22,7 +22,9 @@ class Dashboard extends Component {
       selectedTipKeys: [],
       tipDetail: null,
       mailboxRightPanel: 'mailbox',
-      searchTerm: ''
+      searchTerm: '',
+      tipsPerPage: 10,
+      showPage: 0
     }
     this.showTipDetail = this.showTipDetail.bind(this);
     this.addSelectedItem = this.addSelectedItem.bind(this);
@@ -33,6 +35,7 @@ class Dashboard extends Component {
     this.searchTips = this.searchTips.bind(this)
     this.displayTips = this.displayTips.bind(this)
     this.searchResults = this.searchResults.bind(this)
+    this.changePage = this.changePage.bind(this)
   }
 
   componentWillMount() {
@@ -81,10 +84,31 @@ class Dashboard extends Component {
     // this.context.router.history.push(`tip/${key}`)   NEEDS TO BE FIGURED OUT
   }
 
+  reverseTips(tipObj) {
+    const tipsToDisplay = {};
+    Object.keys(tipObj).reverse().forEach((key) => tipsToDisplay[key] = tipObj[key])
+    return tipsToDisplay
+  }
+
+  paginateTips(tips) {
+    const showPage = this.state.showPage
+    const tipsPerPage = this.state.tipsPerPage
+    const paginatedTips = {};
+    Object.keys(tips).slice((showPage * tipsPerPage), (showPage * tipsPerPage + tipsPerPage))
+                     .forEach((key) => paginatedTips[key] = tips[key]);
+    return paginatedTips
+  }
+
   displayTips() {
     const criteria = this.state.tipsToDisplayStatus['criteria']
     const value = this.state.tipsToDisplayStatus['value']
-    return this.reverseTips(_.pick(this.state.tips, key => key[criteria]===value))
+    const tips = this.state.tips
+
+    let tipsToDisplay = _.pick(tips, key => key[criteria]===value)
+    tipsToDisplay = this.reverseTips(tipsToDisplay)
+    tipsToDisplay = this.paginateTips(tipsToDisplay)
+    
+    return tipsToDisplay
   }
 
   addSelectedItem(selectedRows) {
@@ -132,12 +156,6 @@ class Dashboard extends Component {
     this.setState({tips, selectedTipKeys: []});
   }
 
-  reverseTips(tipObj) {
-    const tipsToDisplay = {};
-    Object.keys(tipObj).reverse().forEach((key) => tipsToDisplay[key] = tipObj[key])
-    return tipsToDisplay
-  }
-
   filterTips(criteria, value) {
     this.setState({ 
       tipsToDisplayStatus: {
@@ -152,6 +170,8 @@ class Dashboard extends Component {
   openTipLongForm = () => this.setState({mailboxRightPanel: 'form'});
 
   searchTips = (searchTerm) => this.setState({searchTerm});
+
+  changePage = (value) => this.setState({showPage: this.state.showPage + value})
 
   searchResults() {
     const matches = Object.keys(this.state.tips)
@@ -191,7 +211,10 @@ class Dashboard extends Component {
           openTipLongForm={this.openTipLongForm}
           selectedTipKeys={this.state.selectedTipKeys}
           searchTips={this.searchTips} 
-          searchTerm={this.state.searchTerm} />
+          searchTerm={this.state.searchTerm} 
+          changePage={this.changePage} 
+          showPage={this.state.showPage}
+          tipsPerPage={this.state.tipsPerPage} />
       </Layout>
     )
   }

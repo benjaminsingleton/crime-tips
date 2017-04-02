@@ -18,7 +18,10 @@ class Mailbox extends Component {
             tipsToDisplay={this.props.tipsToDisplay}
             searchTips={this.props.searchTips}
             searchTerm={this.props.searchTerm}
-            isAdmin={true} />
+            isAdmin={true}
+            showNextButton={(Object.keys(this.props.tipsToDisplay).length < this.props.tipsPerPage) ? false: true}
+            showPreviousButton={(this.props.showPage===0) ? false: true}
+            changePage={this.props.changePage} />
         )
       case 'detail':
         return <TipDetail tipDetail={this.props.tipDetail} uid={this.props.uid} tips={this.props.tips} />
