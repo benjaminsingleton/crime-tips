@@ -44,6 +44,13 @@ export default class TipDetail extends Component {
     this.setState({userNote: ''})
   }
 
+  deleteUserNote(userNoteKey) {
+    databaseRef.child(`tips/${this.props.tipDetail.key}/userNotes/${userNoteKey}`).update({
+      deleted: true,
+      deleted_timestamp: Date.now()
+    })
+  }
+
   render() {
     const details = this.props.tips[this.props.tipDetail.key]
 
@@ -52,17 +59,27 @@ export default class TipDetail extends Component {
       header: {backgroundColor: '#E0E0E0'}
     }
 
-    const userNotes = details.userNotes ? Object.keys(details.userNotes).map(key => 
-                                                        <Card style={style.card}>
-                                                          <CardHeader 
-                                                            title={`${details.userNotes[key].uid} ${details.userNotes[key].timestamp}`} 
-                                                            style={style.header} 
+    const userNotes = details.userNotes ? Object.keys(details.userNotes).filter(key => !details.userNotes[key].deleted) : null
+    const userNotesToDisplay = userNotes.map(key => 
+                                                  <Card style={style.card} key={key}>
+                                                    <CardHeader 
+                                                      title={`${details.userNotes[key].uid} ${details.userNotes[key].timestamp}`} 
+                                                      style={style.header} 
+                                                    />
+                                                    <CardText>
+                                                      <p>{details.userNotes[key].note}</p>
+                                                    </CardText>
+                                                    {(details.userNotes[key].uid === this.props.uid) 
+                                                      ? <CardActions style={{textAlign: 'right'}}>
+                                                          <RaisedButton 
+                                                            label="Delete" 
+                                                            default={true} 
+                                                            onTouchTap={() => this.deleteUserNote(key)} 
                                                           />
-                                                          <CardText>
-                                                            <p>{details.userNotes[key].note}</p>
-                                                          </CardText>
-                                                        </Card>)
+                                                        </CardActions>
                                                       : null
+                                                    }
+                                                  </Card>)
 
     return (
       <div className="col-xs-12 col-sm-8 col-md-9 col-lg-9">
@@ -171,7 +188,7 @@ export default class TipDetail extends Component {
           <Card expanded={this.state.panelDisplay[9]} onExpandChange={() => this.togglePanel(9)} style={style.card}>
             <CardHeader title="** User Notes **" actAsExpander={true} showExpandableButton={true} style={style.header} />
             <CardText expandable={true}>
-              {userNotes}
+              {userNotes && userNotesToDisplay}
               <TextField
                 hintText="Add new note here"
                 multiLine={true}
