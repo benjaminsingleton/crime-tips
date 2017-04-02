@@ -18,7 +18,8 @@ import {tipTimeFormat} from '../helpers/helpers'
 
 const MailboxPanel = (props) => {
 
-  const {markTipAs, addSelectedItem, tipsToDisplay, searchTerm, searchTips} = props;
+  const {markTipAs, addSelectedItem, tipsToDisplay, searchTerm, 
+    searchTips, changePage, showNextButton, showPreviousButton} = props;
 
   const tipRows = Object.keys(tipsToDisplay).map(key => 
                   <TableRow key={key}>
@@ -88,8 +89,8 @@ const MailboxPanel = (props) => {
           </Table>
         </CardText>
         <CardActions style={{textAlign: 'right'}}>
-          <RaisedButton label="Previous" default={true}/>
-          <RaisedButton label="Next" default={true}/>
+          { showPreviousButton && <RaisedButton label="Previous" default={true} onTouchTap={() => changePage(-1)} />}
+          { showNextButton && <RaisedButton label="Next" default={true} onTouchTap={() => changePage(1)} />}
         </CardActions>
       </Card>
     </div>
