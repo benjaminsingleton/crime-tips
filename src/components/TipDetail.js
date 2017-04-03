@@ -60,7 +60,8 @@ export default class TipDetail extends Component {
     }
 
     const userNotes = details.userNotes ? Object.keys(details.userNotes).filter(key => !details.userNotes[key].deleted) : null
-    const userNotesToDisplay = userNotes.map(key => 
+    const userNotesToDisplay = userNotes ?
+                                  userNotes.map(key => 
                                                   <Card style={style.card} key={key}>
                                                     <CardHeader 
                                                       title={`${details.userNotes[key].uid} ${details.userNotes[key].timestamp}`} 
@@ -80,6 +81,7 @@ export default class TipDetail extends Component {
                                                       : null
                                                     }
                                                   </Card>)
+                                      : null
 
     return (
       <div className="col-xs-12 col-sm-8 col-md-9 col-lg-9">
