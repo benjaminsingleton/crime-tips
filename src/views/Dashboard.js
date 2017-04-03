@@ -169,7 +169,7 @@ class Dashboard extends Component {
 
   openTipLongForm = () => this.setState({mailboxRightPanel: 'form'});
 
-  searchTips = (searchTerm) => this.setState({searchTerm});
+  searchTips = (searchTerm) => this.setState({searchTerm, showPage: 0});
 
   changePage = (value) => this.setState({showPage: this.state.showPage + value})
 
@@ -180,7 +180,7 @@ class Dashboard extends Component {
                                                               .indexOf(this.state.searchTerm.toLowerCase()) !== -1)
     const tipsToDisplay = {}
     matches.reverse().forEach((key) => tipsToDisplay[key] = this.state.tips[key])
-    return tipsToDisplay
+    return this.paginateTips(tipsToDisplay)
   }
 
   render() {
