@@ -19,7 +19,7 @@ class Mailbox extends Component {
             searchTips={this.props.searchTips}
             searchTerm={this.props.searchTerm}
             isAdmin={true}
-            showNextButton={(Object.keys(this.props.tipsToDisplay).length < this.props.tipsPerPage) ? false: true}
+            showNextButton={(Object.keys(this.props.tipsToDisplay).length <= this.props.tipsPerPage) ? false: true}
             showPreviousButton={(this.props.showPage===0) ? false: true}
             changePage={this.props.changePage} />
         )
