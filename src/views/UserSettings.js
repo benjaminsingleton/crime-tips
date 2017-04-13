@@ -1,4 +1,9 @@
 import React, {Component} from 'react';
+import {Card, CardHeader, CardText} from 'material-ui/Card';
+import TextField from 'material-ui/TextField';
+import RaisedButton from 'material-ui/RaisedButton';
+import Toggle from 'material-ui/Toggle';
+import Divider from 'material-ui/Divider';
 
 import Layout from '../components/Layout'
 
@@ -6,85 +11,50 @@ class UserSettings extends Component {
   render() {
     return (
       <Layout uid={this.props.uid} logout={this.props.logout}>
-        <div className="wrapper wrapper-content">
-          <div className="row animated fadeInRight">
-            <div className="col-md-4">
-              <div className="ibox float-e-margins">
-                <div className="ibox-title">
-                  <h5>Profile Detail</h5>
-                </div>
-                <div>
-                  <div className="ibox-content no-padding border-left-right"></div>
-                  <div className="ibox-content profile-content">
-                    <h4>
-                      <strong>Ben Singleton</strong>
-                    </h4>
-                    <h5>Police Officer</h5>
-                    <p><i className="fa fa-map-marker"></i>User since 2/10/2017</p>
-                    <div className="user-button">
-                      <div className="row">
-                        <div className="col-md-6">
-                          <button className="btn btn-primary btn-sm btn-block" type="button">Change Password</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-8">
-              <div className="ibox float-e-margins">
-                <div className="ibox-title">
-                  <h5>Recent Activity</h5>
-                </div>
-                <div className="ibox-content">
-                  <div>
-                    <div className="feed-activity-list">
-                      <div className="feed-element">
-                        <div className="media-body">
-                          <small className="pull-right">5m ago</small>
-                          <strong>Ben Singleton</strong> added a new tip.
-                          <br/>
-                          <small className="text-muted">Today 5:60 pm - 12.06.2014</small>
-                        </div>
-                      </div>
-                      <div className="feed-element">
-                        <div className="media-body">
-                          <small className="pull-right">5m ago</small>
-                          <strong>Ben Singleton</strong> added a new tip.
-                          <br/>
-                          <small className="text-muted">Today 5:60 pm - 12.06.2014</small>
-                        </div>
-                      </div>
-                      <div className="feed-element">
-                        <div className="media-body">
-                          <small className="pull-right">5m ago</small>
-                          <strong>Ben Singleton</strong> reviewed and closed a tip.
-                          <br/>
-                          <small className="text-muted">Today 5:60 pm - 12.06.2014</small>
-                        </div>
-                      </div>
-                      <div className="feed-element">
-                        <div className="media-body">
-                          <small className="pull-right">5m ago</small>
-                          <strong>Ben Singleton</strong> posted a new blog.
-                          <br/>
-                          <small className="text-muted">Today 5:60 pm - 12.06.2014</small>
-                        </div>
-                      </div>
-                      <div className="feed-element">
-                        <div className="media-body">
-                          <small className="pull-right">5m ago</small>
-                          <strong>Ben Singleton</strong> reviewed and closed a tip.
-                          <br/>
-                          <small className="text-muted">Today 5:60 pm - 12.06.2014</small>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div className="row">
+          <div className="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+            <Card style={{marginLeft: '8px', marginTop: '8px'}} >
+              <CardHeader title="My Settings"/>
+              <Divider />
+              <CardText>
+                <h2>Rank Firstname Lastname</h2>
+                <br />
+                <Divider />
+                <h3>Change Password</h3>
+                <p>Type in a new password (twice) to change it</p>
+                <TextField hintText="Password" />
+                <TextField hintText="Password again" style={{marginBottom: '20px'}} />
+                <RaisedButton label="Change Password" primary={true} style={{marginBottom: '20px'}}/>
+                <Divider />
+                <h3>Notifications</h3>
+                <Toggle
+                  label="Receive emails when new tips are submitted"
+                  defaultToggled={true}
+                />
+              </CardText>
+            </Card>
+          </div>
+          <div className="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+            <Card style={{marginTop: '8px'}}>
+              <CardHeader title="Recent Activity"/>
+              <Divider />
+              <CardText>
+                <p>5m ago</p>
+                <p><b>Ben Singleton</b> added a new tip.</p>
+                <Divider />
+                <p>8m ago</p>
+                <p><b>Ben Singleton</b> added a new tip.</p>
+                <Divider />
+                <p>16m ago</p>
+                <p><b>Ben Singleton</b> archived a tip.</p>
+                <Divider />
+                <p>2hr ago</p>
+                <p><b>Ben Singleton</b> flagged a tip as important.</p>
+                <Divider />
+                <p>2hr ago</p>
+                <p><b>Ben Singleton</b> read a tip.</p>
+              </CardText>
+            </Card>
           </div>
         </div>
       </Layout>
