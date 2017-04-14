@@ -6,7 +6,8 @@ const config = {
   databaseURL: "https://crimetips-c7b87.firebaseio.com",
 }
 
-firebase.initializeApp(config)
+const firebaseApp = firebase.initializeApp(config)
 
-export const databaseRef = firebase.database().ref()
-export const firebaseAuth = firebase.auth
+export {firebaseApp}
+export const databaseRef = firebaseApp.database().ref()
+export const firebaseAuth = firebaseApp.auth
