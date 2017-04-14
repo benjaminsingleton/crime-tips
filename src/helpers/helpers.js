@@ -52,3 +52,15 @@ export function tipTimeFormatLong(ts) {
 
     return tipDateTime.format('MMMM Do YYYY, h:mm a')
 }
+
+export function relativeTime(ts) {
+    const relativeTime = moment(new Date(ts))
+
+    return relativeTime.fromNow()
+}
+
+export function reverse(obj) {
+      const reversedObj = {};
+      Object.keys(obj).reverse().forEach((key) => reversedObj[key] = obj[key])
+      return reversedObj
+    }
