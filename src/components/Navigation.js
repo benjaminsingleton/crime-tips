@@ -6,6 +6,8 @@ import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import {logout} from '../helpers/auth'
 
+import {firebaseApp} from '../helpers/constants'
+
 const AppBarWithLink = ({uid, handleToggle}) => (
   <Route render={({history}) => (
     <AppBar
@@ -20,6 +22,10 @@ const AppBarWithLink = ({uid, handleToggle}) => (
 
 const HomeMenuItem = withRouter(({ history }) => (
   <MenuItem onTouchTap={() => {history.push('/')}}>Home</MenuItem>
+))
+
+const DashboardMenuItem = withRouter(({ history }) => (
+  <MenuItem onTouchTap={() => {history.push('/dashboard')}}>Dashboard</MenuItem>
 ))
 
 const FAQsMenuItem = withRouter(({ history }) => (
@@ -42,13 +48,19 @@ const AccountManagementMenuItem = withRouter(({ history }) => (
   <MenuItem onTouchTap={() => {history.push('/account_management')}}>Account Management</MenuItem>
 ))
 
-class Navigation extends Component {
+export default class Navigation extends Component {
   constructor() {
     super()
     this.state = {
-      open: false
+      open: false,
+      uid: null
     }
     this.handleToggle = this.handleToggle.bind(this)
+  }
+
+  componentDidMount() {
+    const user = firebaseApp.auth().currentUser
+    if (user) this.setState({uid: user.uid})
   }
 
   handleToggle = () => this.setState({open: !this.state.open});
@@ -58,14 +70,15 @@ class Navigation extends Component {
   render() {
     return (
       <div>
-        <AppBarWithLink uid={this.props.uid} handleToggle={this.handleToggle} />
+        <AppBarWithLink uid={this.state.uid} handleToggle={this.handleToggle} />
         <Drawer
           open={this.state.open}
           onRequestChange={this.closeDrawer}
           docked={false}>
-          {this.props.uid
+          {this.state.uid
             ? <div>
                 <HomeMenuItem />
+                <DashboardMenuItem />
                 <SettingsMenuItem />
                 <AccountManagementMenuItem />
                 <AboutMenuItem />
@@ -82,5 +95,3 @@ class Navigation extends Component {
     )
   }
 }
-
-export default Navigation
