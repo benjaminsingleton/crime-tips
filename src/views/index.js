@@ -82,7 +82,7 @@ export default class App extends Component {
               <PublicRoute authed={this.state.authed} path='/login' component={Login} />
               <PublicRoute authed={this.state.authed} path='/forgot_password' component={ForgotPassword} />
               <PrivateRoute authed={this.state.authed} uid={this.state.uid} path='/dashboard' component={Dashboard} />
-              <PrivateRoute authed={this.state.authed} path='/settings' component={UserSettings} />
+              <PrivateRoute authed={this.state.authed} uid={this.state.uid} path='/settings' component={UserSettings} />
               <PrivateRoute authed={this.state.authed} path='/tip/:tipId' component={Dashboard} />
               <PrivateRoute authed={this.state.authed} path='/logout' component={LoggedOut} />
               <Route component={NoMatch} />
