@@ -4,7 +4,9 @@ import {Card, CardHeader, CardText, CardActions} from 'material-ui/Card';
 import RaisedButton from 'material-ui/RaisedButton';
 import Divider from 'material-ui/Divider';
 import TextField from 'material-ui/TextField';
+import moment from 'moment'
 import {databaseRef} from '../helpers/constants'
+import tipToPDF from '../helpers/tipToPDF'
 
 export default class TipDetail extends Component {
   constructor() {
@@ -20,11 +22,13 @@ export default class TipDetail extends Component {
         7: true,
         8: true,
         9: true
-      }
+      },
+      noteAuthors: {}
     }
     this.togglePanel = this.togglePanel.bind(this)
     this.handleTextChange = this.handleTextChange.bind(this)
     this.createUserNote = this.createUserNote.bind(this)
+    this.generateUserNoteTitle = this.generateUserNoteTitle.bind(this)
   }
 
   togglePanel(panelNumber) {
@@ -51,6 +55,23 @@ export default class TipDetail extends Component {
     })
   }
 
+  getUserName(key, uid) {
+      databaseRef.child(`users/${uid}/account`).once('value', function(snapshot) {
+        const user = snapshot.val()
+        const noteAuthors = {...this.state.noteAuthors}
+        noteAuthors[key] = `${user.rank} ${user.firstName} ${user.lastName}`
+        this.setState({noteAuthors})
+      });
+  }
+
+  generateUserNoteTitle(uid, timestamp) {
+    const name = this.getUserName(uid)
+    const date = moment(new Date(timestamp)).format('MMMM Do YYYY, h:mm a')
+    console.log(name)
+    console.log(date)
+    return `${name} ${date}`
+  }
+
   render() {
     const details = this.props.tips[this.props.tipDetail.key]
 
@@ -59,29 +80,36 @@ export default class TipDetail extends Component {
       header: {backgroundColor: '#E0E0E0'}
     }
 
-    const userNotes = details.userNotes ? Object.keys(details.userNotes).filter(key => !details.userNotes[key].deleted) : null
-    const userNotesToDisplay = userNotes ?
-                                  userNotes.map(key => 
-                                                  <Card style={style.card} key={key}>
-                                                    <CardHeader 
-                                                      title={`${details.userNotes[key].uid} ${details.userNotes[key].timestamp}`} 
-                                                      style={style.header} 
-                                                    />
-                                                    <CardText>
-                                                      <p>{details.userNotes[key].note}</p>
-                                                    </CardText>
-                                                    {(details.userNotes[key].uid === this.props.uid) 
-                                                      ? <CardActions style={{textAlign: 'right'}}>
-                                                          <RaisedButton 
-                                                            label="Delete" 
-                                                            default={true} 
-                                                            onTouchTap={() => this.deleteUserNote(key)} 
-                                                          />
-                                                        </CardActions>
-                                                      : null
-                                                    }
-                                                  </Card>)
-                                      : null
+    const userNotes = details.userNotes 
+                        ? Object.keys(details.userNotes).filter(key => !details.userNotes[key].deleted)
+                        : null
+    
+    let userNotesToDisplay = null
+    
+    if (userNotes) {
+      userNotes.map(function(key) {
+        <Card style={style.card} key={key}>
+          <CardHeader 
+            title={`${this.state.noteAuthors[key]} ${moment(new Date(details.userNotes[key].timestamp)).format('MMMM Do YYYY, h:mm a')}`} 
+            style={style.header} 
+          />
+          <CardText>
+            <p>{details.userNotes[key].note}</p>
+          </CardText>
+          {(details.userNotes[key].uid === this.props.uid) 
+            ? <CardActions style={{textAlign: 'right'}}>
+                <RaisedButton 
+                  label="Delete" 
+                  default={true} 
+                  onTouchTap={() => this.deleteUserNote(key)} 
+                />
+              </CardActions>
+            : null
+          }
+        </Card>
+      }
+    }
+
 
     return (
       <div className="col-xs-12 col-sm-8 col-md-9 col-lg-9">
@@ -205,7 +233,7 @@ export default class TipDetail extends Component {
             </CardText>
           </Card>
           <CardActions style={{textAlign: 'right'}}>
-            <RaisedButton label="Print" default={true}/>
+            <RaisedButton label="Print" default={true} onTouchTap={() => tipToPDF()}/>
             <RaisedButton label="Email" default={true}/>
             <RaisedButton label="Archive" primary={true}/>
           </CardActions>
