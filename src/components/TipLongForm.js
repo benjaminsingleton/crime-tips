@@ -10,7 +10,7 @@ import TipFormSuspectVehicle from '../components/TipFormSuspectVehicle'
 import TipFormDrugs from '../components/TipFormDrugs'
 import TipFormMedia from '../components/TipFormMedia'
 import TipFormFinal from '../components/TipFormFinal'
-import {databaseRef} from '../helpers/constants'
+import {firebaseApp, databaseRef} from '../helpers/constants'
 
 class TipLongForm extends Component {
 
@@ -79,7 +79,7 @@ class TipLongForm extends Component {
     var tip = {...this.state.tip}
     tip['submitted'] = true
     tip['timestamp'] = Date.now()
-    tip['uid'] = this.props.uid
+    tip['uid'] = firebaseApp.auth().currentUser.uid
     databaseRef.child('tips/').push({...tip})
     this.setState({tip: {}});
     this.props.filterTips('archived', false)
