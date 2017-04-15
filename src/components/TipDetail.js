@@ -6,7 +6,6 @@ import Divider from 'material-ui/Divider';
 import TextField from 'material-ui/TextField';
 import moment from 'moment'
 import {firebaseApp, databaseRef} from '../helpers/constants'
-import tipToPDF from '../helpers/tipToPDF'
 
 export default class TipDetail extends Component {
   constructor() {
@@ -237,7 +236,7 @@ export default class TipDetail extends Component {
             </CardText>
           </Card>
           <CardActions style={{textAlign: 'right'}}>
-            <RaisedButton label="Print" default={true} onTouchTap={() => tipToPDF()}/>
+            <RaisedButton label="Print" default={true} />
             <RaisedButton label="Email" default={true}/>
             <RaisedButton label="Archive" primary={true}/>
           </CardActions>
