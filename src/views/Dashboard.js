@@ -107,7 +107,6 @@ class Dashboard extends Component {
     let tipsToDisplay = _.pick(tips, key => key[criteria]===value)
     tipsToDisplay = this.reverseTips(tipsToDisplay)
     tipsToDisplay = this.paginateTips(tipsToDisplay)
-    
     return tipsToDisplay
   }
 
@@ -178,9 +177,10 @@ class Dashboard extends Component {
                           .filter(key => this.state.tips[key].tipText
                                                               .toLowerCase()
                                                               .indexOf(this.state.searchTerm.toLowerCase()) !== -1)
-    const tipsToDisplay = {}
+    let tipsToDisplay = {}
     matches.reverse().forEach((key) => tipsToDisplay[key] = this.state.tips[key])
-    return this.paginateTips(tipsToDisplay)
+    tipsToDisplay = this.paginateTips(tipsToDisplay)
+    return tipsToDisplay
   }
 
   render() {
@@ -200,6 +200,7 @@ class Dashboard extends Component {
         <Mailbox
           uid={this.props.uid}
           tips={tips}
+          tipCount={Object.keys(tipsToDisplay).length}
           tipsToDisplay={tipsToDisplay}
           unreadCount={counts.unreadCount}
           showTipDetail={this.showTipDetail}
