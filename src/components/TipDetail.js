@@ -64,14 +64,6 @@ export default class TipDetail extends Component {
       });
   }
 
-  generateUserNoteTitle(uid, timestamp) {
-    const name = this.getUserName(uid)
-    const date = moment(new Date(timestamp)).format('MMMM Do YYYY, h:mm a')
-    console.log(name)
-    console.log(date)
-    return `${name} ${date}`
-  }
-
   render() {
     const details = this.props.tips[this.props.tipDetail.key]
 
@@ -85,18 +77,17 @@ export default class TipDetail extends Component {
                         : null
     
     let userNotesToDisplay = null
-    
     if (userNotes) {
-      userNotes.map(function(key) {
+      userNotesToDisplay = userNotes.map(key => 
         <Card style={style.card} key={key}>
           <CardHeader 
-            title={`${this.state.noteAuthors[key]} ${moment(new Date(details.userNotes[key].timestamp)).format('MMMM Do YYYY, h:mm a')}`} 
+            title={`${moment(new Date(details.userNotes[key].timestamp)).format('MMMM Do YYYY, h:mm a')}`}
             style={style.header} 
           />
           <CardText>
             <p>{details.userNotes[key].note}</p>
           </CardText>
-          {(details.userNotes[key].uid === this.props.uid) 
+          {(details.userNotes[key].uid === this.props.uid)
             ? <CardActions style={{textAlign: 'right'}}>
                 <RaisedButton 
                   label="Delete" 
@@ -107,10 +98,9 @@ export default class TipDetail extends Component {
             : null
           }
         </Card>
-      }
+      )
     }
-
-
+    
     return (
       <div className="col-xs-12 col-sm-8 col-md-9 col-lg-9">
         <Card>
