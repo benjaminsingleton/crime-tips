@@ -5,7 +5,7 @@ import Navigation from '../components/Navigation'
 const Layout = (props) => {
   return (
     <div>
-      <Navigation uid={props.uid} /> 
+      <Navigation /> 
       {props.children}
     </div>
   );

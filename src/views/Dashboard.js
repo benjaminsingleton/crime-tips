@@ -1,15 +1,12 @@
 import React, {Component} from 'react';
 import _ from 'underscore'
-
 import Layout from '../components/Layout'
 import DashboardMetrics from '../components/DashboardMetrics'
 import Mailbox from '../components/Mailbox'
-
 import {oneDayAgoTimestamp, firstOfThisYearTimestamp} from '../helpers/helpers'
 import {databaseRef} from '../helpers/constants'
 
-
-class Dashboard extends Component {
+export default class Dashboard extends Component {
   constructor() {
     super()
     this.state = {
@@ -195,13 +192,12 @@ class Dashboard extends Component {
     }
 
     return (
-      <Layout uid={this.props.uid}>
+      <Layout>
         <DashboardMetrics counts={counts} />
         <Mailbox
-          uid={this.props.uid}
           tips={tips}
-          tipCount={Object.keys(tipsToDisplay).length}
           tipsToDisplay={tipsToDisplay}
+          tipCount={Object.keys(tipsToDisplay).length}
           unreadCount={counts.unreadCount}
           showTipDetail={this.showTipDetail}
           tipDetail={this.state.tipDetail}
@@ -224,5 +220,3 @@ class Dashboard extends Component {
 Dashboard.contextTypes = {
   router: React.PropTypes.object
 }
-
-export default Dashboard;
