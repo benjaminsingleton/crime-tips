@@ -4,10 +4,9 @@ import MailboxPanel from './MailboxPanel'
 import TipDetail from './TipDetail'
 import TipLongForm from './TipLongForm'
 
-class Mailbox extends Component {
+export default class Mailbox extends Component {
 
   renderRightPanel() {
-
     switch(this.props.mailboxRightPanel) {
       case 'mailbox':
         return (
@@ -24,27 +23,24 @@ class Mailbox extends Component {
             changePage={this.props.changePage} />
         )
       case 'detail':
-        return <TipDetail tipDetail={this.props.tipDetail} uid={this.props.uid} tips={this.props.tips} />
+        return <TipDetail tipDetail={this.props.tipDetail} tips={this.props.tips} />
       case 'form':
-        return <TipLongForm uid={this.props.uid} filterTips={this.props.filterTips} />
+        return <TipLongForm filterTips={this.props.filterTips} />
       default:
         console.error('Invalid Right Panel', 'mailBoxRightPanel must be mailbox, detail or form')
     }
   }
 
   render() {
+    const MailboxRightPanel = this.renderRightPanel()
     return (
-      <div className="row" style={{
-        margin: '10px 2px 8px 2px'
-      }}>
+      <div className="row" style={{margin: '10px 2px 8px 2px'}}>
         <MailboxLeftPanel
           unreadCount={this.props.unreadCount}
           filterTips={this.props.filterTips}
-          openTipLongForm={this.props.openTipLongForm}/> 
-        {this.renderRightPanel()}
+          openTipLongForm={this.props.openTipLongForm} /> 
+        {MailboxRightPanel}
       </div>
     )
   }
 }
-
-export default Mailbox
