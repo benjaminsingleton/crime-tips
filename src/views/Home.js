@@ -155,6 +155,7 @@ class Home extends Component {
             <TipFormIntro
               handleSelectChange={this.handleSelectChange}
               handleTextChange={this.handleTextChange}
+              handleDatePickerChange={this.handleDatePickerChange}
               tip={this.state.tip}
               noOptionalMsg={true}
               isAdmin={false}
@@ -264,9 +265,7 @@ class Home extends Component {
     return (
       <Layout>
         <div className="appBarBannerAccent"></div>
-        <div
-          className="row"
-          style={{margin: '-260px 2px 30px 2px'}}>
+        <div className="row" style={{margin: '-260px 2px 30px 2px'}}>
           <div
             className="col-xs-12 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 col-lg-offset-3 col-lg-6">
             {this.getStepContent(this.state.stepIndex)}
