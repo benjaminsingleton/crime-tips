@@ -41,7 +41,6 @@ class Home extends Component {
     }
     this.baseState = this.state
     this.getStepContent = this.getStepContent.bind(this)
-    this.handleInputChange = this.handleInputChange.bind(this)
     this.addToStepContent = this.addToStepContent.bind(this)
     this.createTip = this.createTip.bind(this)
     this.resetForm = this.resetForm.bind(this)
@@ -53,7 +52,7 @@ class Home extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    // update tip in firebase
+    // update tip data in firebase when this.state.tip changes
     if (prevState.tip !== this.state.tip) {
       if (this.state.tipKey) {
         databaseRef.child('tips/' + this.state.tipKey).update({...this.state.tip})
@@ -91,30 +90,18 @@ class Home extends Component {
     this.setState({tip})
   }
 
-  handleInputChange(event) {
-    const target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = target.name;
-    const tip = {...this.state.tip}
-    tip[name] = value
-    this.setState({tip})
-  }
-
   createTip(event) {
     event.preventDefault();
-    var tip = {...this.state.tip}
+    const tip = {...this.state.tip}
     tip['submitted'] = true
     tip['timestampCompleted'] = Date.now()
     databaseRef.child('tips/' + this.state.tipKey).update({...tip})
     this.changeStep('next')
   }
 
-  resetForm() {
-    this.setState(this.baseState)
-  }
+  resetForm = () => this.setState(this.baseState)
 
   changeStep(direction) {
-    console.log(direction)
     let stepIndex = this.state.stepIndex
 
     if (direction === 'next') {
@@ -128,7 +115,12 @@ class Home extends Component {
           this.setState({errorText})
         } else {
           stepIndex++;
-          this.setState({errorText: {crimeType: null, tipText: null}})
+          this.setState({
+            errorText: {
+              crimeType: null, 
+              tipText: null
+            }
+          })
         }
       } else {
         stepIndex++;
@@ -240,7 +232,7 @@ class Home extends Component {
       case 'tipsterHasMedia':
         return (
           <TipFormContainer title="Media Upload" changeStep={this.changeStep}>
-            <TipFormMedia handleInputChange={this.handleInputChange} tip={this.state.tip}/>
+            <TipFormMedia tip={this.state.tip}/>
           </TipFormContainer>
         )
       case 'final':
