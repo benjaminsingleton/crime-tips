@@ -18,7 +18,7 @@ class Home extends Component {
     super()
     this.state = {
       tip: {
-        timestamp: Date.now(),
+        timestampStarted: Date.now(),
         read: false,
         attachment: false,
         archived: false,
@@ -50,6 +50,20 @@ class Home extends Component {
     this.handleTextChange = this.handleTextChange.bind(this)
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this)
     this.handleDatePickerChange = this.handleDatePickerChange.bind(this)
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    // update tip in firebase
+    if (prevState.tip !== this.state.tip) {
+      if (this.state.tipKey) {
+        databaseRef.child('tips/' + this.state.tipKey).update({...this.state.tip})
+      } else {
+        databaseRef.child('tips/').push({...this.state.tip})
+          .then((snap) => {
+            this.setState({tipKey: snap.key})
+          })
+      }
+    }
   }
 
   handleSelectChange(name, event, index, value) {
@@ -90,8 +104,8 @@ class Home extends Component {
     event.preventDefault();
     var tip = {...this.state.tip}
     tip['submitted'] = true
-    tip['timestamp'] = Date.now()
-    databaseRef.child('tips/').push({...tip})
+    tip['timestampCompleted'] = Date.now()
+    databaseRef.child('tips/' + this.state.tipKey).update({...tip})
     this.changeStep('next')
   }
 
