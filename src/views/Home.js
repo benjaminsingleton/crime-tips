@@ -32,8 +32,8 @@ class Home extends Component {
         tipsterHasMedia: false,
         submitted: false
       },
-      stepIndex: 0,
-      stepContent: ['initial', 'second', 'final', 'success'],
+      formWizardPageIndex: 0,
+      formWizardContent: ['initial', 'second', 'final', 'success'],
       errorText: {
         crimeType: null,
         tipText: null
@@ -85,7 +85,6 @@ class Home extends Component {
 
   handleDatePickerChange(name, nothing, date) {
     const tip = {...this.state.tip}
-    console.log(name, date)
     tip[name] = date
     this.setState({tip})
   }
@@ -95,26 +94,30 @@ class Home extends Component {
     const tip = {...this.state.tip}
     tip['submitted'] = true
     tip['timestampCompleted'] = Date.now()
-    databaseRef.child('tips/' + this.state.tipKey).update({...tip})
+    databaseRef.child(`tips/${this.state.tipKey}`).update({...tip})
     this.changeStep('next')
   }
 
   resetForm = () => this.setState(this.baseState)
 
-  changeStep(direction) {
-    let stepIndex = this.state.stepIndex
+  changeFormWizardPageIndex(direction) {
+    let formWizardPageIndex = this.state.formWizardPageIndex
 
     if (direction === 'next') {
-      if (stepIndex === 0) {
+      if (formWizardPageIndex === 0) {
+        // do form validation before proceeding to next step
         const crimeTypeError = (this.state.tip.crimeType == null)
         const tipTextError = (this.state.tip.tipText == null || this.state.tip.tipText.length < 20)
-        if (crimeTypeError || tipTextError) {
+        if (crimeTypeError) {
           const errorText = {...this.state.errorText}
-          crimeTypeError && (errorText['crimeType'] = 'This field is required')
-          tipTextError && (errorText['tipText'] = 'Your description is too brief. 20 characters minimum.')
+          errorText['crimeType'] = 'This field is required'
+          this.setState({errorText})
+        } else if (tipTextError) {
+          const errorText = {...this.state.errorText}
+          errorText['tipText'] = 'Your description is too brief. 20 characters minimum.'
           this.setState({errorText})
         } else {
-          stepIndex++;
+          formWizardPageIndex++;
           this.setState({
             errorText: {
               crimeType: null, 
@@ -123,39 +126,39 @@ class Home extends Component {
           })
         }
       } else {
-        stepIndex++;
+        formWizardPageIndex++;
       }
     } else if (direction === 'previous') {
-      stepIndex--;
+      formWizardPageIndex--;
     };
-    this.setState({stepIndex})
+    this.setState({formWizardPageIndex})
   }
 
-  addToStepContent(name, event, isInputChecked) {
-    const stepContent = this.state.stepContent
+  addFormWizardContent(name, event, isInputChecked) {
+    const formWizardContent = this.state.formWizardContent
     const tip = {...this.state.tip}
 
-    if (!stepContent.includes(name)) {
-      stepContent.splice(-2, 0, name) // add step in 3rd to last place (behind final, success)
+    if (!formWizardContent.includes(name)) {
+      formWizardContent.splice(-2, 0, name) // add step in 3rd to last place (behind final, success)
     } else {
-      var pos = stepContent.indexOf(name);
-      stepContent.splice(pos, 1)
+      var pos = formWizardContent.indexOf(name);
+      formWizardContent.splice(pos, 1)
     };
 
     tip[name] = isInputChecked
 
-    this.setState({stepContent, tip})
+    this.setState({formWizardContent, tip})
   }
 
-  getStepContent(stepIndex) {
-    const contentToDisplay = this.state.stepContent[stepIndex]
+  getFormWizardContent(formWizardPageIndex) {
+    const contentToDisplay = this.state.FormWizardContent[formWizardPageIndex]
 
     switch (contentToDisplay) {
       case 'initial':
         return (
           <TipFormContainer
             title="Submit a Tip"
-            changeStep={this.changeStep}
+            changeFormWizardPageIndex={this.changeFormWizardPageIndex}
             noPreviousButton={true}
             noOptionalMsg={true}>
             <TipFormIntro
@@ -172,16 +175,16 @@ class Home extends Component {
         return (
           <TipFormContainer
             title="Clarifying Questions"
-            changeStep={this.changeStep}
+            changeFormWizardPageIndex={this.changeFormWizardPageIndex}
             noOptionalMsg={true}>
             <TipFormIntroPartTwo
               tip={this.state.tip}
-              addToStepContent={this.addToStepContent}/>
+              addFormWizardContent={this.addFormWizardContent}/>
           </TipFormContainer>
         )
       case 'tipsterKnowsSuspectDescription':
         return (
-          <TipFormContainer title="Suspect Description" changeStep={this.changeStep}>
+          <TipFormContainer title="Suspect Description" changeFormWizardPageIndex={this.changeFormWizardPageIndex}>
             <TipFormSuspectDescription
               handleSelectChange={this.handleSelectChange}
               handleTextChange={this.handleTextChange}
@@ -191,7 +194,7 @@ class Home extends Component {
         )
       case 'tipsterKnowsSuspectLocation':
         return (
-          <TipFormContainer title="Suspect Location" changeStep={this.changeStep}>
+          <TipFormContainer title="Suspect Location" changeFormWizardPageIndex={this.changeFormWizardPageIndex}>
             <TipFormSuspectLocation
               handleSelectChange={this.handleSelectChange}
               handleTextChange={this.handleTextChange}
@@ -201,7 +204,7 @@ class Home extends Component {
         )
       case 'tipsterKnowsSuspectEmployment':
         return (
-          <TipFormContainer title="Suspect Employment" changeStep={this.changeStep}>
+          <TipFormContainer title="Suspect Employment" changeFormWizardPageIndex={this.changeFormWizardPageIndex}>
             <TipFormSuspectEmployment
               handleSelectChange={this.handleSelectChange}
               handleTextChange={this.handleTextChange}
@@ -211,7 +214,7 @@ class Home extends Component {
         )
       case 'tipsterKnowsSuspectVehicle':
         return (
-          <TipFormContainer title="Suspect Vehicle" changeStep={this.changeStep}>
+          <TipFormContainer title="Suspect Vehicle" changeFormWizardPageIndex={this.changeFormWizardPageIndex}>
             <TipFormSuspectVehicle
               handleSelectChange={this.handleSelectChange}
               handleTextChange={this.handleTextChange}
@@ -221,7 +224,7 @@ class Home extends Component {
         )
       case 'tipsterKnowsAboutDrugs':
         return (
-          <TipFormContainer title="Drugs" changeStep={this.changeStep}>
+          <TipFormContainer title="Drugs" changeFormWizardPageIndex={this.changeFormWizardPageIndex}>
             <TipFormDrugs
               handleSelectChange={this.handleSelectChange}
               handleTextChange={this.handleTextChange}
@@ -231,7 +234,7 @@ class Home extends Component {
         )
       case 'tipsterHasMedia':
         return (
-          <TipFormContainer title="Media Upload" changeStep={this.changeStep}>
+          <TipFormContainer title="Media Upload" changeFormWizardPageIndex={this.changeFormWizardPageIndex}>
             <TipFormMedia tip={this.state.tip}/>
           </TipFormContainer>
         )
@@ -239,7 +242,7 @@ class Home extends Component {
         return (
           <TipFormContainer
             title="Conclusion"
-            changeStep={this.changeStep}
+            changeFormWizardPageIndex={this.changeFormWizardPageIndex}
             showSubmit={true}
             noNextButton={true}
             createTip={this.createTip}>
@@ -274,7 +277,7 @@ class Home extends Component {
         <div className="row" style={{margin: '-260px 2px 30px 2px'}}>
           <div
             className="col-xs-12 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 col-lg-offset-3 col-lg-6">
-            {this.getStepContent(this.state.stepIndex)}
+            {this.getFormWizardContent(this.state.formWizardPageIndex)}
           </div>
         </div>
       </Layout>
