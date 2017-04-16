@@ -56,26 +56,26 @@ const TipFormIntro = (props) => {
       <div className="row">
         <div className="col-lg-6 col-md-12 col-s-12 col-xs-12">
           <div style={style.prompt}>
-            Where did the incident take place?<span style={style.required}> *</span>
+            Where did the crime take place?<span style={style.required}> *</span>
           </div>
           <div>
             <TextField
-              hintText="Incident location"
-              value={props.tip.incidentLocation}
-              onChange={props.handleTextChange.bind(null, "incidentLocation")}
+              hintText="Crime location"
+              value={props.tip.crimeLocation}
+              onChange={props.handleTextChange.bind(null, "crimeLocation")}
             />
           </div>
         </div>
         <div className="col-lg-6 col-md-12 col-s-12 col-xs-12">
           <div style={style.prompt}>
-            When did the incident occur?<span style={style.required}> *</span>
+            When did the crime occur?<span style={style.required}> *</span>
           </div>
           <div>
             <DatePicker
               autoOk={true}
               hintText="Pick a date"
-              value={props.tip.incidentDate}
-              onChange={props.handleDatePickerChange.bind(null, "incidentDate")}
+              value={props.tip.crimeDate}
+              onChange={props.handleDatePickerChange.bind(null, "crimeDate")}
             />
           </div>
         </div>
