@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import _ from 'underscore'
 import {tipTimeFormatLong} from '../helpers/helpers'
 import {Card, CardHeader, CardText, CardActions} from 'material-ui/Card';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -23,6 +24,7 @@ export default class TipDetail extends Component {
         8: true,
         9: true
       },
+      tip: {},
       noteAuthors: {}
     }
     this.togglePanel = this.togglePanel.bind(this)
@@ -31,23 +33,31 @@ export default class TipDetail extends Component {
     this.displayUserNotes = this.displayUserNotes.bind(this)
   }
 
-  componentDidMount() {
-    // get names of note authors
-    const tip = this.props.tips[this.props.tipDetail.key]
-    const userNoteKeys = tip.userNotes 
-                        ? Object.keys(tip.userNotes).filter(key => !tip.userNotes[key].deleted)
-                        : null
-    
-    function getAuthorName(key, uid) {
-      const noteAuthors = {...this.state.noteAuthors}
-      databaseRef.child(`users/${uid}/account`).once('value', function(snapshot) {
-        const user = snapshot.val()
-        noteAuthors[key] = `${user.rank} ${user.firstName} ${user.lastName}`
-        this.setState({noteAuthors})
-      });
-    }
+  componentWillMount() {
+    // get tip
+    databaseRef.child(`tips/${this.props.tipDetailKey}`).on('value', function(snapshot) {
+        const tip = snapshot.val()
+        this.setState({tip})
+    }.bind(this));
+  }
 
-    if (userNoteKeys) userNoteKeys.map(key => getAuthorName(key, tip.userNotes[key].uid))
+   componentWillUnmount = () => databaseRef.child(`tips/${this.props.tipDetailKey}`).off();
+
+  componentDidUpdate(prevProps, prevState) {
+    if (_.isEmpty(prevState.tip) && !_.isEmpty(this.state.tip)) {
+      // get names of note authors
+      const userNotes = this.state.tip.userNotes
+      const userNoteKeys = userNotes ? Object.keys(userNotes).filter(key => !userNotes[key].deleted) : null
+      const noteAuthors = {...this.state.noteAuthors}
+
+      if (userNoteKeys) userNoteKeys.map(key => 
+        databaseRef.child(`users/${userNotes[key].uid}/account`).once('value', function(snapshot) {
+          const user = snapshot.val()
+          noteAuthors[key] = `${user.rank} ${user.firstName} ${user.lastName}`
+          this.setState({noteAuthors})
+        }.bind(this))
+      )
+    }
   }
 
   togglePanel(panelNumber) {
@@ -84,7 +94,7 @@ export default class TipDetail extends Component {
     const userNotesToDisplay = notDeletedUserNoteKeys.map(key => 
         <Card style={style.card} key={key}>
           <CardHeader 
-            title={`${moment(new Date(userNotes[key].timestamp)).format('MMMM Do YYYY, h:mm a')}`}
+            title={`${this.state.noteAuthors[key]}, ${moment(new Date(userNotes[key].timestamp)).format('MMMM Do YYYY, h:mm a')}`}
             style={style.header} 
           />
           <CardText>
@@ -107,7 +117,7 @@ export default class TipDetail extends Component {
   }
 
   render() {
-    const tip = this.props.tips[this.props.tipDetail.key]
+    const tip = this.state.tip
     const userNotes = tip.userNotes ? this.displayUserNotes(tip.userNotes) : null
     const style = {
       card: {margin: '10px'},
@@ -247,5 +257,5 @@ export default class TipDetail extends Component {
 }
 
 TipDetail.propTypes = {
-  tipDetail: React.PropTypes.object.isRequired
+  tipDetailKey: React.PropTypes.string.isRequired
 }

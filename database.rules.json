@@ -4,13 +4,18 @@
       ".read": "auth !== null",
       "$tip": {
         ".write": "!data.exists() || auth !== null"
-      }
+      },
+      ".indexOn": ["archived", "important"]
     },
     "users": {
       ".read": "auth !== null",
       ".write": "auth !== null"
     },
     "logs": {
+      ".read": "auth !== null",
+      ".write": "auth !== null"
+    },
+    "metrics": {
       ".read": "auth !== null",
       ".write": "auth !== null"
     }

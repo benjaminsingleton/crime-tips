@@ -8,7 +8,7 @@ import ContentDrafts from 'material-ui/svg-icons/content/drafts';
 import ContentArchive from 'material-ui/svg-icons/content/archive';
 import ImageLens from 'material-ui/svg-icons/image/lens';
 
-const MailboxLeftPanel = ({filterTips, openTipLongForm}) => {
+const DashboardLeftPanel = ({filterTips, changePanel}) => {
   
   const style = {
     fontSize: '14px',
@@ -23,7 +23,7 @@ const MailboxLeftPanel = ({filterTips, openTipLongForm}) => {
             label="New Tip"
             primary={true}
             fullWidth={true}
-            onClick={() => openTipLongForm()}/>
+            onClick={() => changePanel('form')}/>
           <h4>FOLDERS</h4>
           <List>
             <ListItem
@@ -118,4 +118,4 @@ const MailboxLeftPanel = ({filterTips, openTipLongForm}) => {
   )
 }
 
-export default MailboxLeftPanel
+export default DashboardLeftPanel
