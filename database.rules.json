@@ -2,9 +2,7 @@
   "rules": {
     "tips": {
       ".read": "auth !== null",
-      "$tip": {
-        ".write": "!data.exists() || auth !== null"
-      },
+      ".write": true,
       ".indexOn": ["archived", "important"]
     },
     "users": {

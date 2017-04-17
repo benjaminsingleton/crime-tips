@@ -37,7 +37,7 @@ export default class Home extends Component {
       errorText: {
         crimeType: null,
         tipText: null
-      }
+      },
     }
     this.baseState = this.state
     this.getFormWizardContent = this.getFormWizardContent.bind(this)
@@ -92,10 +92,10 @@ export default class Home extends Component {
 
   createTip(event) {
     event.preventDefault();
-    const tip = {...this.state.tip}
-    tip['submitted'] = true
-    tip['timestampSubmit'] = Date.now()
-    databaseRef.child(`tips/${this.state.tipKey}`).update({...tip})
+    databaseRef.child(`tips/${this.state.tipKey}`).update({
+      'submitted': true, 
+      'timestampSubmit': Date.now()
+    })
     this.changeFormWizardIndex('next')
   }
 
@@ -236,7 +236,7 @@ export default class Home extends Component {
       case 'tipsterHasMedia':
         return (
           <TipFormContainer title="Media Upload" changeFormWizardIndex={this.changeFormWizardIndex}>
-            <TipFormMedia tip={this.state.tip}/>
+            <TipFormMedia tip={this.state.tip} tipKey={this.state.tipKey} />
           </TipFormContainer>
         )
       case 'final':
@@ -273,6 +273,7 @@ export default class Home extends Component {
 
   render() {
     const formWizardContent = this.getFormWizardContent(this.state.formWizardPageIndex)
+    
     return (
       <Layout>
         <div className="row" style={{margin: '50px 2px 30px 2px'}}>
