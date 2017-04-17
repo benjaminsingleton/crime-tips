@@ -1,0 +1,8 @@
+service firebase.storage {
+  match /b/crimetips-c7b87.appspot.com/o {
+    match /tips/{tipId} {
+      // Only allow uploads of any image file that's less than 500MB
+      allow write: if request.resource.size < 500 * 1024 * 1024
+    }
+  }
+}
