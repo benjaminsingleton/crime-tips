@@ -193,7 +193,7 @@ export default class Mailbox extends Component {
         </TableRowColumn>
         <TableRowColumn style={{width: '15%', textAlign: 'right'}}>
           <a onClick={() => this.showTipDetail(key)}>
-            {tips[key].read ? tipTimeFormat(tips[key].timestamp) : <b>{tipTimeFormat(tips[key].timestamp)}</b>}
+            {tips[key].read ? tipTimeFormat(tips[key].timestampStart) : <b>{tipTimeFormat(tips[key].timestampStart)}</b>}
           </a>
         </TableRowColumn>
       </TableRow>)

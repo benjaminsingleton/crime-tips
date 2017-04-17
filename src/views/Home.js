@@ -12,13 +12,13 @@ import TipFormMedia from '../components/TipFormMedia'
 import TipFormFinal from '../components/TipFormFinal'
 import {databaseRef} from '../helpers/constants'
 
-class Home extends Component {
+export default class Home extends Component {
 
   constructor() {
     super()
     this.state = {
       tip: {
-        timestampStarted: Date.now(),
+        timestampStart: Date.now(),
         read: false,
         attachment: false,
         archived: false,
@@ -40,27 +40,28 @@ class Home extends Component {
       }
     }
     this.baseState = this.state
-    this.getStepContent = this.getStepContent.bind(this)
-    this.addToStepContent = this.addToStepContent.bind(this)
-    this.createTip = this.createTip.bind(this)
-    this.resetForm = this.resetForm.bind(this)
-    this.changeStep = this.changeStep.bind(this)
+    this.getFormWizardContent = this.getFormWizardContent.bind(this)
     this.handleSelectChange = this.handleSelectChange.bind(this)
     this.handleTextChange = this.handleTextChange.bind(this)
-    this.handleCheckboxChange = this.handleCheckboxChange.bind(this)
     this.handleDatePickerChange = this.handleDatePickerChange.bind(this)
+    this.handleCheckboxChange = this.handleCheckboxChange.bind(this)
+    this.createTip = this.createTip.bind(this)
+    this.changeFormWizardIndex = this.changeFormWizardIndex.bind(this)
+    this.addFormWizardContent = this.addFormWizardContent.bind(this)
   }
 
   componentDidUpdate(prevProps, prevState) {
     // update tip data in firebase when this.state.tip changes
-    if (prevState.tip !== this.state.tip) {
-      if (this.state.tipKey) {
-        databaseRef.child('tips/' + this.state.tipKey).update({...this.state.tip})
-      } else {
-        databaseRef.child('tips/').push({...this.state.tip})
-          .then((snap) => {
-            this.setState({tipKey: snap.key})
-          })
+    if (this.state.tip.tipText && this.state.tip.tipText.length >= 20) {
+      if (prevState.tip !== this.state.tip) {
+        if (this.state.tipKey) {
+          databaseRef.child('tips/' + this.state.tipKey).update({...this.state.tip})
+        } else {
+          databaseRef.child('tips/').push({...this.state.tip})
+            .then((snap) => {
+              this.setState({tipKey: snap.key})
+            })
+        }
       }
     }
   }
@@ -93,14 +94,14 @@ class Home extends Component {
     event.preventDefault();
     const tip = {...this.state.tip}
     tip['submitted'] = true
-    tip['timestampCompleted'] = Date.now()
+    tip['timestampSubmit'] = Date.now()
     databaseRef.child(`tips/${this.state.tipKey}`).update({...tip})
-    this.changeStep('next')
+    this.changeFormWizardIndex('next')
   }
 
   resetForm = () => this.setState(this.baseState)
 
-  changeFormWizardPageIndex(direction) {
+  changeFormWizardIndex(direction) {
     let formWizardPageIndex = this.state.formWizardPageIndex
 
     if (direction === 'next') {
@@ -151,14 +152,14 @@ class Home extends Component {
   }
 
   getFormWizardContent(formWizardPageIndex) {
-    const contentToDisplay = this.state.FormWizardContent[formWizardPageIndex]
+    const contentToDisplay = this.state.formWizardContent[formWizardPageIndex]
 
     switch (contentToDisplay) {
       case 'initial':
         return (
           <TipFormContainer
             title="Submit a Tip"
-            changeFormWizardPageIndex={this.changeFormWizardPageIndex}
+            changeFormWizardIndex={this.changeFormWizardIndex}
             noPreviousButton={true}
             noOptionalMsg={true}>
             <TipFormIntro
@@ -175,7 +176,7 @@ class Home extends Component {
         return (
           <TipFormContainer
             title="Clarifying Questions"
-            changeFormWizardPageIndex={this.changeFormWizardPageIndex}
+            changeFormWizardIndex={this.changeFormWizardIndex}
             noOptionalMsg={true}>
             <TipFormIntroPartTwo
               tip={this.state.tip}
@@ -184,7 +185,7 @@ class Home extends Component {
         )
       case 'tipsterKnowsSuspectDescription':
         return (
-          <TipFormContainer title="Suspect Description" changeFormWizardPageIndex={this.changeFormWizardPageIndex}>
+          <TipFormContainer title="Suspect Description" changeFormWizardIndex={this.changeFormWizardIndex}>
             <TipFormSuspectDescription
               handleSelectChange={this.handleSelectChange}
               handleTextChange={this.handleTextChange}
@@ -194,7 +195,7 @@ class Home extends Component {
         )
       case 'tipsterKnowsSuspectLocation':
         return (
-          <TipFormContainer title="Suspect Location" changeFormWizardPageIndex={this.changeFormWizardPageIndex}>
+          <TipFormContainer title="Suspect Location" changeFormWizardIndex={this.changeFormWizardIndex}>
             <TipFormSuspectLocation
               handleSelectChange={this.handleSelectChange}
               handleTextChange={this.handleTextChange}
@@ -204,7 +205,7 @@ class Home extends Component {
         )
       case 'tipsterKnowsSuspectEmployment':
         return (
-          <TipFormContainer title="Suspect Employment" changeFormWizardPageIndex={this.changeFormWizardPageIndex}>
+          <TipFormContainer title="Suspect Employment" changeFormWizardIndex={this.changeFormWizardIndex}>
             <TipFormSuspectEmployment
               handleSelectChange={this.handleSelectChange}
               handleTextChange={this.handleTextChange}
@@ -214,7 +215,7 @@ class Home extends Component {
         )
       case 'tipsterKnowsSuspectVehicle':
         return (
-          <TipFormContainer title="Suspect Vehicle" changeFormWizardPageIndex={this.changeFormWizardPageIndex}>
+          <TipFormContainer title="Suspect Vehicle" changeFormWizardIndex={this.changeFormWizardIndex}>
             <TipFormSuspectVehicle
               handleSelectChange={this.handleSelectChange}
               handleTextChange={this.handleTextChange}
@@ -224,7 +225,7 @@ class Home extends Component {
         )
       case 'tipsterKnowsAboutDrugs':
         return (
-          <TipFormContainer title="Drugs" changeFormWizardPageIndex={this.changeFormWizardPageIndex}>
+          <TipFormContainer title="Drugs" changeFormWizardIndex={this.changeFormWizardIndex}>
             <TipFormDrugs
               handleSelectChange={this.handleSelectChange}
               handleTextChange={this.handleTextChange}
@@ -234,7 +235,7 @@ class Home extends Component {
         )
       case 'tipsterHasMedia':
         return (
-          <TipFormContainer title="Media Upload" changeFormWizardPageIndex={this.changeFormWizardPageIndex}>
+          <TipFormContainer title="Media Upload" changeFormWizardIndex={this.changeFormWizardIndex}>
             <TipFormMedia tip={this.state.tip}/>
           </TipFormContainer>
         )
@@ -242,7 +243,7 @@ class Home extends Component {
         return (
           <TipFormContainer
             title="Conclusion"
-            changeFormWizardPageIndex={this.changeFormWizardPageIndex}
+            changeFormWizardIndex={this.changeFormWizardIndex}
             showSubmit={true}
             noNextButton={true}
             createTip={this.createTip}>
@@ -271,18 +272,15 @@ class Home extends Component {
   }
 
   render() {
+    const formWizardContent = this.getFormWizardContent(this.state.formWizardPageIndex)
     return (
       <Layout>
-        <div className="appBarBannerAccent"></div>
-        <div className="row" style={{margin: '-260px 2px 30px 2px'}}>
-          <div
-            className="col-xs-12 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 col-lg-offset-3 col-lg-6">
-            {this.getFormWizardContent(this.state.formWizardPageIndex)}
+        <div className="row" style={{margin: '50px 2px 30px 2px'}}>
+          <div className="col-xs-12 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 col-lg-offset-3 col-lg-6">
+            {formWizardContent}
           </div>
         </div>
       </Layout>
     );
   }
 }
-
-export default Home;

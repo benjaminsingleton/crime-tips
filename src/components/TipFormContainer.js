@@ -29,13 +29,13 @@ const TipFormContainer = (props) => {
           : <RaisedButton
             label="Previous"
             default={true}
-            onClick={() => props.changeStep('previous')}/>}
+            onClick={() => props.changeFormWizardIndex('previous')}/>}
         {props.noNextButton
           ? null
           : <RaisedButton
             label="Next"
             primary={true}
-            onClick={() => props.changeStep('next')}/>}
+            onClick={() => props.changeFormWizardIndex('next')}/>}
         {props.showSubmit
           ? <RaisedButton label="Submit" primary={true} onTouchTap={(e) => props.createTip(e)}/>
           : null}
