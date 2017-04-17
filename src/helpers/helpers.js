@@ -40,8 +40,18 @@ export function getMonthAndDay(date) {
 }
 
 export function tipTimeFormat(ts) {
-  const tipDateTime = moment(new Date(ts))
-  return tipDateTime.format('ll')
+  const timestamp = moment(new Date(ts))
+  const now = new Date()
+  if (timestamp.isSame(now, "day")) {
+    // if today, show 8:25 am
+    return timestamp.format('h:mm a')
+  } else if (timestamp.isSame(now, "year")) {
+    // if same year, show Apr 8
+    return timestamp.format('MMM D')
+  } else {
+    // otherwise, show 9/2/16
+    return timestamp.format('M/D/YY')
+  }
 }
 
 export function tipTimeFormatLong(ts) {
