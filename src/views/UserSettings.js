@@ -16,10 +16,6 @@ export default class UserSettings extends Component {
     this.state = {
       uid: firebaseApp.auth().currentUser.uid,
       userDetails: {},
-      rank: null,
-      firstName: null,
-      lastName: null,
-      notifications: true,
       newPassword: '',
       newPasswordRepeat: '',
       passwordMsg: '',
@@ -55,7 +51,7 @@ export default class UserSettings extends Component {
   }
 
   onToggle() {
-    const notifications = !this.state.notifications
+    const notifications = !this.state.userDetails.notifications
     firebaseApp.database().ref(`users/${this.state.uid}`).update({notifications})
     this.setState({notifications})
   }
