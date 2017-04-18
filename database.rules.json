@@ -5,6 +5,10 @@
       ".write": true,
       ".indexOn": ["archived", "important"]
     },
+    "abandonedTips": {
+      ".read": "auth !== null",
+      ".write": true
+    },
     "users": {
       ".read": "auth !== null",
       ".write": "auth !== null"
