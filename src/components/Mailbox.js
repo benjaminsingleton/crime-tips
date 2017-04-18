@@ -143,7 +143,9 @@ export default class Mailbox extends Component {
 
   showTipDetail(key) {
     // Tip marked as read when clicked
-    databaseRef.child('tips/' + key).update({read: true})
+    if (this.state.tip[key].read === false) {
+      databaseRef.child('tips/' + key).update({read: true})
+    }
 
     // Log activity to 'logs' and 'users/uid' for auditing purposes
     const user = this.state.uid;
