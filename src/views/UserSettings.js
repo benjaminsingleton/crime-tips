@@ -7,13 +7,15 @@ import Toggle from 'material-ui/Toggle';
 import Divider from 'material-ui/Divider';
 
 import Layout from '../components/Layout'
-import {databaseRef, firebaseApp} from '../helpers/constants'
+import {firebaseApp} from '../helpers/constants'
 import {relativeTime, reverse} from '../helpers/helpers'
 
 export default class UserSettings extends Component {
   constructor () {
     super()
     this.state = {
+      uid: firebaseApp.auth().currentUser.uid,
+      userDetails: {},
       rank: null,
       firstName: null,
       lastName: null,
@@ -31,21 +33,21 @@ export default class UserSettings extends Component {
     this.changeEmail = this.changeEmail.bind(this)
   }
 
-  componentDidMount() {
-    databaseRef.child(`users/${this.props.uid}/account`).once('value', function(snapshot) {
+  componentWillMount() {
+    firebaseApp.database().ref(`users/${this.state.uid}`).on('value', function(snapshot) {
       const userDetails = snapshot.val()
-      this.setState({
-        rank: userDetails.rank,
-        firstName: userDetails.firstName,
-        lastName: userDetails.lastName,
-        notifications: userDetails.notifications
-      })
-    }.bind(this));
+      this.setState({userDetails})
+      }.bind(this));
 
-    databaseRef.child(`users/${this.props.uid}/activity`).limitToLast(5).once('value', function(snapshot) {
+    firebaseApp.database().ref(`userActivity/${this.state.uid}`).limitToLast(5).on('value', function(snapshot) {
       const userActivity = snapshot.val()
       this.setState({userActivity})
     }.bind(this));
+  }
+
+  componentWillUnmount() {
+    firebaseApp.database().ref(`users/${this.state.uid}`).off()
+    firebaseApp.database().ref(`userActivity/${this.state.uid}`).off()
   }
 
   handleTextChange(name, event) {
@@ -54,7 +56,7 @@ export default class UserSettings extends Component {
 
   onToggle() {
     const notifications = !this.state.notifications
-    databaseRef.child(`users/${this.props.uid}/account`).update({notifications})
+    firebaseApp.database().ref(`users/${this.state.uid}`).update({notifications})
     this.setState({notifications})
   }
 
@@ -66,7 +68,7 @@ export default class UserSettings extends Component {
 
     if (newPassword === newPasswordRepeat) {
       user.updatePassword(newPassword).then(function() {
-        databaseRef.child(`users/${user.uid}/activity/`).push({
+        firebaseApp.database().ref(`userActivity/${this.state.uid}`).push({
           action: 'changePassword',
           timestamp: timestamp
         });
@@ -99,7 +101,7 @@ export default class UserSettings extends Component {
 
     if (newEmail === newEmailRepeat) {
       user.updateEmail(newEmail).then(function() {
-        databaseRef.child(`users/${user.uid}/activity/`).push({
+        firebaseApp.database().ref(`userActivity/${this.state.uid}/`).push({
           action: 'changeEmail',
           timestamp: timestamp
         });
@@ -125,11 +127,10 @@ export default class UserSettings extends Component {
   }
 
   render() {
-    const {userActivity} = this.state
+    const {userActivity, userDetails} = this.state
     const email = firebaseApp.auth().currentUser.email
 
     function activityText(key) {
-
       const tipLink = <Link to={`tips/${key}`} style={{textDecoration: 'none'}}>tip</Link>
 
       switch (userActivity[key].action) {
@@ -162,24 +163,24 @@ export default class UserSettings extends Component {
       userActivityToDisplay = Object.keys(userActivityReversed).map(key =>  
                                   <div key={key}>
                                     <p style={{color: 'rgb(117, 117, 117)'}}>{relativeTime(userActivity[key].timestamp)}</p>
-                                    <p><b>{`${this.state.firstName} ${this.state.lastName}`}</b> {activityText(key)}</p>
+                                    <p><b>{`${userDetails.firstName} ${userDetails.lastName}`}</b> {activityText(key)}</p>
                                     <Divider />
                                   </div>)
     }
     
     return (
-      <Layout uid={this.props.uid} logout={this.props.logout}>
+      <Layout uid={this.state.uid} logout={this.props.logout}>
         <div className="row" style={{margin: '10px 2px 8px 2px'}}>
           <div className="col-xs-12 col-sm-12 col-md-4 col-lg-4">
             <Card>
               <CardHeader title="My Settings"/>
               <Divider />
               <CardText>
-                <h2>{`${this.state.rank} ${this.state.firstName} ${this.state.lastName}`}</h2>
+                <h2>{`${userDetails.rank} ${userDetails.firstName} ${userDetails.lastName}`}</h2>
                 <h3>Notifications</h3>
                 <Toggle
                   label="Receive emails when new tips are submitted"
-                  toggled={this.state.notifications}
+                  toggled={userDetails.notifications}
                   style={{marginBottom: '20px'}}
                   onToggle={this.onToggle}
                 />

@@ -128,7 +128,7 @@ export default class Mailbox extends Component {
         timestamp: timestamp
       });
 
-      databaseRef.child(`users/${user}/activity/`).push({
+      databaseRef.child(`userActivity/${user}`).push({
         tip: key,
         action: criteria,
         status: status,
@@ -143,7 +143,7 @@ export default class Mailbox extends Component {
 
   showTipDetail(key) {
     // Tip marked as read when clicked
-    if (this.state.tip[key].read === false) {
+    if (this.state.tips[key].read === false) {
       databaseRef.child('tips/' + key).update({read: true})
     }
 
@@ -156,7 +156,7 @@ export default class Mailbox extends Component {
         action: 'read',
         timestamp: timestamp
     });
-    databaseRef.child(`users/${user}/activity/`).push({
+    databaseRef.child(`userActivity/${user}`).push({
         tip: key,
         action: 'read',
         timestamp: timestamp
