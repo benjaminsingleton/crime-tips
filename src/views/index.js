@@ -10,6 +10,7 @@ import About from './About'
 import Home from './Home';
 import Dashboard from './Dashboard';
 import UserSettings from './UserSettings';
+import AccountManagement from './AccountManagement';
 import LoggedOut from './LoggedOut';
 import ForgotPassword from './ForgotPassword';
 import NoMatch from './NoMatch';
@@ -81,8 +82,9 @@ export default class App extends Component {
               <Route path='/faq' exact component={FAQ} />
               <PublicRoute authed={this.state.authed} path='/login' component={Login} />
               <PublicRoute authed={this.state.authed} path='/forgot_password' component={ForgotPassword} />
-              <PrivateRoute authed={this.state.authed} uid={this.state.uid} path='/dashboard' component={Dashboard} />
-              <PrivateRoute authed={this.state.authed} uid={this.state.uid} path='/settings' component={UserSettings} />
+              <PrivateRoute authed={this.state.authed} path='/dashboard' component={Dashboard} />
+              <PrivateRoute authed={this.state.authed} path='/settings' component={UserSettings} />
+              <PrivateRoute authed={this.state.authed} path='/account_management' component={AccountManagement} />
               <PrivateRoute authed={this.state.authed} path='/tip/:tipId' component={Dashboard} />
               <PrivateRoute authed={this.state.authed} path='/logout' component={LoggedOut} />
               <Route component={NoMatch} />
