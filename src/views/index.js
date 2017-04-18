@@ -26,12 +26,11 @@ const muiTheme = getMuiTheme({
   },
 });
 
-function PrivateRoute ({component: Component, authed, uid, ...rest}) {
+function PrivateRoute ({component: Component, authed, ...rest}) {
   return (
-    <Route
-      {...rest}
+    <Route {...rest}
       render={(props) => authed === true
-        ? <Component {...props} uid={uid} />
+        ? <Component {...props} />
         : <Redirect to={{pathname: '/login', state: {from: props.location}}} />}
     />
   )
