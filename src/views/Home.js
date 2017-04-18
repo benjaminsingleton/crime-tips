@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import _ from 'underscore'
 import Layout from '../components/Layout'
 import TipFormContainer from '../components/TipFormContainer'
 import TipFormIntro from '../components/TipFormIntro'
@@ -51,18 +52,16 @@ export default class Home extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    // update tip data in firebase when this.state.tip changes
-    if (this.state.tip.tipText && this.state.tip.tipText.length >= 20) {
-      if (prevState.tip !== this.state.tip) {
-        if (this.state.tipKey) {
-          databaseRef.child('tips/' + this.state.tipKey).update({...this.state.tip})
-        } else {
-          databaseRef.child('tips/').push({...this.state.tip})
-            .then((snap) => {
-              this.setState({tipKey: snap.key})
-            })
-        }
-      }
+    if (!this.state.tipKey && this.state.tip.tipText && this.state.tip.tipText.length >= 20) {
+      databaseRef.child('abandonedTips/').push({...this.state.tip})
+          .then((snap) => {
+            const tipKey = snap.key
+            this.setState({tipKey})
+          })
+    } else if (this.state.tipKey && this.state.tip !== prevState.tip) {
+      // create an object that is the diff between the old tip and new tip for updating
+      const updated = _.omit(this.state.tip, function(v,k) { return prevState.tip[k] === v; })
+      databaseRef.child(`abandonedTips/${this.state.tipKey}`).update({...updated})
     }
   }
 
@@ -92,11 +91,18 @@ export default class Home extends Component {
 
   createTip(event) {
     event.preventDefault();
-    databaseRef.child(`tips/${this.state.tipKey}`).update({
-      'submitted': true, 
-      'timestampSubmit': Date.now()
-    })
-    this.changeFormWizardIndex('next')
+    const tip = {...this.state.tip}
+    tip['submitted'] = true
+    tip['timestampSubmit'] = Date.now()
+
+    databaseRef.child(`tips/`).push({...this.state.tip})
+      .then((snap) => {
+        // if tip is successfully submitted, delete the abandoned tip record
+        databaseRef.child(`abandonedTips/${this.state.tipKey}`).remove()
+        const tipKey = snap.key
+        this.setState({tipKey}) // save new tipKey which users will use as a receipt #, for now
+        this.changeFormWizardIndex('next')
+      })
   }
 
   resetForm = () => this.setState(this.baseState)
