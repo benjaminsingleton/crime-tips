@@ -21,6 +21,12 @@ export default class Dashboard extends Component {
     this.filterTips = this.filterTips.bind(this)
   }
 
+  componentWillMount() {
+    if (this.props.match.path === '/tip/:tipId') {
+      this.setTipDetailKey(this.props.match.params.tipId)
+    }
+  }
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.match.path === '/dashboard' && this.state.panelToDisplay !== 'mailbox') {
       this.setState({panelToDisplay: 'mailbox', tipDetailKey: null})

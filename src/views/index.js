@@ -27,6 +27,8 @@ const muiTheme = getMuiTheme({
 });
 
 function PrivateRoute ({component: Component, authed, ...rest}) {
+  console.log('private route')
+  console.log('private authed', authed)
   return (
     <Route {...rest}
       render={(props) => authed === true
@@ -37,33 +39,33 @@ function PrivateRoute ({component: Component, authed, ...rest}) {
 }
 
 function PublicRoute ({component: Component, authed, ...rest}) {
+  console.log('public route')
+   console.log('public authed', authed)
   return (
     <Route
       {...rest}
       render={(props) => authed === false
         ? <Component {...props} />
-        : <Redirect to='/dashboard' />}
+        : <Redirect to={props.location.state ? props.location.state.from : '/dashboard'} />}
     />
   )
 }
 
 export default class App extends Component {
-  state = {
-    authed: false,
-    uid: null
+  constructor() {
+    super()
+    this.state = {
+      authed: false
+    }
   }
-  componentDidMount () {
+  
+  componentWillMount () {
     this.removeListener = firebaseAuth().onAuthStateChanged((user) => {
+      console.log(user)
       if (user) {
-        this.setState({
-          authed: true,
-          uid: user.uid,
-        })
+        this.setState({authed: true})
       } else {
-        this.setState({
-          authed: false,
-          uid: null,
-        })
+        this.setState({authed: false})
       }
     })
   }
