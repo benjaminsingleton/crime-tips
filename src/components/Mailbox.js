@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import PropTypes from 'prop-types';
 import {Card, CardText, CardActions} from 'material-ui/Card';
 import IconButton from 'material-ui/IconButton';
 import ActionGrade from 'material-ui/svg-icons/action/grade';
@@ -164,8 +165,7 @@ export default class Mailbox extends Component {
 
     this.props.setTipDetailKey(key)
     this.props.changePanel('detail')
-
-    // this.context.router.history.push(`tip/${key}`)   NEEDS TO BE FIGURED OUT
+    this.props.history.push(`/tip/${key}`)
   }
 
   searchTips = (searchTerm) => this.setState({searchTerm, currentPage: 0});
@@ -254,5 +254,5 @@ export default class Mailbox extends Component {
 }
 
 Mailbox.propTypes = {
-  tipFilter: React.PropTypes.object.isRequired,
+  tipFilter: PropTypes.object.isRequired,
 }

@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import TextField from 'material-ui/TextField';
@@ -166,8 +167,8 @@ const TipFormSuspectDescription = (props) => {
 }
 
 TipFormSuspectDescription.propTypes = {
-  handleTextChange: React.PropTypes.func.isRequired,
-  handleSelectChange: React.PropTypes.func.isRequired,
+  handleTextChange: PropTypes.func.isRequired,
+  handleSelectChange: PropTypes.func.isRequired,
 }
 
 export default TipFormSuspectDescription

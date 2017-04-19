@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types';
 import Checkbox from 'material-ui/Checkbox';
 
 const TipFormIntroPartTwo = (props) => {
@@ -61,7 +62,7 @@ const TipFormIntroPartTwo = (props) => {
 }
 
 TipFormIntroPartTwo.propTypes = {
-  addFormWizardContent: React.PropTypes.func.isRequired
+  addFormWizardContent: PropTypes.func.isRequired
 }
 
 export default TipFormIntroPartTwo
