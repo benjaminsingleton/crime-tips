@@ -27,8 +27,6 @@ const muiTheme = getMuiTheme({
 });
 
 function PrivateRoute ({component: Component, authed, ...rest}) {
-  console.log('private route')
-  console.log('private authed', authed)
   return (
     <Route {...rest}
       render={(props) => authed === true
@@ -39,8 +37,6 @@ function PrivateRoute ({component: Component, authed, ...rest}) {
 }
 
 function PublicRoute ({component: Component, authed, ...rest}) {
-  console.log('public route')
-   console.log('public authed', authed)
   return (
     <Route
       {...rest}
