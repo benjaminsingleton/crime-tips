@@ -21,6 +21,14 @@ export default class Dashboard extends Component {
     this.filterTips = this.filterTips.bind(this)
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.match.path === '/dashboard' && this.state.panelToDisplay !== 'mailbox') {
+      this.setState({panelToDisplay: 'mailbox', tipDetailKey: null})
+    } else if (nextProps.match.path === '/tip/:tipId') {
+      this.setTipDetailKey(nextProps.match.params.tipId)
+    }
+  }
+
   filterTips(criteria, value) {
     this.setState({
       tipFilter: {
@@ -41,8 +49,8 @@ export default class Dashboard extends Component {
       case 'mailbox':
         return (
           <Mailbox 
-            tipFilter={this.state.tipFilter} 
-            setTipDetailKey={this.setTipDetailKey} 
+            tipFilter={this.state.tipFilter}
+            setTipDetailKey={this.setTipDetailKey}
             history={this.props.history}
           />
         )
