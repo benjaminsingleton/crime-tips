@@ -34,7 +34,7 @@ export default class Dashboard extends Component {
 
   changePanel = (panelToDisplay) => this.setState({panelToDisplay})
 
-  setTipDetailKey = (tipDetailKey) => this.setState({tipDetailKey})
+  setTipDetailKey = (tipDetailKey) => this.setState({tipDetailKey, panelToDisplay: 'detail'})
 
   renderDashboardRightPanel() {
     switch(this.state.panelToDisplay) {
@@ -43,7 +43,6 @@ export default class Dashboard extends Component {
           <Mailbox 
             tipFilter={this.state.tipFilter} 
             setTipDetailKey={this.setTipDetailKey} 
-            changePanel={this.changePanel} 
             history={this.props.history}
           />
         )
