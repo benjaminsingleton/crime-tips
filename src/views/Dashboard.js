@@ -44,7 +44,7 @@ export default class Dashboard extends Component {
             tipFilter={this.state.tipFilter} 
             setTipDetailKey={this.setTipDetailKey} 
             changePanel={this.changePanel} 
-            {...this.props}
+            history={this.props.history}
           />
         )
       case 'detail':

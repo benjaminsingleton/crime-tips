@@ -255,4 +255,6 @@ export default class Mailbox extends Component {
 
 Mailbox.propTypes = {
   tipFilter: PropTypes.object.isRequired,
+  changePanel: PropTypes.func.isRequired,
+  history: PropTypes.object.isRequired
 }
