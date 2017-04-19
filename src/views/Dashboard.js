@@ -18,9 +18,19 @@ export default class Dashboard extends Component {
       tipDetailKey: null
     }
     this.renderDashboardRightPanel = this.renderDashboardRightPanel.bind(this)
+    this.filterTips = this.filterTips.bind(this)
   }
 
-  filterTips = (criteria, value) => this.setState({tipFilter: {'criteria': criteria, 'value': value}, panelToDisplay: 'mailbox'})
+  filterTips(criteria, value) {
+    this.setState({
+      tipFilter: {
+        'criteria': criteria, 
+        'value': value
+      }, 
+      panelToDisplay: 'mailbox'
+    })
+    this.props.history.push(`/dashboard`)
+  } 
 
   changePanel = (panelToDisplay) => this.setState({panelToDisplay})
 
@@ -34,6 +44,7 @@ export default class Dashboard extends Component {
             tipFilter={this.state.tipFilter} 
             setTipDetailKey={this.setTipDetailKey} 
             changePanel={this.changePanel} 
+            {...this.props}
           />
         )
       case 'detail':
