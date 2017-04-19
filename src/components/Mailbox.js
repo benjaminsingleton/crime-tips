@@ -54,10 +54,6 @@ export default class Mailbox extends Component {
   componentWillUnmount = () => databaseRef.child('tips').off();
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.match.path === '/tip/:tipId') {
-      this.setTipDetailKey(this.props.match.params.tipId)
-    }
-
     if (this.props.tipFilter !== nextProps.tipFilter) {
       databaseRef.child('tips')
         .orderByChild(nextProps.tipFilter.criteria)
