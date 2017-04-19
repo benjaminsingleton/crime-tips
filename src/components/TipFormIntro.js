@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import TextField from 'material-ui/TextField';
@@ -102,10 +103,10 @@ const TipFormIntro = (props) => {
 }
 
 TipFormIntro.propTypes = {
-  handleSelectChange: React.PropTypes.func.isRequired,
-  handleTextChange: React.PropTypes.func.isRequired,
-  handleDatePickerChange: React.PropTypes.func.isRequired,
-  tip: React.PropTypes.object.isRequired
+  handleSelectChange: PropTypes.func.isRequired,
+  handleTextChange: PropTypes.func.isRequired,
+  handleDatePickerChange: PropTypes.func.isRequired,
+  tip: PropTypes.object.isRequired
 }
 
 export default TipFormIntro

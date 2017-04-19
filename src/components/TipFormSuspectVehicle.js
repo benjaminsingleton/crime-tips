@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types';
 import { vehicleMakes, vehicleModels } from '../helpers/vehicle_data'
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
@@ -130,9 +131,9 @@ const TipFormSuspectVehicle = (props) => {
 }
 
 TipFormSuspectVehicle.propTypes = {
-  handleTextChange: React.PropTypes.func.isRequired,
-  handleSelectChange: React.PropTypes.func.isRequired,
-  handleCheckboxChange: React.PropTypes.func.isRequired
+  handleTextChange: PropTypes.func.isRequired,
+  handleSelectChange: PropTypes.func.isRequired,
+  handleCheckboxChange: PropTypes.func.isRequired
 }
 
 export default TipFormSuspectVehicle

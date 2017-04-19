@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import PropTypes from 'prop-types';
 import _ from 'underscore'
 import {tipTimeFormatLong} from '../helpers/helpers'
 import {Card, CardHeader, CardText, CardActions} from 'material-ui/Card';
@@ -257,5 +258,5 @@ export default class TipDetail extends Component {
 }
 
 TipDetail.propTypes = {
-  tipDetailKey: React.PropTypes.string.isRequired
+  tipDetailKey: PropTypes.string.isRequired
 }
