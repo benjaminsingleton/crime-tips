@@ -16,7 +16,7 @@ import {
 } from 'material-ui/Table';
 import EditorAttachFile from 'material-ui/svg-icons/editor/attach-file';
 import {tipTimeFormat, reverse} from '../helpers/helpers'
-import {firebaseApp, databaseRef} from '../helpers/constants'
+import {firebaseApp, databaseRef} from '../helpers/firebase'
 
 export default class Mailbox extends Component {
   constructor () {

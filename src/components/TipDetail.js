@@ -7,7 +7,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Divider from 'material-ui/Divider';
 import TextField from 'material-ui/TextField';
 import moment from 'moment'
-import {firebaseApp, databaseRef} from '../helpers/constants'
+import {firebaseApp, databaseRef} from '../helpers/firebase'
 
 export default class TipDetail extends Component {
   constructor() {

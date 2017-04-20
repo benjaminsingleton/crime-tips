@@ -7,7 +7,7 @@ import Toggle from 'material-ui/Toggle';
 import Divider from 'material-ui/Divider';
 
 import Layout from '../components/Layout'
-import {firebaseApp} from '../helpers/constants'
+import {firebaseApp} from '../helpers/firebase'
 import {relativeTime, reverse} from '../helpers/helpers'
 
 export default class UserSettings extends Component {

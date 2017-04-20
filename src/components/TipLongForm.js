@@ -9,8 +9,8 @@ import TipFormSuspectEmployment from '../components/TipFormSuspectEmployment'
 import TipFormSuspectVehicle from '../components/TipFormSuspectVehicle'
 import TipFormDrugs from '../components/TipFormDrugs'
 import TipFormMedia from '../components/TipFormMedia'
-import TipFormFinal from '../components/TipFormFinal'
-import {firebaseApp, databaseRef} from '../helpers/constants'
+import TipFormConclusion from '../components/TipFormConclusion'
+import {firebaseApp, databaseRef} from '../helpers/firebase'
 
 class TipLongForm extends Component {
 
@@ -169,7 +169,7 @@ class TipLongForm extends Component {
           <Card expanded={this.state.panelDisplay[8]} onExpandChange={() => this.togglePanel(8)} style={style.card}>
             <CardHeader title="8. Conclusion" actAsExpander={true} showExpandableButton={true} style={style.header} />
             <CardText expandable={true}>
-              <TipFormFinal
+              <TipFormConclusion
                 tip={this.state.tip}
                 handleSelectChange={this.handleSelectChange} 
                 handleTextChange={this.handleTextChange} 

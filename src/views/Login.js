@@ -22,7 +22,7 @@ export default class Login extends Component {
   }
 
   render () {
-    style = {
+    const style = {
       forgotPassword: {
         textDecoration: 'none', 
         fontSize: '12px'

@@ -34,14 +34,15 @@ export default class Navigation extends Component {
           content='Gotham Crime Tips' 
           header 
         />
-        <Menu.Item 
-          content='Home'
-          name='home' 
-          active={activeItem === 'home'} 
-          onClick={this.handleItemClick} 
-          as={Link} 
-          to='/' 
-        />
+        {!uid && <Menu.Item 
+                   content='Home'
+                   name='home' 
+                   active={activeItem === 'home'} 
+                   onClick={this.handleItemClick} 
+                   as={Link} 
+                   to='/' 
+                 />
+        }
         {uid && <Menu.Item 
                   content='Dashboard'
                   name='dashboard' 
@@ -122,6 +123,6 @@ export default class Navigation extends Component {
           }
        </Menu.Menu>
       </Menu>
-    )
+    );
   }
 }

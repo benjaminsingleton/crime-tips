@@ -43,7 +43,6 @@ export default class App extends Component {
   
   componentWillMount () {
     this.removeListener = firebaseApp.auth().onAuthStateChanged((user) => {
-      console.log(user)
       if (user) {
         this.setState({authed: true})
       } else {
@@ -55,9 +54,16 @@ export default class App extends Component {
     this.removeListener()
   }
   render() {
+    const style = {
+      background: '#2196F3',
+      margin: '0px',
+      boxSizing: 'border-box',
+      minHeight: '100vh',
+      borderBottom: 'solid 20px #1976d2',
+    }
     return (
       <BrowserRouter>
-        <div>
+        <div style={style}>
           <Switch>
             <Route path='/' exact component={Home} />
             <Route path='/about' exact component={About} />
