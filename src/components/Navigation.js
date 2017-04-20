@@ -4,18 +4,20 @@ import { Menu, Dropdown } from 'semantic-ui-react'
 import { firebaseApp } from '../helpers/firebase'
 
 export default class Navigation extends Component {
-  state = {uid: null, admin: false}
+  state = { 
+    uid: null, 
+    admin: false 
+  }
 
   componentWillMount() {
     const user = firebaseApp.auth().currentUser
-    // TODO: query to determine whether user is an admin
     if (user) {
       firebaseApp.database().ref(`users/${user.uid}/admin`).once('value')
         .then((snapshot) => this.setState({
             uid: user.uid, 
             admin: snapshot.val()
           })
-        )
+        );
     }
   }
 
@@ -64,7 +66,7 @@ export default class Navigation extends Component {
                     active={activeItem === 'accountManagement'} 
                     onClick={this.handleItemClick} 
                     as={Link} 
-                    to='/<accou></accou>nt_management' 
+                    to='/account_management' 
                   />
         }
         {!uid && <Menu.Item 
@@ -90,7 +92,14 @@ export default class Navigation extends Component {
                     <Dropdown.Menu>
                       <Dropdown.Item>English</Dropdown.Item>
                       <Dropdown.Item>Spanish</Dropdown.Item>
-                      <Dropdown.Item>Mandarin</Dropdown.Item>
+                      <Dropdown.Item>Chinese</Dropdown.Item>
+                      <Dropdown.Item>French</Dropdown.Item>
+                      <Dropdown.Item>Tagalog</Dropdown.Item>
+                      <Dropdown.Item>Vietnamese</Dropdown.Item>
+                      <Dropdown.Item>German</Dropdown.Item>
+                      <Dropdown.Item>Korean</Dropdown.Item>
+                      <Dropdown.Item>Hindustani</Dropdown.Item>
+                      <Dropdown.Item>Arabic</Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
           }
