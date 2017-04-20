@@ -22,6 +22,12 @@ export default class Login extends Component {
   }
 
   render () {
+    style = {
+      forgotPassword: {
+        textDecoration: 'none', 
+        fontSize: '12px'
+      }
+    }
     return (
       <Layout>
         <Grid centered container columns={1}>
@@ -46,14 +52,14 @@ export default class Login extends Component {
                     value={this.state.password}
                     onChange={this.handleChange}
                   />
-                  { this.state.error && <Message
-                                          error
-                                          header='Invalid username or password'
-                                          content='Please try again.'
+                  {this.state.error && <Message
+                                         error
+                                         header='Invalid username or password'
+                                         content='Please try again.'
                                         />
                   }
                   <Form.Button>Submit</Form.Button>
-                  <Link to="forgot_password" style={{textDecoration: 'none', fontSize: '12px'}}>Forgot password?</Link>
+                  <Link to="forgot_password" style={style.forgotPassword}>Forgot password?</Link>
                 </Form>
               </Card.Content>
             </Card>
