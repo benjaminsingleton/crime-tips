@@ -1,97 +1,118 @@
-import React, {Component} from 'react'
-import { withRouter, Route } from 'react-router-dom'
-import AppBar from 'material-ui/AppBar';
-import FlatButton from 'material-ui/FlatButton';
-import Drawer from 'material-ui/Drawer';
-import MenuItem from 'material-ui/MenuItem';
-import {logout} from '../helpers/auth'
-
-import {firebaseApp} from '../helpers/constants'
-
-const AppBarWithLink = ({uid, handleToggle}) => (
-  <Route render={({history}) => (
-    <AppBar
-      title="Gotham Police Crime Tips"
-      iconElementRight={uid ? <FlatButton label="Log Out" onTouchTap={logout}/> : null}
-      onLeftIconButtonTouchTap={handleToggle}
-      onTitleTouchTap={() => {history.push('/')}}
-      zDepth={0}
-    />
-  )} />
-)
-
-const HomeMenuItem = withRouter(({ history }) => (
-  <MenuItem onTouchTap={() => {history.push('/')}}>Home</MenuItem>
-))
-
-const DashboardMenuItem = withRouter(({ history }) => (
-  <MenuItem onTouchTap={() => {history.push('/dashboard')}}>Dashboard</MenuItem>
-))
-
-const FAQsMenuItem = withRouter(({ history }) => (
-  <MenuItem onTouchTap={() => {history.push('/faq')}}>FAQ</MenuItem>
-))
-
-const AboutMenuItem = withRouter(({ history }) => (
-  <MenuItem onTouchTap={() => {history.push('/about')}}>About</MenuItem>
-))
-
-const LoginMenuItem = withRouter(({ history }) => (
-  <MenuItem onTouchTap={() => {history.push('/login')}}>Login</MenuItem>
-))
-
-const SettingsMenuItem = withRouter(({ history }) => (
-  <MenuItem onTouchTap={() => {history.push('/settings')}}>My Settings</MenuItem>
-))
-
-const AccountManagementMenuItem = withRouter(({ history }) => (
-  <MenuItem onTouchTap={() => {history.push('/account_management')}}>Account Management</MenuItem>
-))
+import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
+import { Menu, Dropdown } from 'semantic-ui-react'
+import { firebaseApp } from '../helpers/firebase'
 
 export default class Navigation extends Component {
-  constructor() {
-    super()
-    this.state = {
-      open: false,
-      uid: null
-    }
-    this.handleToggle = this.handleToggle.bind(this)
-  }
+  state = {uid: null, admin: false}
 
-  componentDidMount() {
+  componentWillMount() {
     const user = firebaseApp.auth().currentUser
-    if (user) this.setState({uid: user.uid})
+    // TODO: query to determine whether user is an admin
+    if (user) {
+      firebaseApp.database().ref(`users/${user.uid}/admin`).once('value')
+        .then((snapshot) => this.setState({
+            uid: user.uid, 
+            admin: snapshot.val()
+          })
+        )
+    }
   }
 
-  handleToggle = () => this.setState({open: !this.state.open});
+  logout = () => firebaseApp.auth().signOut()
 
-  closeDrawer = () => this.setState({open: false});
+  handleItemClick = (e, { name }) => this.setState({ activeItem: name })
 
   render() {
+    const { activeItem, uid, admin } = this.state
+
     return (
-      <div>
-        <AppBarWithLink uid={this.state.uid} handleToggle={this.handleToggle} />
-        <Drawer
-          open={this.state.open}
-          onRequestChange={this.closeDrawer}
-          docked={false}>
-          {this.state.uid
-            ? <div>
-                <HomeMenuItem />
-                <DashboardMenuItem />
-                <SettingsMenuItem />
-                <AccountManagementMenuItem />
-                <AboutMenuItem />
-              </div>
-            : <div>
-                <HomeMenuItem />
-                <FAQsMenuItem />
-                <AboutMenuItem />
-                <LoginMenuItem />
-              </div>
+      <Menu stackable size='large'>
+        <Menu.Item 
+          content='Gotham Crime Tips' 
+          header 
+        />
+        <Menu.Item 
+          content='Home'
+          name='home' 
+          active={activeItem === 'home'} 
+          onClick={this.handleItemClick} 
+          as={Link} 
+          to='/' 
+        />
+        {uid && <Menu.Item 
+                  content='Dashboard'
+                  name='dashboard' 
+                  active={activeItem === 'dashboard'} 
+                  onClick={this.handleItemClick} 
+                  as={Link} 
+                  to='/dashboard' 
+                />
+        }
+        {uid && <Menu.Item 
+                  content='My Settings' 
+                  name='settings' 
+                  active={activeItem === 'settings'} 
+                  onClick={this.handleItemClick} 
+                  as={Link} 
+                  to='/settings' 
+                />
+        }
+        {admin && <Menu.Item 
+                    content='Account Management' 
+                    name='accountManagement' 
+                    active={activeItem === 'accountManagement'} 
+                    onClick={this.handleItemClick} 
+                    as={Link} 
+                    to='/<accou></accou>nt_management' 
+                  />
+        }
+        {!uid && <Menu.Item 
+                   content='FAQ' 
+                   name='faq' 
+                   active={activeItem === 'faq'} 
+                   onClick={this.handleItemClick} 
+                   as={Link} 
+                   to='/FAQ' 
+                 />
+        }
+        {!uid && <Menu.Item 
+                   content='About'
+                   name='about' 
+                   active={activeItem === 'about'} 
+                   onClick={this.handleItemClick} 
+                   as={Link} 
+                   to='/about' 
+                 />
+        }
+        <Menu.Menu position='right'>
+          {!uid && <Dropdown item text='Language'>
+                    <Dropdown.Menu>
+                      <Dropdown.Item>English</Dropdown.Item>
+                      <Dropdown.Item>Spanish</Dropdown.Item>
+                      <Dropdown.Item>Mandarin</Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
           }
-        </Drawer>
-      </div>
+          {!uid ? 
+              <Menu.Item 
+                content='Login' 
+                name='login' 
+                active={activeItem === 'login'} 
+                onClick={this.handleItemClick} 
+                as={Link} 
+                to='/login' 
+              />
+            :
+              <Menu.Item 
+                content='Logout' 
+                onClick={this.logout} 
+                as={Link} 
+                to='/login' 
+              />
+          }
+       </Menu.Menu>
+      </Menu>
     )
   }
 }
