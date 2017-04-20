@@ -5,7 +5,7 @@ import Divider from 'material-ui/Divider';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import RaisedButton from 'material-ui/RaisedButton';
-import {firebaseApp} from '../helpers/constants'
+import {firebaseApp} from '../helpers/firebase'
 
 export default class AccountManagement extends Component {
   constructor () {

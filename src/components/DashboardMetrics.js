@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {Card, CardTitle, CardText} from 'material-ui/Card';
 import Divider from 'material-ui/Divider';
-import {databaseRef} from '../helpers/constants'
+import {databaseRef} from '../helpers/firebase'
 
 import {oneDayAgoDate, getMonthAndDay} from '../helpers/helpers'
 

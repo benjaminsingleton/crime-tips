@@ -1,25 +1,8 @@
 import React, {Component} from 'react'
-import RaisedButton from 'material-ui/RaisedButton';
-import {firebaseApp, databaseRef} from '../helpers/constants'
-
-const styles = {
-  button: {
-    margin: 12,
-  },
-  exampleImageInput: {
-    cursor: 'pointer',
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    right: 0,
-    left: 0,
-    width: '100%',
-    opacity: 0,
-  },
-};
+import { Form } from 'semantic-ui-react'
+import { firebaseApp } from '../helpers/firebase'
 
 export default class TipFormMedia extends Component {
-
   constructor() {
     super()
     this.state = {
@@ -37,7 +20,7 @@ export default class TipFormMedia extends Component {
       let uploadPercent = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
       this.setState({'uploadPercent': uploadPercent}) // progress of upload
       if (uploadPercent === 100) {
-        databaseRef.child(`tips/${this.props.tipKey}/attachments/`).push({
+        firebaseApp.storage().ref(`tips/${this.props.tipKey}/attachments/`).push({
           filename: file.name,
           size: file.size,
           type: file.type,
@@ -51,22 +34,19 @@ export default class TipFormMedia extends Component {
   }
 
   render() {
-    const uploadedFiles = this.state.attachments.length > 0
-                          ? this.state.attachments.map(filename => <p key={filename}>{filename}</p>)
-                          : null
+    const { attachments } = this.state
+    const uploadedFiles = attachments.length > 0 && attachments.map(filename => <p key={filename}>{filename}</p>)
+
     return (
-        <div>
-          {this.state.uploadPercent === 100 ? <p><b>File was uploaded successfully.</b></p> : null}
-          {uploadedFiles}
-          <RaisedButton
-            label="Upload media"
-            labelPosition="before"
-            containerElement="label"
-            style={styles.button}
-          >
-            <input type="file" style={styles.exampleImageInput} onChange={(e) => this.uploadFile(e)} />
-          </RaisedButton>
-        </div>
-      );
+      <Form>
+        {this.state.uploadPercent === 100 && <p><b>File was uploaded successfully.</b></p>}
+        {uploadedFiles}
+        <Form.Input 
+          label='Upload media relevant to your tip. We can receive images, videos, audio, and documents.'
+          type='file'
+          onChange={(e) => this.uploadFile(e)}
+        />
+      </Form>
+    );
   }
 }
