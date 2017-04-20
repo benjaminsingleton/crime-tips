@@ -1,67 +1,64 @@
 import React, { Component } from 'react'
-import {Link} from 'react-router-dom'
-import {Card, CardActions, CardTitle, CardText} from 'material-ui/Card';
-import TextField from 'material-ui/TextField';
-import RaisedButton from 'material-ui/RaisedButton';
-import Divider from 'material-ui/Divider';
+import { Link } from 'react-router-dom'
+import { Grid, Card, Form, Message } from 'semantic-ui-react'
 import Layout from '../components/Layout'
-import { login, resetPassword } from '../helpers/auth'
-
-function setErrorMsg(error) {
-  return {
-    loginMessage: error
-  }
-}
+import { firebaseApp } from '../helpers/firebase'
 
 export default class Login extends Component {
-  state = { loginMessage: null }
+  constructor() {
+    super()
+    this.state = {
+      error: false
+    }
+    this.handleSubmit = this.handleSubmit.bind(this)
+  }
+
+  handleChange = (e, { name, value }) => this.setState({ [name]: value })
+
   handleSubmit = (e) => {
     e.preventDefault()
-    login(this.state.email, this.state.pw)
-      .catch((error) => {
-          this.setState(setErrorMsg('Invalid username/password.'))
-        })
+    firebaseApp.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
+      .catch((error) => this.setState({ error: true }))
   }
-  resetPassword = () => {
-    resetPassword(this.email.value)
-      .then(() => this.setState(setErrorMsg(`Password reset email sent to ${this.email.value}.`)))
-      .catch((error) => this.setState(setErrorMsg(`Email address not found.`)))
-  }
+
   render () {
     return (
       <Layout>
-        <div className="row" style={{margin: '100px 2px 30px 2px'}}>
-          <div className="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4 col-lg-offset-4 col-lg-4">
-            <Card>
-              <CardTitle title="Login" subtitle="Enter your credentials below"/>
-              <Divider/>
-              <form onSubmit={this.handleSubmit}>
-                <CardText>
-                  <div>
-                    <TextField
-                      fullWidth={true}
-                      value={this.state.email}
-                      floatingLabelText="Email"
-                      type="email"
-                      onChange={(e) => this.setState({email: e.target.value})}/>
-                  </div>
-                  <div>
-                    <TextField
-                      fullWidth={true}
-                      value={this.state.pw}
-                      floatingLabelText="Password"
-                      type="password"
-                      onChange={(e) => this.setState({pw: e.target.value})}/>
-                  </div>
-                </CardText>
-                <CardActions>
-                  <RaisedButton type="submit" label="Login" primary={true}/>
+        <Grid centered container columns={1}>
+          <Grid.Column mobile={16} tablet={8} computer={8} largeScreen={8}>
+            <Card centered fluid>
+              <Card.Content header='Login' meta='Enter your credentials below' />
+              <Card.Content>
+                <Form error={this.state.error} onSubmit={this.handleSubmit}>
+                  <Form.Input 
+                    label='Email'
+                    name='email'
+                    type='email'
+                    placeholder='Email'
+                    value={this.state.email}
+                    onChange={this.handleChange}
+                  />
+                  <Form.Input 
+                    label='Password'
+                    name='password'
+                    type='password'
+                    placeholder='Password'
+                    value={this.state.password}
+                    onChange={this.handleChange}
+                  />
+                  { this.state.error && <Message
+                                          error
+                                          header='Invalid username or password'
+                                          content='Please try again.'
+                                        />
+                  }
+                  <Form.Button>Submit</Form.Button>
                   <Link to="forgot_password" style={{textDecoration: 'none', fontSize: '12px'}}>Forgot password?</Link>
-                </CardActions>
-              </form>
+                </Form>
+              </Card.Content>
             </Card>
-          </div>
-        </div>
+          </Grid.Column>
+        </Grid>
       </Layout>
     );
   }

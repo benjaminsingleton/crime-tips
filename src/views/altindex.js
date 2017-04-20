@@ -1,15 +1,8 @@
 import React, { Component } from 'react'
 import { Route, BrowserRouter, Redirect, Switch } from 'react-router-dom'
-import Login from './Login'
 import FAQ from './FAQ'
 import About from './About'
-import Home from './Home';
-import Dashboard from './Dashboard';
-import UserSettings from './UserSettings';
-import AccountManagement from './AccountManagement';
-import LoggedOut from './LoggedOut';
-import ForgotPassword from './ForgotPassword';
-import NoMatch from './NoMatch';
+import Login from './Login'
 import { firebaseApp } from '../helpers/firebase'
 
 function PrivateRoute ({component: Component, authed, ...rest}) {
@@ -43,7 +36,6 @@ export default class App extends Component {
   
   componentWillMount () {
     this.removeListener = firebaseApp.auth().onAuthStateChanged((user) => {
-      console.log(user)
       if (user) {
         this.setState({authed: true})
       } else {
@@ -59,17 +51,9 @@ export default class App extends Component {
       <BrowserRouter>
         <div>
           <Switch>
-            <Route path='/' exact component={Home} />
-            <Route path='/about' exact component={About} />
-            <Route path='/faq' exact component={FAQ} />
-            <PublicRoute authed={this.state.authed} path='/login' component={Login} />
-            <PublicRoute authed={this.state.authed} path='/forgot_password' component={ForgotPassword} />
-            <PrivateRoute authed={this.state.authed} path='/dashboard' component={Dashboard} />
-            <PrivateRoute authed={this.state.authed} path='/settings' component={UserSettings} />
-            <PrivateRoute authed={this.state.authed} path='/account_management' component={AccountManagement} />
-            <PrivateRoute authed={this.state.authed} path='/tip/:tipId' component={Dashboard} />
-            <PrivateRoute authed={this.state.authed} path='/logout' component={LoggedOut} />
-            <Route component={NoMatch} />
+            <Route path='/' exact component={FAQ} />
+            <Route path='/about' component={About} />
+            <Route path='/login' component={Login} />
           </Switch>
         </div>
       </BrowserRouter>
