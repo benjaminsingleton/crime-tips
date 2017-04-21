@@ -4,10 +4,8 @@ import _ from 'underscore'
 import Layout from '../components/Layout'
 import TipFormContainer from '../components/TipFormContainer'
 import TipFormIntro from '../components/TipFormIntro'
-import TipFormSuspectDescription from '../components/TipFormSuspectDescription'
-import TipFormSuspectLocation from '../components/TipFormSuspectLocation'
-import TipFormSuspectEmployment from '../components/TipFormSuspectEmployment'
-import TipFormSuspectVehicle from '../components/TipFormSuspectVehicle'
+import TipFormSuspect from '../components/TipFormSuspect'
+import TipFormVehicle from '../components/TipFormVehicle'
 import TipFormDrugs from '../components/TipFormDrugs'
 import TipFormMedia from '../components/TipFormMedia'
 import TipFormConclusion from '../components/TipFormConclusion'
@@ -23,7 +21,7 @@ export default class Home extends Component {
         submitted: false
       },
       formWizardPageIndex: 0,
-      formWizardContent: ['intro', 'tipsterHasMedia', 'final', 'success'],
+      formWizardContent: ['intro', 'suspect', 'vehicle', 'media', 'final', 'success'],
       error: {
         crimeType: null,
         tipText: null
@@ -58,6 +56,19 @@ export default class Home extends Component {
     const tip = {...this.state.tip}
     tip[name] = value
     this.setState({tip})
+  }
+
+  handleSuspectsVehicles() {
+    const formWizardContent = this.state.formWizardContent
+    if (name === 'numberOfSuspects') {
+      if (value === 0) {
+        var pos = formWizardContent.indexOf(name);
+        formWizardContent.splice(pos, 1)
+      } else if (value === 1) {
+        
+      }
+      // if 0, then remove suspect from formWizardContent
+    }
   }
 
   handleCheckChange(e, { name, value }) {
@@ -164,57 +175,47 @@ export default class Home extends Component {
               />
           </TipFormContainer>
         )
-      case 'tipsterKnowsSuspectDescription':
+      case 'suspect':
         return (
-          <TipFormContainer title="Suspect Description" changeFormWizardIndex={this.changeFormWizardIndex}>
-            <TipFormSuspectDescription
-              handleSelectChange={this.handleSelectChange}
-              handleTextChange={this.handleTextChange}
-              handleDatePickerChange={this.handleDatePickerChange}
+          <TipFormContainer 
+            title="Suspect Description" 
+            changeFormWizardIndex={this.changeFormWizardIndex}
+            previousButton={true}
+            nextButton={true}>
+              <TipFormSuspect
+                handleInputChange={this.handleSelectChange}
+                tip={this.state.tip}
+              />
+          </TipFormContainer>
+        )
+      case 'vehicle':
+        return (
+          <TipFormContainer 
+            title="Suspect Vehicle" 
+            changeFormWizardIndex={this.changeFormWizardIndex}
+            previousButton={true}
+            nextButton={true}>
+            <TipFormVehicle
+              handleInputChange={this.handleInputChange}
               tip={this.state.tip}/>
           </TipFormContainer>
         )
-      case 'tipsterKnowsSuspectLocation':
+      case 'drugs':
         return (
-          <TipFormContainer title="Suspect Location" changeFormWizardIndex={this.changeFormWizardIndex}>
-            <TipFormSuspectLocation
-              handleSelectChange={this.handleSelectChange}
-              handleTextChange={this.handleTextChange}
-              handleCheckboxChange={this.handleCheckboxChange}
-              tip={this.state.tip}/>
+          <TipFormContainer 
+            title="Drugs" 
+            changeFormWizardIndex={this.changeFormWizardIndex}
+            previousButton={true}
+            nextButton={true}>
+              <TipFormDrugs
+                handleSelectChange={this.handleSelectChange}
+                handleTextChange={this.handleTextChange}
+                handleCheckboxChange={this.handleCheckboxChange}
+                tip={this.state.tip}
+              />
           </TipFormContainer>
         )
-      case 'tipsterKnowsSuspectEmployment':
-        return (
-          <TipFormContainer title="Suspect Employment" changeFormWizardIndex={this.changeFormWizardIndex}>
-            <TipFormSuspectEmployment
-              handleSelectChange={this.handleSelectChange}
-              handleTextChange={this.handleTextChange}
-              handleCheckboxChange={this.handleCheckboxChange}
-              tip={this.state.tip}/>
-          </TipFormContainer>
-        )
-      case 'tipsterKnowsSuspectVehicle':
-        return (
-          <TipFormContainer title="Suspect Vehicle" changeFormWizardIndex={this.changeFormWizardIndex}>
-            <TipFormSuspectVehicle
-              handleSelectChange={this.handleSelectChange}
-              handleTextChange={this.handleTextChange}
-              handleCheckboxChange={this.handleCheckboxChange}
-              tip={this.state.tip}/>
-          </TipFormContainer>
-        )
-      case 'tipsterKnowsAboutDrugs':
-        return (
-          <TipFormContainer title="Drugs" changeFormWizardIndex={this.changeFormWizardIndex}>
-            <TipFormDrugs
-              handleSelectChange={this.handleSelectChange}
-              handleTextChange={this.handleTextChange}
-              handleCheckboxChange={this.handleCheckboxChange}
-              tip={this.state.tip}/>
-          </TipFormContainer>
-        )
-      case 'tipsterHasMedia':
+      case 'media':
         return (
           <TipFormContainer 
             title="Media Upload" 
