@@ -3,10 +3,8 @@ import {Card, CardHeader, CardText, CardActions} from 'material-ui/Card';
 import RaisedButton from 'material-ui/RaisedButton';
 import Divider from 'material-ui/Divider';
 import TipFormIntro from '../components/TipFormIntro'
-import TipFormSuspectDescription from '../components/TipFormSuspectDescription'
-import TipFormSuspectLocation from '../components/TipFormSuspectLocation'
-import TipFormSuspectEmployment from '../components/TipFormSuspectEmployment'
-import TipFormSuspectVehicle from '../components/TipFormSuspectVehicle'
+import TipFormSuspect from '../components/TipFormSuspect'
+import TipFormVehicle from '../components/TipFormVehicle'
 import TipFormDrugs from '../components/TipFormDrugs'
 import TipFormMedia from '../components/TipFormMedia'
 import TipFormConclusion from '../components/TipFormConclusion'
@@ -110,9 +108,9 @@ class TipLongForm extends Component {
             </CardText>
           </Card>
           <Card expanded={this.state.panelDisplay[2]} onExpandChange={() => this.togglePanel(2)} style={style.card}>
-            <CardHeader title="2. Suspect Description" actAsExpander={true} showExpandableButton={true} style={style.header} />
+            <CardHeader title="2. Suspect" actAsExpander={true} showExpandableButton={true} style={style.header} />
             <CardText expandable={true}>
-              <TipFormSuspectDescription 
+              <TipFormSuspect
                 tip={this.state.tip}
                 handleSelectChange={this.handleSelectChange} 
                 handleTextChange={this.handleTextChange} 
@@ -121,29 +119,9 @@ class TipLongForm extends Component {
             </CardText>
           </Card>
           <Card expanded={this.state.panelDisplay[3]} onExpandChange={() => this.togglePanel(3)} style={style.card}>
-            <CardHeader title="3. Suspect Location" actAsExpander={true} showExpandableButton={true} style={style.header} />
+            <CardHeader title="5. Vehicle" actAsExpander={true} showExpandableButton={true} style={style.header} />
             <CardText expandable={true}>
-              <TipFormSuspectLocation 
-                tip={this.state.tip}
-                handleSelectChange={this.handleSelectChange} 
-                handleTextChange={this.handleTextChange} 
-                handleCheckboxChange={this.handleCheckboxChange} />
-            </CardText>
-          </Card>
-          <Card expanded={this.state.panelDisplay[4]} onExpandChange={() => this.togglePanel(4)} style={style.card}>
-            <CardHeader title="4. Suspect Employment" actAsExpander={true} showExpandableButton={true} style={style.header} />
-            <CardText expandable={true}>
-              <TipFormSuspectEmployment 
-                tip={this.state.tip}
-                handleSelectChange={this.handleSelectChange}
-                handleTextChange={this.handleTextChange} 
-                handleCheckboxChange={this.handleCheckboxChange} />
-            </CardText>
-          </Card>
-          <Card expanded={this.state.panelDisplay[5]} onExpandChange={() => this.togglePanel(5)} style={style.card}>
-            <CardHeader title="5. Suspect Vehicle" actAsExpander={true} showExpandableButton={true} style={style.header} />
-            <CardText expandable={true}>
-              <TipFormSuspectVehicle
+              <TipFormVehicle
                 tip={this.state.tip}
                 handleSelectChange={this.handleSelectChange} 
                 handleTextChange={this.handleTextChange} 
