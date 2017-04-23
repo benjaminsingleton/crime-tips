@@ -1,11 +1,21 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { Card, Button } from 'semantic-ui-react'
+import { Card, Button, Step } from 'semantic-ui-react'
 
 const TipFormContainer = (props) => {
   return (
     <Card centered fluid>
       <Card.Content header={props.title} meta='All tips are completely anonymous. Your community needs your help.' />
+      {/*<Card.Content>
+        <Step.Group size='mini'>
+          <Step active icon='marker' title='Incident' />
+          <Step icon='user' title='Suspect' />
+          <Step disabled icon='car' title='Vehicle' description='optional' />
+          <Step disabled icon='medkit' title='Drugs' description='optional' />
+          <Step disabled icon='cloud upload' title='Media' description='optional' />
+          <Step icon='check' title='Finish' />
+        </Step.Group>
+      </Card.Content>*/}
       <Card.Content>
         {props.OptionalMsg &&
           <p>
