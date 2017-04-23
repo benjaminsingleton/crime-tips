@@ -1,52 +1,105 @@
 import React, {Component} from 'react'
-import { Form } from 'semantic-ui-react'
+import { Form, Input, Button, Segment, Progress } from 'semantic-ui-react'
 import { firebaseApp } from '../helpers/firebase'
 
 export default class TipFormMedia extends Component {
-  constructor() {
-    super()
-    this.state = {
-      uploadPercent: 0,
-      attachments: []
-    }
-    this.uploadFile = this.uploadFile.bind(this)
+  state = {
+    uploadPercent: 0,
+    filename: '',
   }
 
-  uploadFile(event) {
-    const file = event.target.files[0]; // get the first file uploaded
-    const storageRef = firebaseApp.storage().ref(`tips/${this.props.tipKey}/${file.name}`);
-    const uploadTask = storageRef.put(file);
-    uploadTask.on('state_changed', function progress(snapshot) {
-      let uploadPercent = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-      this.setState({'uploadPercent': uploadPercent}) // progress of upload
-      if (uploadPercent === 100) {
-        firebaseApp.storage().ref(`tips/${this.props.tipKey}/attachments/`).push({
-          filename: file.name,
-          size: file.size,
-          type: file.type,
-          lastModified: file.lastModified
+  click = (e) => {
+    e.preventDefault()
+    this.fileInput.click()
+  }
+
+  delete = (filename) => {
+    firebaseApp.storage().ref(`tips/${this.props.tipKey}/${filename}`).delete().then(() => {
+      if (Object.keys(this.props.tip.attachments).length === 1) {
+        firebaseApp.database().ref(`abandonedTips/${this.props.tipKey}/attachments`).remove()
+      } else {
+        firebaseApp.database().ref(`abandonedTips/${this.props.tipKey}/attachments`).once('value').then((snapshot) => {
+        // Query all attachments and find the key associated with the filename to be deleted
+        const attachments = snapshot.val()
+        const keyToDelete = Object.keys(attachments).filter(key => attachments[key].filename === filename)[0]
+        firebaseApp.database().ref(`abandonedTips/${this.props.tipKey}/attachments/${keyToDelete}`).remove()
         })
-        const attachments = this.state.attachments
-        attachments.push(file.name)
-        this.setState({attachments});
       }
-    }.bind(this));
+      this.setState({error: null})
+    }).catch((error) => {
+      this.setState({error: error.code})
+    })
+  }
+
+  uploadFile = (event) => {
+    const file = event.target.files[0]; // get the first file uploaded
+    this.setState({filename: file.name})
+    const storageRef = firebaseApp.storage().ref(`tips/${this.props.tipKey}/${file.name}`);
+    const uploadTask = storageRef.put(file)
+
+    uploadTask.on('state_changed', (snapshot) => {
+      // in progress
+      let uploadPercent = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      this.setState({uploadPercent})
+    }, (error) => {
+      // error
+      this.setState({error: error.code, uploadPercent: 0})
+    }, () => {
+      // success
+      firebaseApp.database().ref(`abandonedTips/${this.props.tipKey}/attachments`).push({
+        filename: file.name,
+        size: file.size,
+        type: file.type,
+        lastModified: file.lastModified,
+        storageKey: this.props.tipKey
+      })
+      this.setState({filename: '', uploadPercent: 0});
+    });
   }
 
   render() {
-    const { attachments } = this.state
-    const uploadedFiles = attachments.length > 0 && attachments.map(filename => <p key={filename}>{filename}</p>)
+    const { attachments } = this.props.tip
+    const uploadedFiles = attachments ? Object.keys(attachments).map(key => 
+                                        <Segment key={key}>
+                                          <p>
+                                            {attachments[key].filename}
+                                            <Button basic compact
+                                              icon='delete'
+                                              color='red'
+                                              floated='right'
+                                              onClick={() => this.delete(attachments[key].filename)}
+                                            />
+                                          </p>
+                                        </Segment>)
+                                      : null
 
     return (
-      <Form>
-        {this.state.uploadPercent === 100 && <p><b>File was uploaded successfully.</b></p>}
-        {uploadedFiles}
-        <Form.Input 
-          label='Upload media relevant to your tip. We can receive images, videos, audio, and documents.'
-          type='file'
-          onChange={(e) => this.uploadFile(e)}
-        />
-      </Form>
+      <div>  
+        {(attachments || this.state.uploadPercent > 0 || this.state.error) &&
+          <Segment padded basic>
+            {this.state.error && 
+              <p><b>An error occurred. Please try again.</b>{`(Error Code: ${this.state.error})`}</p>}
+            {(this.state.uploadPercent > 0 && this.state.uploadPercent < 100) && <p><b>Uploading ...</b></p>}
+            {this.state.uploadPercent > 0 && <Progress percent={this.state.uploadPercent} indicating autoSuccess />}
+            {uploadedFiles}
+          </Segment>
+        }
+        <Form>
+          <Form.Field>
+            <label>Upload as many files as you need. Accepted file types include images, videos, screenshots, documents, etc.</label>
+            <div className="ui file input action">
+              <Input type="text" value={this.state.filename} readOnly={true} />
+              <input 
+                type="file" 
+                ref={(input) => { this.fileInput = input; }} 
+                style={{display: 'none'}} 
+                onChange={(e) => this.uploadFile(e)}
+              />
+              <Button content='Upload' icon='cloud upload' onClick={(e) => this.click(e)} />
+            </div>
+        </Form.Field>
+       </Form>
+      </div>
     );
   }
 }

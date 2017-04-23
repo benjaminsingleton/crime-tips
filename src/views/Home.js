@@ -36,49 +36,51 @@ export default class Home extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (!this.state.tipKey && this.state.tip.tipText && this.state.tip.tipText.length >= 20) {
-      firebaseApp.database().ref('abandonedTips/').push({...this.state.tip})
-          .then((snap) => {
-            const tipKey = snap.key
-            this.setState({tipKey})
-          })
+    if (!this.state.tipKey && 
+        !this.state.gettingTipKey &&
+        this.state.tip.tipText && this.state.tip.tipText.length >= 20) {
+          this.setState({gettingTipKey: true})
+          firebaseApp.database().ref('abandonedTips/').push({...this.state.tip})
+              .then((snap) => {
+                const tipKey = snap.key
+                this.setState({tipKey})
+              })
     } else if (this.state.tipKey && this.state.tip !== prevState.tip) {
       // create an object that is the diff between the old tip and new tip for updating
       const updated = _.omit(this.state.tip, function(v,k) { return prevState.tip[k] === v; })
       firebaseApp.database().ref(`abandonedTips/${this.state.tipKey}`).update({...updated})
       // TODO: increase abandoned tip unread count by one using transactions
     }
+    
+    if (this.state.tipKey && 
+        this.state.tip.tipsterHasMedia && 
+        (this.state.tip.tipsterHasMedia !== prevState.tip.tipsterHasMedia)) {
+      // setup listener only when tipster is going to upload media
+      firebaseApp.database().ref(`abandonedTips/${this.state.tipKey}/attachments`).on('value', function(snapshot) {
+          const attachments = snapshot.val()
+          const tip = {...this.state.tip}
+          tip['attachments'] = attachments
+          this.setState({tip})
+      }.bind(this));
+    }
   }
+
+  componentWillUnmount = () => this.state.tipKey && firebaseApp.database().ref(`abandonedTips/${this.state.tipKey}`).off();
   
-  handleInputChange(e, { name, value }) {
-    console.log(e, name, value)
-    console.log(e.target.value)
+  handleInputChange = (e, { name, value }) => {
     const tip = {...this.state.tip}
     tip[name] = value
     this.setState({tip})
   }
 
-  handleSuspectsVehicles() {
-    const formWizardContent = this.state.formWizardContent
-    if (name === 'numberOfSuspects') {
-      if (value === 0) {
-        var pos = formWizardContent.indexOf(name);
-        formWizardContent.splice(pos, 1)
-      } else if (value === 1) {
-        
-      }
-      // if 0, then remove suspect from formWizardContent
-    }
-  }
-
-  handleCheckChange(e, { name, value }) {
+  handleCheckChange = (e, { name, value }) => {
     const tip = {...this.state.tip}
     tip[name] = tip[name] ? !tip[name] : true
     this.setState({tip})
     this.addModuleToFormWizard(name)
   }
 
-  createTip(event) {
+  createTip = (event) => {
     event.preventDefault();
     const tip = {...this.state.tip}
     tip['submitted'] = true
@@ -99,7 +101,7 @@ export default class Home extends Component {
       })
   }
 
-  validateIntroModule() {
+  validateIntroModule = () => {
     const { formWizardPageIndex } = this.state
     const crimeTypeError = (this.state.tip.crimeType == null)
     const tipTextError = (this.state.tip.tipText == null || this.state.tip.tipText.length < 20)
@@ -178,12 +180,12 @@ export default class Home extends Component {
       case 'suspect':
         return (
           <TipFormContainer 
-            title="Suspect Description" 
+            title="Suspect" 
             changeFormWizardIndex={this.changeFormWizardIndex}
             previousButton={true}
             nextButton={true}>
               <TipFormSuspect
-                handleInputChange={this.handleSelectChange}
+                handleInputChange={this.handleInputChange}
                 tip={this.state.tip}
               />
           </TipFormContainer>
@@ -217,8 +219,8 @@ export default class Home extends Component {
         )
       case 'media':
         return (
-          <TipFormContainer 
-            title="Media Upload" 
+          <TipFormContainer
+            title="Upload Media" 
             changeFormWizardIndex={this.changeFormWizardIndex}
             previousButton={true}
             nextButton={true}>
