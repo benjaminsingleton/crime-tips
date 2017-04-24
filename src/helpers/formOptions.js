@@ -1,9 +1,10 @@
 const crimeTypeOptions = [
   {text: 'Arson', value: 'Arson'},
   {text: 'Assault', value: 'Assault'},
-  {text: 'Bank Fraud', value: 'Bank Fraud'},
+  {text: 'Bullying', value: 'Bullying'},
   {text: 'Burglary', value: 'Burglary'},
   {text: 'Drugs', value: 'Drugs'},
+  {text: 'Fraud', value: 'Fraud'},
   {text: 'Fugitive', value: 'Fugitive'},
   {text: 'Guns', value: 'Guns'},
   {text: 'Homicide', value: 'Homicide'},
