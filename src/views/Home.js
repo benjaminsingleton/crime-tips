@@ -10,7 +10,7 @@ import TipFormDrugs from '../components/TipFormDrugs'
 import TipFormMedia from '../components/TipFormMedia'
 import TipFormConclusion from '../components/TipFormConclusion'
 import { firebaseApp } from '../helpers/firebase'
-import { language } from '../helpers/questionLanguages'
+import { language } from '../helpers/languages'
 
 export default class Home extends Component {
   constructor() {
