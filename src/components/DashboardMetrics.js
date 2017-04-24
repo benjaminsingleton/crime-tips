@@ -1,31 +1,26 @@
 import React, {Component} from 'react'
-import {Card, CardTitle, CardText} from 'material-ui/Card';
-import Divider from 'material-ui/Divider';
-import {databaseRef} from '../helpers/firebase'
-
-import {oneDayAgoDate, getMonthAndDay} from '../helpers/helpers'
+import { Grid, Card } from 'semantic-ui-react'
+import { firebaseApp } from '../helpers/firebase'
+import { oneDayAgoDate, getMonthAndDay } from '../helpers/helpers'
 
 export default class DashboardMetrics extends Component {
-  constructor () {
-    super()
-    this.state = {
-      metrics: {
+  state = {
+    metrics: {
         unreadTips: null,
         tipsReceivedLast24Hours: null,
         tipsReceivedYTD: null,
         unreadAbandonedTips: null,
-      }
     }
   }
 
-  componentWillMount() {
-    databaseRef.child('metrics').on('value', function(snapshot) {
+  componentWillMount = () => {
+    firebaseApp.database().ref('metrics').on('value', (snapshot) => {
         const metrics = snapshot.val()
         this.setState({metrics})
-    }.bind(this));
+    });
   }
 
-  componentWillUnmount = () => databaseRef.child('metrics').off();
+  componentWillUnmount = () => firebaseApp.database().ref('metrics').off();
 
   render() {
     const style = {
@@ -42,48 +37,46 @@ export default class DashboardMetrics extends Component {
       }
     }
     return (
-      <div className="row" style={style.row}>
-        <div className="col-xs-12 col-sm-6 col-md-3 col-lg-3">
-          <Card>
-            <CardTitle title="Unread Tips" titleStyle={style.title} />
-            <Divider />
-            <CardText>
-              <div style={style.metric}>{this.state.metrics.unreadTips}</div>
-              <div style={style.detail}>To be reviewed</div>
-            </CardText>
-          </Card>
-        </div>
-        <div className="col-xs-12 col-sm-6 col-md-3 col-lg-3">
-          <Card>
-            <CardTitle title="Tips Received - 24hrs" titleStyle={style.title} />
-            <Divider />
-            <CardText style={style.metric}>
-              <div>{this.state.metrics.tipsReceivedLast24Hours}</div>
-              <div style={style.detail}>Since {getMonthAndDay(oneDayAgoDate())}</div>
-            </CardText>
-          </Card>
-        </div>
-        <div className="col-xs-12 col-sm-6 col-md-3 col-lg-3">
-          <Card>
-            <CardTitle title="Tips Received - YTD" titleStyle={style.title} />
-            <Divider />
-            <CardText style={style.metric}>
-              <div>{this.state.metrics.tipsReceivedYTD}</div>
-              <div style={style.detail}>Since January 1</div>
-            </CardText>
-          </Card>
-        </div>
-        <div className="col-xs-12 col-sm-6 col-md-3 col-lg-3">
-          <Card>
-            <CardTitle title="Abandoned Tips" titleStyle={style.title} />
-            <Divider />
-            <CardText style={style.metric}>
-              <div>{this.state.metrics.unreadAbandonedTips}</div>
-              <div style={style.detail}>Never completed</div>
-            </CardText>
-          </Card>
-        </div>
-      </div>
+      <Grid container columns={4}>
+        <Grid.Row>
+          <Grid.Column mobile={16} tablet={8} computer={4} largeScreen={4}>
+            <Card centered fluid>
+              <Card.Content header='Unread Tips' />
+              <Card.Content>
+                <div style={style.metric}>{this.state.metrics.unreadTips}</div>
+                <div style={style.detail}>To be reviewed</div>
+              </Card.Content>
+            </Card>
+          </Grid.Column>
+          <Grid.Column mobile={16} tablet={8} computer={4} largeScreen={4}>
+            <Card centered fluid>
+              <Card.Content header='Tips Received - 24hrs' />
+              <Card.Content>
+                <div>{this.state.metrics.tipsReceivedLast24Hours}</div>
+                <div style={style.detail}>Since {getMonthAndDay(oneDayAgoDate())}</div>
+              </Card.Content>
+            </Card>
+          </Grid.Column>
+          <Grid.Column mobile={16} tablet={8} computer={4} largeScreen={4}>
+            <Card centered fluid>
+              <Card.Content header='Tips Received - YTD' />
+              <Card.Content>
+                <div>{this.state.metrics.tipsReceivedYTD}</div>
+                <div style={style.detail}>Since January 1</div>
+              </Card.Content>
+            </Card>
+          </Grid.Column>
+          <Grid.Column mobile={16} tablet={8} computer={4} largeScreen={4}>
+            <Card centered fluid>
+              <Card.Content header='Abandoned Tips' />
+              <Card.Content>
+                <div>{this.state.metrics.unreadAbandonedTips}</div>
+                <div style={style.detail}>Never completed</div>
+              </Card.Content>
+            </Card>
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
     )
   }
 }
