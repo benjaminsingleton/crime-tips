@@ -200,6 +200,8 @@ export default class Home extends Component {
           <TipFormContainer
             title="Submit a Tip"
             changeFormWizardIndex={this.changeFormWizardIndex}
+            showFormModule={this.state.showFormModule}
+            activeModule='intro'
             nextButton={true}>
               <TipFormIntro
                 handleInputChange={this.handleInputChange}
@@ -216,6 +218,8 @@ export default class Home extends Component {
           <TipFormContainer 
             title="Suspect" 
             changeFormWizardIndex={this.changeFormWizardIndex}
+            showFormModule={this.state.showFormModule}
+            activeModule='suspect'
             previousButton={true}
             nextButton={true}>
               <TipFormSuspect
@@ -230,6 +234,8 @@ export default class Home extends Component {
           <TipFormContainer 
             title="Suspect Vehicle" 
             changeFormWizardIndex={this.changeFormWizardIndex}
+            showFormModule={this.state.showFormModule}
+            activeModule='vehicle'
             previousButton={true}
             nextButton={true}>
             <TipFormVehicle
@@ -244,6 +250,8 @@ export default class Home extends Component {
           <TipFormContainer 
             title="Drugs" 
             changeFormWizardIndex={this.changeFormWizardIndex}
+            showFormModule={this.state.showFormModule}
+            activeModule='drugs'
             previousButton={true}
             nextButton={true}>
               <TipFormDrugs
@@ -258,6 +266,8 @@ export default class Home extends Component {
           <TipFormContainer
             title="Upload Media" 
             changeFormWizardIndex={this.changeFormWizardIndex}
+            showFormModule={this.state.showFormModule}
+            activeModule='media'
             previousButton={true}
             nextButton={true}>
               <TipFormMedia 
@@ -272,6 +282,8 @@ export default class Home extends Component {
           <TipFormContainer
             title="Conclusion"
             changeFormWizardIndex={this.changeFormWizardIndex}
+            showFormModule={this.state.showFormModule}
+            activeModule='final'
             previousButton={true}
             showSubmit={true}
             createTip={this.createTip}>
@@ -285,7 +297,7 @@ export default class Home extends Component {
         )
       case 'success':
         return (
-          <TipFormContainer title="Thank you!">
+          <TipFormContainer title="Thank you!" showFormModule={this.state.showFormModule}>
             <p>You've done your community a great service!</p>
             <p>You're tip number is: <b>{this.state.tipKey}</b>. Save it as a reference.</p>
             <p><a onClick={() => this.setState(this.baseState)}>Click here</a> to write another tip.</p>

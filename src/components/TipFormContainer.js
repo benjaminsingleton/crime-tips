@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { Card, Button } from 'semantic-ui-react'
+import { Card, Button, Container, Breadcrumb, Icon } from 'semantic-ui-react'
 
 const TipFormContainer = (props) => {
   return (
@@ -30,6 +30,43 @@ const TipFormContainer = (props) => {
           </tbody>
         </table>
       </Card.Content>*/}
+      <Card.Content>
+        <Container textAlign='center'>
+          <Breadcrumb>
+            <Breadcrumb.Section active={props.activeModule === 'intro'}>
+              <Icon disabled={props.activeModule !== 'intro'} name='marker' />Incident
+            </Breadcrumb.Section>
+            <Breadcrumb.Divider icon='right arrow' />
+            {props.showFormModule.suspect === true && 
+              <Breadcrumb.Section active={props.activeModule === 'suspect'}>
+                <Icon disabled={props.activeModule !== 'suspect'} name='user' />Suspect
+              </Breadcrumb.Section>
+            }
+            {props.showFormModule.suspect === true && <Breadcrumb.Divider icon='right arrow' />}
+            {props.showFormModule.vehicle === true && 
+              <Breadcrumb.Section active={props.activeModule === 'vehicle'}>
+                <Icon disabled={props.activeModule !== 'vehicle'} name='car' />Vehicle
+              </Breadcrumb.Section>
+            }
+            {props.showFormModule.vehicle === true && <Breadcrumb.Divider icon='right arrow' />}
+            {props.showFormModule.drugs === true && 
+              <Breadcrumb.Section active={props.activeModule === 'drugs'}>
+                <Icon disabled={props.activeModule !== 'drugs'} name='medkit' />Drugs
+              </Breadcrumb.Section>
+            }
+            {props.showFormModule.drugs === true && <Breadcrumb.Divider icon='right arrow' />}
+            {props.showFormModule.media === true && 
+              <Breadcrumb.Section active={props.activeModule === 'media'}>
+                <Icon disabled={props.activeModule !== 'media'} name='cloud upload' />Media
+              </Breadcrumb.Section>
+            }
+            {props.showFormModule.media === true && <Breadcrumb.Divider icon='right arrow' />}
+            <Breadcrumb.Section active={props.activeModule === 'final'}>
+              <Icon disabled={props.activeModule !== 'final'} name='check' />Submit
+            </Breadcrumb.Section>
+          </Breadcrumb>
+        </Container>
+      </Card.Content>
       <Card.Content>
         {props.OptionalMsg &&
           <p>
