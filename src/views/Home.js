@@ -18,21 +18,27 @@ export default class Home extends Component {
       tip: {
         timestampStart: Date.now(),
         tipType: 'web',
+        numberOfSuspects: 1,
+        numberOfVehicles: 0,
         submitted: false
       },
-      formWizardPageIndex: 0,
-      formWizardContent: ['intro', 'suspect', 'vehicle', 'media', 'final', 'success'],
+      moduleIndex: 0,
+      formModules: ['intro', 'suspect', 'vehicle', 'drugs', 'media', 'final', 'success'],
+      showFormModule: {
+        'intro': true,
+        'suspect': true,
+        'vehicle': false,
+        'drugs': false,
+        'media': false,
+        'final': true,
+        'success': true,
+      },
       error: {
         crimeType: null,
         tipText: null
       },
     }
     this.baseState = this.state
-    this.getFormWizardContent = this.getFormWizardContent.bind(this)
-    this.handleInputChange = this.handleInputChange.bind(this)
-    this.handleCheckChange = this.handleCheckChange.bind(this)
-    this.createTip = this.createTip.bind(this)
-    this.changeFormWizardIndex = this.changeFormWizardIndex.bind(this)
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -63,6 +69,14 @@ export default class Home extends Component {
           this.setState({tip})
       }.bind(this));
     }
+
+    if (this.state.showFormModule[this.state.formModules[this.state.moduleIndex]] === false) {
+      if (this.state.moduleIndex > prevState.moduleIndex) {
+        this.setState({moduleIndex: this.state.moduleIndex + 1})
+      } else {
+        this.setState({moduleIndex: this.state.moduleIndex - 1})
+      }
+    }
   }
 
   componentWillUnmount = () => this.state.tipKey && firebaseApp.database().ref(`abandonedTips/${this.state.tipKey}`).off();
@@ -73,11 +87,48 @@ export default class Home extends Component {
     this.setState({tip})
   }
 
-  handleCheckChange = (e, { name, value }) => {
+  handleCheckChange = (e, { name }) => {
     const tip = {...this.state.tip}
     tip[name] = tip[name] ? !tip[name] : true
     this.setState({tip})
-    this.addModuleToFormWizard(name)
+  }
+
+  handleFormModuleChange = (e, { name, value }) => {
+    if (name === 'crimeType' && value === 'Drugs' && this.state.showFormModule.drugs === false) {
+      const showFormModule = {...this.state.showFormModule}
+      showFormModule['drugs'] = true
+      this.setState({showFormModule})
+    } else if (name === 'crimeType' && value !== 'Drugs' && this.state.showFormModule.drugs === true) {
+      const showFormModule = {...this.state.showFormModule}
+      showFormModule['drugs'] = false
+      this.setState({showFormModule})
+    }
+
+    if (name === 'numberOfSuspects' && value === 0 && this.state.showFormModule.suspect === true) {
+      const showFormModule = {...this.state.showFormModule}
+      showFormModule['suspect'] = false
+      this.setState({showFormModule})
+    } else if (name === 'numberOfSuspects' && value > 0 && this.state.showFormModule.suspect === false) {
+      const showFormModule = {...this.state.showFormModule}
+      showFormModule['suspect'] = true
+      this.setState({showFormModule})
+    }
+
+    if (name === 'numberOfVehicles' && value > 0 && this.state.showFormModule.vehicle === false) {
+      const showFormModule = {...this.state.showFormModule}
+      showFormModule['vehicle'] = true
+      this.setState({showFormModule})
+    } else if (name === 'numberOfVehicles' && value === 0 && this.state.showFormModule.suspect === true) {
+      const showFormModule = {...this.state.showFormModule}
+      showFormModule['vehicle'] = false
+      this.setState({showFormModule})
+    }
+
+    if (name === 'tipsterHasMedia') {
+      const showFormModule = {...this.state.showFormModule}
+      showFormModule['media'] = !showFormModule['media']
+      this.setState({showFormModule})
+    }
   }
 
   createTip = (event) => {
@@ -102,7 +153,7 @@ export default class Home extends Component {
   }
 
   validateIntroModule = () => {
-    const { formWizardPageIndex } = this.state
+    const { moduleIndex } = this.state
     const crimeTypeError = (this.state.tip.crimeType == null)
     const tipTextError = (this.state.tip.tipText == null || this.state.tip.tipText.length < 20)
 
@@ -117,50 +168,29 @@ export default class Home extends Component {
       this.setState({ error })
     } else {
       this.setState({
-        formWizardPageIndex: formWizardPageIndex + 1,
+        moduleIndex: moduleIndex + 1,
         error: { crimeType: null, tipText: null }
       })
     }
   }
 
-  changeFormWizardIndex(direction) {
-    const { formWizardPageIndex } = this.state
+  changeFormWizardIndex = (direction) => {
+    const { moduleIndex } = this.state
 
     if (direction === 'next') {
-      if (formWizardPageIndex === 'change back to zero') {
+      if (moduleIndex === 'change back to zero') {
         // if on first page, check that crime type is entered and tiptext is >20 characters
         this.validateIntroModule()
       } else {
-        this.setState({ formWizardPageIndex: formWizardPageIndex + 1 })
+        this.setState({ moduleIndex: moduleIndex + 1 })
       }
     } else if (direction === 'previous') {
-      this.setState({ formWizardPageIndex: formWizardPageIndex - 1 })
+      this.setState({ moduleIndex: moduleIndex - 1 })
     };
   }
 
-  addModuleToFormWizard(name) {
-    const formWizardModules = [
-      'tipsterKnowsSuspectDescription',
-      'tipsterKnowsSuspectLocation',
-      'tipsterKnowsSuspectEmployment',
-      'tipsterKnowsSuspectVehicle',
-      'tipsterKnowsAboutDrugs',
-      'tipsterHasMedia'
-    ]
-    if (formWizardModules.includes(name)) { 
-      const formWizardContent = this.state.formWizardContent
-      if (!formWizardContent.includes(name)) {
-        formWizardContent.splice(-2, 0, name) // add module 3rd to last place (behind final, success)
-      } else {
-        var pos = formWizardContent.indexOf(name);
-        formWizardContent.splice(pos, 1)
-      };
-      this.setState({formWizardContent})
-    }
-  }
-
-  getFormWizardContent(formWizardPageIndex) {
-    const contentToDisplay = this.state.formWizardContent[formWizardPageIndex]
+  displayFormModule = (moduleIndex) => {
+    const contentToDisplay = this.state.formModules[moduleIndex]
 
     switch (contentToDisplay) {
       case 'intro':
@@ -172,6 +202,7 @@ export default class Home extends Component {
               <TipFormIntro
                 handleInputChange={this.handleInputChange}
                 handleCheckChange={this.handleCheckChange}
+                handleFormModuleChange={this.handleFormModuleChange}
                 tip={this.state.tip}
                 error={this.state.error}
               />
@@ -199,7 +230,8 @@ export default class Home extends Component {
             nextButton={true}>
             <TipFormVehicle
               handleInputChange={this.handleInputChange}
-              tip={this.state.tip}/>
+              tip={this.state.tip}
+            />
           </TipFormContainer>
         )
       case 'drugs':
@@ -210,9 +242,7 @@ export default class Home extends Component {
             previousButton={true}
             nextButton={true}>
               <TipFormDrugs
-                handleSelectChange={this.handleSelectChange}
-                handleTextChange={this.handleTextChange}
-                handleCheckboxChange={this.handleCheckboxChange}
+                handleInputChange={this.handleInputChange}
                 tip={this.state.tip}
               />
           </TipFormContainer>
@@ -259,13 +289,13 @@ export default class Home extends Component {
   }
 
   render() {
-    const formWizardContent = this.getFormWizardContent(this.state.formWizardPageIndex)
+    const formModule = this.displayFormModule(this.state.moduleIndex)
     
     return (
       <Layout>
         <Grid centered container columns={1}>
           <Grid.Column mobile={16} tablet={12} computer={10} largeScreen={10}>
-            {formWizardContent}
+            {formModule}
           </Grid.Column>
 			  </Grid>
       </Layout>

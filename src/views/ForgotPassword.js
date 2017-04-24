@@ -1,76 +1,47 @@
-import React, {Component} from 'react';
-import {browserHistory} from 'react-router'
-import {Card, CardActions, CardTitle, CardText} from 'material-ui/Card';
-import TextField from 'material-ui/TextField';
-import RaisedButton from 'material-ui/RaisedButton';
-import Divider from 'material-ui/Divider';
-
+import React, { Component } from 'react';
+import { Grid, Card, Form } from 'semantic-ui-react'
 import Layout from '../components/Layout'
 
-class ForgotPassword extends Component {
-
-  constructor() {
-    super();
-    this.state = {
-      email: ''
-    }
-    this.handleTextChange = this.handleTextChange.bind(this)
-    this.handleSubmit = this.handleSubmit.bind(this)
-    this.errorHandler = this.errorHandler.bind(this)
+export default class ForgotPassword extends Component {
+  state = {
+    email: '',
+    password: ''
   }
 
-  handleTextChange(name, event) {
-    this.setState({[name]: event.target.value});
-  }
+  handleInputChange = (e, { name, value }) => this.setState({[name]: value})
 
-  handleSubmit(event) {
+  handleSubmit = (event) => {
     event.preventDefault();
     // base.resetPassword({
     //   email: this.state.email
     // }, this.errorHandler);
   }
 
-  errorHandler(err) {
-    if (err) {
-      console.error(err)
-      return;
-    }
-    browserHistory.push('/login')
-  }
-
   render() {
     return (
       <Layout>
-        <div className="row" style={{margin: '100px 2px 30px 2px'}}>
-          <div
-            className="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4 col-lg-offset-4 col-lg-4">
-            <Card>
-              <CardTitle title="Forgot Password"/>
-              <Divider/>
-              <form onSubmit={this.handleSubmit}>
-                <CardText>
-                  <div className="prompt">
-                    Enter your email address and you will receive a link to reset your password.
-                  </div>
-                  <div>
-                    <TextField
-                      fullWidth={true}
-                      value={this.state.email}
-                      floatingLabelText="Email"
-                      type="email"
-                      onChange={this.handleTextChange.bind(null, "email")}/>
-                  </div>
-                </CardText>
-                <CardActions>
-                  <RaisedButton type="submit" label="Reset Password" primary={true}/>
-                </CardActions>
-              </form>
+        <Grid centered container columns={1}>
+          <Grid.Column mobile={16} tablet={8} computer={8} largeScreen={8}>
+            <Card centered fluid>
+              <Card.Content header='Forgot Password' />
+              <Card.Content>
+                <p>Enter your email address and you will receive a link to reset your password.</p>
+                <Form error={this.state.error} onSubmit={this.handleSubmit}>
+                  <Form.Input 
+                    label='Email'
+                    name='email'
+                    type='email'
+                    placeholder='Email'
+                    value={this.state.email}
+                    onChange={this.handleChange}
+                  />
+                  <Form.Button>Reset Password</Form.Button>
+                </Form>
+              </Card.Content>
             </Card>
-          </div>
-        </div>
+          </Grid.Column>
+        </Grid>
       </Layout>
     );
   }
 }
-
-export default ForgotPassword;

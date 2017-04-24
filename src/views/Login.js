@@ -5,12 +5,8 @@ import Layout from '../components/Layout'
 import { firebaseApp } from '../helpers/firebase'
 
 export default class Login extends Component {
-  constructor() {
-    super()
-    this.state = {
-      error: false
-    }
-    this.handleSubmit = this.handleSubmit.bind(this)
+  state = {
+    error: false
   }
 
   handleChange = (e, { name, value }) => this.setState({ [name]: value })
