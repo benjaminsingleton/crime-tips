@@ -10,6 +10,7 @@ import TipFormDrugs from '../components/TipFormDrugs'
 import TipFormMedia from '../components/TipFormMedia'
 import TipFormConclusion from '../components/TipFormConclusion'
 import { firebaseApp } from '../helpers/firebase'
+import { language } from '../helpers/questionLanguages'
 
 export default class Home extends Component {
   constructor() {
@@ -37,6 +38,7 @@ export default class Home extends Component {
         crimeType: null,
         tipText: null
       },
+      language: 'english'
     }
     this.baseState = this.state
   }
@@ -205,6 +207,7 @@ export default class Home extends Component {
                 handleFormModuleChange={this.handleFormModuleChange}
                 tip={this.state.tip}
                 error={this.state.error}
+                lang={language[this.state.language]}
               />
           </TipFormContainer>
         )
@@ -218,6 +221,7 @@ export default class Home extends Component {
               <TipFormSuspect
                 handleInputChange={this.handleInputChange}
                 tip={this.state.tip}
+                lang={language[this.state.language]}
               />
           </TipFormContainer>
         )
@@ -231,6 +235,7 @@ export default class Home extends Component {
             <TipFormVehicle
               handleInputChange={this.handleInputChange}
               tip={this.state.tip}
+              lang={language[this.state.language]}
             />
           </TipFormContainer>
         )
@@ -244,6 +249,7 @@ export default class Home extends Component {
               <TipFormDrugs
                 handleInputChange={this.handleInputChange}
                 tip={this.state.tip}
+                lang={language[this.state.language]}
               />
           </TipFormContainer>
         )
@@ -257,6 +263,7 @@ export default class Home extends Component {
               <TipFormMedia 
                 tip={this.state.tip} 
                 tipKey={this.state.tipKey} 
+                lang={language[this.state.language]}
               />
           </TipFormContainer>
         )
@@ -272,12 +279,13 @@ export default class Home extends Component {
                 handleInputChange={this.handleInputChange}
                 handleCheckChange={this.handleCheckChange}
                 tip={this.state.tip}
+                lang={language[this.state.language]}
               />
           </TipFormContainer>
         )
       case 'success':
         return (
-          <TipFormContainer title="Thanks!">
+          <TipFormContainer title="Thank you!">
             <p>You've done your community a great service!</p>
             <p>You're tip number is: <b>{this.state.tipKey}</b>. Save it as a reference.</p>
             <p><a onClick={() => this.setState(this.baseState)}>Click here</a> to write another tip.</p>
