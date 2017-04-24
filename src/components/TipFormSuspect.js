@@ -16,19 +16,19 @@ const SuspectInput = ({props, suspectNumber, numberOfSuspects}) => {
       <Grid.Row>
         <Grid.Column>
           <Form.Input
-            label='Full name'
+            label={props.lang.suspectFullName.label}
             name={`suspect${suspectNumber}FullName`}
             value={props.tip[`suspect${suspectNumber}FullName`]}
-            placeholder='First and last name'
+            placeholder={props.lang.suspectFullName.placeholder}
             onChange={props.handleInputChange}
           />
         </Grid.Column>
         <Grid.Column>
           <Form.Input
-            label='Nickname / alias'
+            label={props.lang.suspectNickname.label}
             name={`suspect${suspectNumber}Nickname`}
             value={props.tip[`suspect${suspectNumber}Nickname`]}
-            placeholder='Nickname'
+            placeholder={props.lang.suspectNickname.placeholder}
             onChange={props.handleInputChange}
           />
         </Grid.Column>
@@ -36,19 +36,19 @@ const SuspectInput = ({props, suspectNumber, numberOfSuspects}) => {
       <Grid.Row>
         <Grid.Column>
           <Form.Input
-            label='Date of Birth'
+            label={props.lang.suspectDateOfBirth.label}
             name={`suspect${suspectNumber}DateOfBirth`}
             value={props.tip[`suspect${suspectNumber}DateOfBirth`]}
-            placeholder='MM/DD/YYYY'
+            placeholder={props.lang.suspectDateOfBirth.placeholder}
             onChange={props.handleInputChange}
           />
         </Grid.Column>
         <Grid.Column>
           <Form.Input
-            label='Approximate age'
+            label={props.lang.suspectAge.label}
             name={`suspect${suspectNumber}Age`}
             value={props.tip[`suspect${suspectNumber}Age`]}
-            placeholder='Age'
+            placeholder={props.lang.suspectAge.placeholder}
             onChange={props.handleInputChange}
           />
         </Grid.Column>
@@ -56,21 +56,21 @@ const SuspectInput = ({props, suspectNumber, numberOfSuspects}) => {
       <Grid.Row>
         <Grid.Column>
           <Form.Select
-            label='Gender'
+            label={props.lang.suspectGender.label}
             name={`suspect${suspectNumber}Gender`}
             value={props.tip[`suspect${suspectNumber}Gender`]}
             options={genderOptions}
-            placeholder='Select a gender'
+            placeholder={props.lang.suspectGender.placeholder}
             onChange={props.handleInputChange}
           />
         </Grid.Column>
         <Grid.Column>
           <Form.Select
-            label='Race'
+            label={props.lang.suspectRace.label}
             name={`suspect${suspectNumber}Race`}
             value={props.tip[`suspect${suspectNumber}Race`]}
             options={raceOptions}
-            placeholder='Select a race'
+            placeholder={props.lang.suspectRace.placeholder}
             onChange={props.handleInputChange}
           />
         </Grid.Column>
@@ -78,20 +78,20 @@ const SuspectInput = ({props, suspectNumber, numberOfSuspects}) => {
       <Grid.Row>
         <Grid.Column>
           <Form.Select
-            label='Height'
+            label={props.lang.suspectHeight.label}
             name={`suspect${suspectNumber}Height`}
             value={props.tip[`suspect${suspectNumber}Height`]}
             options={heightOptions}
-            placeholder='Select a height'
+            placeholder={props.lang.suspectHeight.placeholder}
             onChange={props.handleInputChange}
           />
         </Grid.Column>
         <Grid.Column>
           <Form.Input
-            label='Weight'
+            label={props.lang.suspectWeight.label}
             name={`suspect${suspectNumber}Weight`}
             value={props.tip[`suspect${suspectNumber}Weight`]}
-            placeholder='Weight'
+            placeholder={props.lang.suspectWeight.placeholder}
             onChange={props.handleInputChange}
           />
         </Grid.Column>
@@ -99,10 +99,10 @@ const SuspectInput = ({props, suspectNumber, numberOfSuspects}) => {
       <Grid.Row>
         <Grid.Column width={16}>
           <Form.Input
-            label='Home Address'
+            label={props.lang.suspectAddress.label}
             name={`suspect${suspectNumber}Address`}
             value={props.tip[`suspect${suspectNumber}Address`]}
-            placeholder='Home Address'
+            placeholder={props.lang.suspectAddress.placeholder}
             onChange={props.handleInputChange}
           />
         </Grid.Column>
@@ -110,20 +110,20 @@ const SuspectInput = ({props, suspectNumber, numberOfSuspects}) => {
       <Grid.Row>
         <Grid.Column>
           <Form.Input
-            label='City'
+            label={props.lang.suspectCity.label}
             name={`suspect${suspectNumber}City`}
             value={props.tip[`suspect${suspectNumber}City`]}
-            placeholder='City'
+            placeholder={props.lang.suspectCity.placeholder}
             onChange={props.handleInputChange}
           />
         </Grid.Column>
         <Grid.Column>
           <Form.Select
-            label='State'
+            label={props.lang.suspectState.label}
             name={`suspect${suspectNumber}State`}
             value={props.tip[`suspect${suspectNumber}State`]}
             options={stateOptions}
-            placeholder='Select a state'
+            placeholder={props.lang.suspectState.placeholder}
             onChange={props.handleInputChange}
         />
         </Grid.Column>
@@ -131,10 +131,10 @@ const SuspectInput = ({props, suspectNumber, numberOfSuspects}) => {
       <Grid.Row>
         <Grid.Column>
           <Form.Input
-            label='Phone number'
+            label={props.lang.suspectPhone.label}
             name={`suspect${suspectNumber}Phone`}
             value={props.tip[`suspect${suspectNumber}Phone`]}
-            placeholder='XXX-XXX-XXXX'
+            placeholder={props.lang.suspectPhone.placeholder}
             onChange={props.handleInputChange}
           />
         </Grid.Column>
@@ -142,19 +142,19 @@ const SuspectInput = ({props, suspectNumber, numberOfSuspects}) => {
       <Grid.Row>
         <Grid.Column>
           <Form.Input
-            label='Scars, Marks, Tattoos, Piercings'
+            label={props.lang.suspectMarkings.label}
             name={`suspect${suspectNumber}Markings`}
             value={props.tip[`suspect${suspectNumber}Markings`]}
-            placeholder='Identifying markings'
+            placeholder={props.lang.suspectMarkings.placeholder}
             onChange={props.handleInputChange}
           />
         </Grid.Column>
         <Grid.Column>
           <Form.Input
-            label='Gang membership'
+            label={props.lang.suspectGang.label}
             name={`suspect${suspectNumber}Gang`}
             value={props.tip[`suspect${suspectNumber}Gang`]}
-            placeholder='Gang name'
+            placeholder={props.lang.suspectGang.placeholder}
             onChange={props.handleInputChange}
           />
         </Grid.Column>
@@ -162,10 +162,10 @@ const SuspectInput = ({props, suspectNumber, numberOfSuspects}) => {
       <Grid.Row>
         <Grid.Column width={16}>
           <Form.Input
-            label='Social media accounts (e.g. Facebook, Instagram, Twitter)'
+            label={props.lang.suspectSocialMedia.label}
             name={`suspect${suspectNumber}SocialMedia`}
             value={props.tip[`suspect${suspectNumber}SocialMedia`]}
-            placeholder='e.g. https://www.facebook.com/username'
+            placeholder={props.lang.suspectSocialMedia.placeholder}
             onChange={props.handleInputChange}
           />
         </Grid.Column>
@@ -173,10 +173,10 @@ const SuspectInput = ({props, suspectNumber, numberOfSuspects}) => {
       <Grid.Row>
         <Grid.Column width={16}>
           <Form.Input
-            label='Does the suspect carry weapons? What kind?'
+            label={props.lang.suspectWeapon.label}
             name={`suspect${suspectNumber}Weapon`}
             value={props.tip[`suspect${suspectNumber}Weapon`]}
-            placeholder='Weapon'
+            placeholder={props.lang.suspectWeapon.placeholder}
             onChange={props.handleInputChange}
           />
         </Grid.Column>
@@ -184,10 +184,10 @@ const SuspectInput = ({props, suspectNumber, numberOfSuspects}) => {
       <Grid.Row>
         <Grid.Column width={16}>
         <Form.Input
-          label='Place of Employment'
+          label={props.lang.suspectEmployer.label}
           name={`suspect${suspectNumber}Employer`}
           value={props.tip[`suspect${suspectNumber}Employer`]}
-          placeholder='Employer name'
+          placeholder={props.lang.suspectEmployer.placeholder}
           onChange={props.handleInputChange}
         />
         </Grid.Column>
@@ -195,10 +195,10 @@ const SuspectInput = ({props, suspectNumber, numberOfSuspects}) => {
       <Grid.Row>
         <Grid.Column width={16}>
           <Form.Input
-            label='Is there anything else we should know about the suspect?'
+            label={props.lang.suspectComments.label}
             name={`suspect${suspectNumber}Comments`}
             value={props.tip[`suspect${suspectNumber}Comments`]}
-            placeholder='Additional details'
+            placeholder={props.lang.suspectComments.placeholder}
             onChange={props.handleInputChange}
           />
         </Grid.Column>
@@ -225,7 +225,8 @@ const TipFormSuspect = (props) => {
 
 TipFormSuspect.propTypes = {
   handleInputChange: PropTypes.func.isRequired,
-  tip: PropTypes.object.isRequired
+  tip: PropTypes.object.isRequired,
+  lang: PropTypes.object.isRequired
 }
 
 export default TipFormSuspect

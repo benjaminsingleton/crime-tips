@@ -86,11 +86,11 @@ export default class TipFormMedia extends Component {
         }
         <Form>
           <Form.Field>
-            <label>Upload as many files as you need. Accepted file types include images, videos, screenshots, documents, etc.</label>
+            <label>{this.props.lang.media.label}</label>
             <div className="ui file input action">
               <Input type="text" value={this.state.filename} readOnly={true} />
               <input 
-                type="file" 
+                type="file"
                 ref={(input) => { this.fileInput = input; }} 
                 style={{display: 'none'}} 
                 onChange={(e) => this.uploadFile(e)}

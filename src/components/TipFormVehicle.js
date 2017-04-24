@@ -16,20 +16,20 @@ const VehicleInput = ({ props, vehicleNumber, numberOfVehicles }) => {
       <Grid.Row>
         <Grid.Column>
           <Form.Select
-            label='What is the vehicle make?'
+            label={props.lang.vehicleMake.label}
             name={`vehicle${vehicleNumber}Make`}
             value={props.tip[`vehicle${vehicleNumber}Make`]}
-            placeholder='Select a make'
+            placeholder={props.lang.vehicleMake.placeholder}
             options={vehicleMakeOptions}
             onChange={props.handleInputChange}
           />
         </Grid.Column>
         <Grid.Column>
           <Form.Input
-            label='What is the vehicle model?'
+            label={props.lang.vehicleModel.label}
             name={`vehicle${vehicleNumber}Model`}
             value={props.tip[`vehicle${vehicleNumber}Model`]}
-            placeholder='Vehicle model'
+            placeholder={props.lang.vehicleModel.placeholder}
             onChange={props.handleInputChange}
           />
         </Grid.Column>
@@ -37,20 +37,20 @@ const VehicleInput = ({ props, vehicleNumber, numberOfVehicles }) => {
       <Grid.Row>
         <Grid.Column>
           <Form.Select
-            label='What is the color of the vehicle?'
+            label={props.lang.vehicleColor.label}
             name={`vehicle${vehicleNumber}Color`}
             value={props.tip[`vehicle${vehicleNumber}Color`]}
-            placeholder='Select a color'
+            placeholder={props.lang.vehicleColor.placeholder}
             options={vehicleColorOptions}
             onChange={props.handleInputChange}
           />
         </Grid.Column>
         <Grid.Column>
           <Form.Input
-            label='What is the license plate number?'
+            label={props.lang.vehiclePlate.label}
             name={`vehicle${vehicleNumber}Plate`}
             value={props.tip[`vehicle${vehicleNumber}Plate`]}
-            placeholder='License plate number'
+            placeholder={props.lang.vehiclePlate.placeholder}
             onChange={props.handleInputChange}
           />
         </Grid.Column>
@@ -58,10 +58,10 @@ const VehicleInput = ({ props, vehicleNumber, numberOfVehicles }) => {
       <Grid.Row>
         <Grid.Column width={16}>
           <Form.Input
-            label='Where can the vehicle usually be found?'
+            label={props.lang.vehicleLocation.label}
             name={`vehicle${vehicleNumber}Location`}
             value={props.tip[`vehicle${vehicleNumber}Location`]}
-            placeholder='Vehicle location'
+            placeholder={props.lang.vehicleLocation.placeholder}
             onChange={props.handleInputChange}
           />
         </Grid.Column>
@@ -69,10 +69,10 @@ const VehicleInput = ({ props, vehicleNumber, numberOfVehicles }) => {
         <Grid.Row>
         <Grid.Column width={16}>
           <Form.Input
-            label='Please note if the vehicle has any identifying marks, scratches, bumper stickers, etc.'
+            label={props.lang.vehicleMarkings.label}
             name={`vehicle${vehicleNumber}Markings`}
             value={props.tip[`vehicle${vehicleNumber}Markings`]}
-            placeholder='Vehicle markings'
+            placeholder={props.lang.vehicleMarkings.placeholder}
             onChange={props.handleInputChange}
           />
         </Grid.Column>
@@ -99,7 +99,8 @@ const TipFormVehicle = (props) => {
 
 TipFormVehicle.propTypes = {
   handleInputChange: PropTypes.func.isRequired,
-  tip: PropTypes.object.isRequired
+  tip: PropTypes.object.isRequired,
+  lang: PropTypes.object.isRequired
 }
 
 export default TipFormVehicle

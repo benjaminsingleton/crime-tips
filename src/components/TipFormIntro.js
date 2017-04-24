@@ -10,10 +10,10 @@ const TipFormIntro = (props) => {
         <Grid.Row>
           <Grid.Column>
             <Form.Select
-              label='What kind of crime was committed?'
+              label={props.lang.crimeType.label}
               name='crimeType'
               value={props.tip.crimeType}
-              placeholder='Select a crime type'
+              placeholder={props.lang.crimeType.placeholder}
               options={crimeTypeOptions}
               error={props.error.crimeType}
               onChange={(e, p) => {props.handleInputChange(e, p); props.handleFormModuleChange(e, p)}}
@@ -21,8 +21,8 @@ const TipFormIntro = (props) => {
             {props.error.crimeType && 
               <Message
                 error
-                header='Required Field'
-                content='Please select a crime type.'
+                header={props.lang.crimeType.required}
+                content={props.lang.crimeType.error}
               />
             }
           </Grid.Column>
@@ -30,18 +30,18 @@ const TipFormIntro = (props) => {
         <Grid.Row>
           <Grid.Column width={16}>
             <Form.TextArea
-              label="Please tell us the information you wanted to share."
+              label={props.lang.tipText.label}
               name='tipText'
               value={props.tip.tipText}
-              placeholder='Tip description'
+              placeholder={props.lang.tipText.placeholder}
               error={props.error.tipText}
               onChange={props.handleInputChange}
             />
             {props.error.tipText && 
               <Message
                 error
-                header='Required Field'
-                content='Your description is too brief. 20 characters minimum.'
+                header={props.lang.tipText.required}
+                content={props.lang.tipText.error}
               />
             }
           </Grid.Column>
@@ -49,19 +49,19 @@ const TipFormIntro = (props) => {
         <Grid.Row>
           <Grid.Column>
             <Form.Input
-              label='Where did the crime take place?'
+              label={props.lang.crimeLocation.label}
               name='crimeLocation'
               value={props.tip.crimeLocation}
-              placeholder='Crime location'
+              placeholder={props.lang.crimeLocation.placeholder}
               onChange={props.handleInputChange}
             />
           </Grid.Column>
           <Grid.Column>
             <Form.Input
-              label='When did the crime occur?'
+              label={props.lang.crimeDate.label}
               name='crimeDate'
               value={props.tip.crimeDate}
-              placeholder='Crime date'
+              placeholder={props.lang.crimeDate.placeholder}
               onChange={props.handleInputChange}
             />
           </Grid.Column>
@@ -69,10 +69,10 @@ const TipFormIntro = (props) => {
          <Grid.Row>
           <Grid.Column>
             <Form.Select
-                label="How many suspects were involved?"
+                label={props.lang.numberOfSuspects.label}
                 name='numberOfSuspects'
                 value={props.tip.numberOfSuspects}
-                placeholder='Select a number'
+                placeholder={props.lang.numberOfSuspects.placeholder}
                 options={[{value: 0, text: 0}, {value: 1, text: 1}, {value: 2, text: 2}, {value: 3, text: 3}]}
                 inline
                 onChange={(e, p) => {props.handleInputChange(e, p); props.handleFormModuleChange(e, p)}}
@@ -80,10 +80,10 @@ const TipFormIntro = (props) => {
           </Grid.Column>
           <Grid.Column>
              <Form.Select
-                label="How many vehicles were involved?"
+                label={props.lang.numberOfVehicles.label}
                 name='numberOfVehicles'
                 value={props.tip.numberOfVehicles}
-                placeholder='Select a number'
+                placeholder={props.lang.numberOfVehicles.placeholder}
                 options={[{value: 0, text: 0}, {value: 1, text: 1}, {value: 2, text: 2}, {value: 3, text: 3}]}
                 inline
                 onChange={(e, p) => {props.handleInputChange(e, p); props.handleFormModuleChange(e, p)}}
@@ -93,7 +93,7 @@ const TipFormIntro = (props) => {
         <Grid.Row>
           <Grid.Column width={16}>
             <Form.Checkbox
-              label="I have media (such as an image or video) to upload."
+              label={props.lang.tipsterHasMedia.label}
               name='tipsterHasMedia'
               checked={props.tip.tipsterHasMedia}
               onChange={(e, p) => {props.handleCheckChange(e, p); props.handleFormModuleChange(e, p)}}
@@ -108,7 +108,8 @@ const TipFormIntro = (props) => {
 TipFormIntro.propTypes = {
   handleInputChange: PropTypes.func.isRequired,
   handleFormModuleChange: PropTypes.func.isRequired,
-  tip: PropTypes.object.isRequired
+  tip: PropTypes.object.isRequired,
+  lang: PropTypes.object.isRequired
 }
 
 export default TipFormIntro

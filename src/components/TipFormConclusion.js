@@ -13,10 +13,10 @@ const TipFormConclusion = (props) => {
         <Grid.Row>
           <Grid.Column width={8}>
             <Form.Select 
-              label='How are you aware of this crime?'
+              label={props.lang.tipsterAwareOfCrimeMethod.label}
               name='tipsterAwareOfCrimeMethod'
               value={props.tip.tipsterAwareOfCrimeMethod}
-              placeholder='Select a source'
+              placeholder={props.lang.tipsterAwareOfCrimeMethod.placeholder}
               options={tipsterAwareOfCrimeMethodOptions} 
               onChange={props.handleInputChange}
             />
@@ -25,10 +25,10 @@ const TipFormConclusion = (props) => {
         <Grid.Row>
           <Grid.Column width={8}>
             <Form.Select
-              label='How did you find out about online crime tips?'
+              label={props.lang.websiteDiscoveryMethod.label}
               name='tipsterWebsiteDiscoveryMethod'
               value={props.tip.websiteDiscoveryMethod}
-              placeholder='Select an option'
+              placeholder={props.lang.websiteDiscoveryMethod.placeholder}
               options={websiteDiscoveryMethodOptions}
               onChange={props.handleInputChange}
             />
@@ -37,17 +37,17 @@ const TipFormConclusion = (props) => {
         <Grid.Row>
           <Grid.Column width={16}>
           <Form.Checkbox
-            label="I know my tip is anonymous, but now I want to be contacted by the police."
+            label={props.lang.tipsterWantsToBeContacted.label}
             name='tipsterWantsToBeContacted'
             checked={props.tip.tipsterWantsToBeContacted}
             onChange={props.handleCheckChange}
           />
           {props.tip.tipsterWantsToBeContacted &&
             <Form.Input
-              label='Please provide your contact details.'
+              label={props.lang.tipsterContactDetails.label}
               name='tipsterContactDetails'
               value={props.tip.tipsterContactDetails}
-              placeholder='Contact information'
+              placeholder={props.lang.tipsterContactDetails.placeholder}
               onChange={props.handleInputChange}
             />
           }

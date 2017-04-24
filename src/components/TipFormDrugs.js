@@ -7,33 +7,33 @@ const TipFormDrugs = (props) => {
   return (
     <Form>
       <Form.Select
-        label='What drug is possessed / being sold?'
+        label={props.lang.drugType.label}
         name='drugType'
         value={props.tip.drugType}
         options={drugTypeOptions}
-        placeholder='Select a drug type'
+        placeholder={props.lang.drugType.placeholder}
         onChange={props.handleInputChange}
       />
       <Form.Select
-        label='How are the drugs being sold?'
+        label={props.lang.drugSaleMethod.label}
         name='drugSaleMethod'
         value={props.tip.drugSaleMethod}
         options={drugSaleMethodOptions}
-        placeholder='Select a method'
+        placeholder={props.lang.drugSaleMethod.placeholder}
         onChange={props.handleInputChange}
       />
       <Form.Input
-        label='What time of day are drugs sold?'
+        label={props.lang.drugSaleTime.label}
         name='drugSaleTime'
         value={props.tip.drugSaleTime}
-        placeholder='e.g., 10am-4pm on weekdays'
+        placeholder={props.lang.drugSaleTime.placeholder}
         onChange={props.handleInputChange}
       />
       <Form.Input
-        label='What is the phone number used to buy drugs'
+        label={props.lang.drugSalePhoneNumber.label}
         name='drugSalePhoneNumber'
         value={props.tip.drugSalePhoneNumber}
-        placeholder='XXX-XXX-XXXX'
+        placeholder={props.lang.drugSalePhoneNumber.placeholder}
         onChange={props.handleInputChange}
       />
     </Form>
