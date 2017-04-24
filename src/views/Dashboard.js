@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import { Grid } from 'semantic-ui-react'
 import Layout from '../components/Layout'
 import DashboardMetrics from '../components/DashboardMetrics'
 import DashboardLeftPanel from '../components/DashboardLeftPanel'
@@ -70,13 +71,16 @@ export default class Dashboard extends Component {
   }
 
   render() {
+    // const dashboardRightPanel = this.renderDashboardRightPanel()
     return (
       <Layout>
         <DashboardMetrics />
-        <div className="row" style={{margin: '10px 2px 8px 2px'}}>
-          <DashboardLeftPanel filterTips={this.filterTips} changePanel={this.changePanel} /> 
-          {this.renderDashboardRightPanel()}
-        </div>
+        <Grid container columns={4}>
+          <Grid.Row>
+            <DashboardLeftPanel filterTips={this.filterTips} changePanel={this.changePanel} /> 
+            {/*{dashboardRightPanel}*/}
+          </Grid.Row>
+        </Grid>
       </Layout>
     )
   }
