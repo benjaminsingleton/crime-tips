@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { Menu, Dropdown } from 'semantic-ui-react'
+import { Menu, Dropdown, Flag } from 'semantic-ui-react'
 import { firebaseApp } from '../helpers/firebase'
 
 export default class Navigation extends Component {
@@ -29,7 +29,7 @@ export default class Navigation extends Component {
     const { activeItem, uid, admin } = this.state
 
     return (
-      <Menu stackable size='large'>
+      <Menu inverted stackable size='large' style={{backgroundColor: '#1976d2'}}>
         <Menu.Item 
           content='Gotham Crime Tips' 
           header 
@@ -71,7 +71,7 @@ export default class Navigation extends Component {
                   />
         }
         {!uid && <Menu.Item 
-                   content='FAQ' 
+                   content='Questions?' 
                    name='faq' 
                    active={activeItem === 'faq'} 
                    onClick={this.handleItemClick} 
@@ -89,18 +89,18 @@ export default class Navigation extends Component {
                  />
         }
         <Menu.Menu position='right'>
-          {!uid && <Dropdown item text='Language'>
+          {!uid && <Dropdown item text={'Language'}>
                     <Dropdown.Menu>
-                      <Dropdown.Item>English</Dropdown.Item>
-                      <Dropdown.Item>Spanish</Dropdown.Item>
-                      <Dropdown.Item>Chinese</Dropdown.Item>
-                      <Dropdown.Item>French</Dropdown.Item>
-                      <Dropdown.Item>Tagalog</Dropdown.Item>
-                      <Dropdown.Item>Vietnamese</Dropdown.Item>
-                      <Dropdown.Item>German</Dropdown.Item>
-                      <Dropdown.Item>Korean</Dropdown.Item>
-                      <Dropdown.Item>Hindustani</Dropdown.Item>
-                      <Dropdown.Item>Arabic</Dropdown.Item>
+                      <Dropdown.Item><Flag name='us' /> English</Dropdown.Item>
+                      <Dropdown.Item><Flag name='mx' /> Español</Dropdown.Item>
+                      <Dropdown.Item><Flag name='cn' /> 广东话</Dropdown.Item>
+                      <Dropdown.Item><Flag name='fr' /> Français</Dropdown.Item>
+                      <Dropdown.Item><Flag name='ph' /> Tagalog</Dropdown.Item>
+                      <Dropdown.Item><Flag name='vn' /> Tiếng Việt</Dropdown.Item>
+                      <Dropdown.Item><Flag name='de' /> Deutsch</Dropdown.Item>
+                      <Dropdown.Item><Flag name='kr' /> Korean</Dropdown.Item>
+                      <Dropdown.Item><Flag name='in' /> हिन्दुस्तानी</Dropdown.Item>
+                      <Dropdown.Item><Flag name='eg' /> العَرَبِيَّة</Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
           }

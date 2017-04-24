@@ -1,57 +1,48 @@
 import React from 'react'
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
-import TextField from 'material-ui/TextField';
+import PropTypes from 'prop-types';
+import { Form } from 'semantic-ui-react'
+import { drugTypeOptions, drugSaleMethodOptions } from '../helpers/formOptions'
 
 const TipFormDrugs = (props) => {
   return (
-    <div>
-      <div className="prompt">What drug is possessed / being sold?</div>
-      <div>
-        <SelectField
-          hintText="Select a drug"
-          value={props.tip.drugTypes}
-          onChange={props.handleSelectChange.bind(null, "drugTypes")}>
-          <MenuItem value="Marijuana" primaryText="Marijuana"/>
-          <MenuItem value="Cocaine" primaryText="Cocaine"/>
-          <MenuItem value="Crack" primaryText="Crack"/>
-          <MenuItem value="Methamphetamine" primaryText="Methamphetamine"/>
-          <MenuItem value="Pills" primaryText="Pills"/>
-          <MenuItem value="Other" primaryText="Other"/>
-        </SelectField>
-      </div>
-      <br/>
-      <div className="prompt">How are the drugs being sold?</div>
-      <div>
-        <SelectField
-          hintText="Select an option"
-          value={props.tip.drugSaleMethod}
-          onChange={props.handleSelectChange.bind(null, "drugSaleMethod")}>
-          <MenuItem value="On the street" primaryText="On the street"/>
-          <MenuItem value="In an apartment / house" primaryText="In an apartment / house"/>
-          <MenuItem value="From a vehicle" primaryText="From a vehicle"/>
-          <MenuItem value="Other" primaryText="Other"/>
-        </SelectField>
-      </div>
-      <br/>
-      <div className="prompt">What time of day are drugs sold?</div>
-      <div>
-        <TextField
-          hintText="10am-4pm on weekdays"
-          value={props.tip.drugSaleTime}
-          onChange={props.handleTextChange.bind(null, "drugSaleTime")}/>
-      </div>
-      <br/>
-      <div className="prompt">What is the phone number dialed to buy drugs?</div>
-      <div>
-        <TextField
-          hintText="917-123-4567"
-          value={props.tip.drugSalePhoneNumber}
-          onChange={props.handleTextChange.bind(null, "drugSalePhoneNumber")}/>
-      </div>
-      <br/>
-    </div>
+    <Form>
+      <Form.Select
+        label='What drug is possessed / being sold?'
+        name='drugType'
+        value={props.tip.drugType}
+        options={drugTypeOptions}
+        placeholder='Select a drug type'
+        onChange={props.handleInputChange}
+      />
+      <Form.Select
+        label='How are the drugs being sold?'
+        name='drugSaleMethod'
+        value={props.tip.drugSaleMethod}
+        options={drugSaleMethodOptions}
+        placeholder='Select a method'
+        onChange={props.handleInputChange}
+      />
+      <Form.Input
+        label='What time of day are drugs sold?'
+        name='drugSaleTime'
+        value={props.tip.drugSaleTime}
+        placeholder='e.g., 10am-4pm on weekdays'
+        onChange={props.handleInputChange}
+      />
+      <Form.Input
+        label='What is the phone number used to buy drugs'
+        name='drugSalePhoneNumber'
+        value={props.tip.drugSalePhoneNumber}
+        placeholder='XXX-XXX-XXXX'
+        onChange={props.handleInputChange}
+      />
+    </Form>
   );
+}
+
+TipFormDrugs.propTypes = {
+  handleInputChange: PropTypes.func.isRequired,
+  tip: PropTypes.object.isRequired
 }
 
 export default TipFormDrugs

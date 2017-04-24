@@ -163,6 +163,7 @@ const raceOptions = [
   {text: 'Black', value: 'Black'},
   {text: 'White Hispanic', value: 'White Hispanic'},
   {text: 'Black Hispanic', value: 'Black Hispanic'},
+  {text: 'Asian', value: 'Asian'},
   {text: 'American Indian /  Alaskan Native', value: 'American Indian /  Alaskan Native'},
   {text: 'Native Hawaiian / Pacific Islander', value: 'Native Hawaiian / Pacific Islander'}
 ]
@@ -201,6 +202,23 @@ const eyeColorOptions = [
   {text: 'Amber', value: 'Amber'},
 ]
 
+const drugTypeOptions = [
+  {text: 'Marijuana', value: 'Marijuana'},
+  {text: 'Cocaine', value: 'Cocaine'},
+  {text: 'Crack', value: 'Crack'},
+  {text: 'Heroin', value: 'Heroin'},
+  {text: 'Methamphetamine', value: 'Methamphetamine'},
+  {text: 'Pills', value: 'Pills'},
+  {text: 'Other', value: 'Other'}
+]
+
+const drugSaleMethodOptions = [
+  {text: 'On the street', value: 'On the street'},
+  {text: 'In an apartment / house', value: 'In an apartment / house'},
+  {text: 'From a vehicle', value: 'From a vehicle'},
+  {text: 'Other', value: 'Other'}
+]
+
 export {
   genderOptions,
   raceOptions,
@@ -212,5 +230,7 @@ export {
   websiteDiscoveryMethodOptions,
   vehicleMakeOptions,
   vehicleColorOptions,
-  stateOptions
+  stateOptions,
+  drugTypeOptions,
+  drugSaleMethodOptions
 }
