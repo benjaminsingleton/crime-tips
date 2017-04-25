@@ -89,18 +89,18 @@ export default class Navigation extends Component {
                  />
         }
         <Menu.Menu position='right'>
-          {!uid && <Dropdown item text={'Language'}>
+          {!uid && <Dropdown item text='Language'>
                     <Dropdown.Menu>
-                      <Dropdown.Item><Flag name='us' /> English</Dropdown.Item>
-                      <Dropdown.Item><Flag name='mx' /> Español</Dropdown.Item>
-                      <Dropdown.Item><Flag name='cn' /> 广东话</Dropdown.Item>
-                      <Dropdown.Item><Flag name='fr' /> Français</Dropdown.Item>
-                      <Dropdown.Item><Flag name='ph' /> Tagalog</Dropdown.Item>
-                      <Dropdown.Item><Flag name='vn' /> Tiếng Việt</Dropdown.Item>
-                      <Dropdown.Item><Flag name='de' /> Deutsch</Dropdown.Item>
-                      <Dropdown.Item><Flag name='kr' /> Korean</Dropdown.Item>
-                      <Dropdown.Item><Flag name='in' /> हिन्दुस्तानी</Dropdown.Item>
-                      <Dropdown.Item><Flag name='eg' /> العَرَبِيَّة</Dropdown.Item>
+                      <Dropdown.Item><Flag name='us' style={{marginRight: '8px'}}/>English</Dropdown.Item>
+                      <Dropdown.Item><Flag name='mx' style={{marginRight: '8px'}}/>Español</Dropdown.Item>
+                      <Dropdown.Item><Flag name='cn' style={{marginRight: '8px'}}/>广东话</Dropdown.Item>
+                      <Dropdown.Item><Flag name='fr' style={{marginRight: '8px'}}/>Français</Dropdown.Item>
+                      <Dropdown.Item><Flag name='ph' style={{marginRight: '8px'}}/>Tagalog</Dropdown.Item>
+                      <Dropdown.Item><Flag name='vn' style={{marginRight: '8px'}}/>Tiếng Việt</Dropdown.Item>
+                      <Dropdown.Item><Flag name='de' style={{marginRight: '8px'}}/>Deutsch</Dropdown.Item>
+                      <Dropdown.Item><Flag name='kr' style={{marginRight: '8px'}}/>Korean</Dropdown.Item>
+                      <Dropdown.Item><Flag name='in' style={{marginRight: '8px'}}/>हिन्दुस्तानी</Dropdown.Item>
+                      <Dropdown.Item><Flag name='eg' style={{marginRight: '8px'}}/>العَرَبِيَّة</Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
           }
