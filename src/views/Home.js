@@ -210,7 +210,7 @@ export default class Home extends Component {
       const newModuleIndex = this.checkModuleIndex('next')
       this.setState({ 
         moduleIndex: newModuleIndex,
-         error: { crimeType: null, tipText: null }
+        error: { crimeType: null, tipText: null }
       })
       this.navigateTo(newModuleIndex)
     }
@@ -247,7 +247,7 @@ export default class Home extends Component {
     let newModuleIndex
 
     if (direction === 'next') {
-      if (moduleIndex === 'change back to zero') {
+      if (moduleIndex === 0) {
         // if on first page, check that crime type is entered and tiptext is >20 characters
         this.validateIntroModule()
       } else {
