@@ -9,6 +9,8 @@ import TipFormVehicle from '../components/TipFormVehicle'
 import TipFormDrugs from '../components/TipFormDrugs'
 import TipFormMedia from '../components/TipFormMedia'
 import TipFormConclusion from '../components/TipFormConclusion'
+import About from '../views/About'
+import FAQ from '../views/FAQ'
 import { firebaseApp } from '../helpers/firebase'
 import { language } from '../helpers/languages'
 
@@ -96,6 +98,12 @@ export default class Home extends Component {
         break;
       case '/success':
         newModuleIndex = 6
+        break;
+      case '/about':
+        newModuleIndex = 'about'
+        break;
+      case '/faq':
+        newModuleIndex = 'faq'
         break;
       default:
         console.error('invalid URL')
@@ -383,13 +391,20 @@ export default class Home extends Component {
   }
 
   render() {
-    const formModule = this.displayFormModule(this.state.moduleIndex)
-    
+    let displayComponent = null
+    if (this.state.moduleIndex === 'about') {
+      displayComponent = <About lang={language[this.state.language]} />
+    } else if (this.state.moduleIndex === 'faq') {
+      displayComponent = <FAQ lang={language[this.state.language]} />
+    } else {
+      displayComponent = this.displayFormModule(this.state.moduleIndex)
+    }
+
     return (
       <Layout>
         <Grid centered container columns={1}>
           <Grid.Column mobile={16} tablet={12} computer={10} largeScreen={10}>
-            {formModule}
+            {displayComponent}
           </Grid.Column>
 			  </Grid>
       </Layout>
