@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { Form, Grid, Segment } from 'semantic-ui-react'
+import { Form, Grid, Segment, Button } from 'semantic-ui-react'
 import { vehicleMakeOptions, vehicleColorOptions } from '../helpers/formOptions'
 
 const VehicleInput = ({ props, vehicleNumber, numberOfVehicles }) => {
@@ -75,6 +75,24 @@ const VehicleInput = ({ props, vehicleNumber, numberOfVehicles }) => {
             placeholder={props.lang.vehicleMarkings.placeholder}
             onChange={props.handleInputChange}
           />
+        </Grid.Column>
+      </Grid.Row>
+      <Grid.Row>
+        <Grid.Column floated='right' textAlign='right'>
+          {(vehicleNumber === numberOfVehicles && numberOfVehicles > 1) && 
+            <Button 
+              type='button' 
+              content='— Remove Vehicle'
+              onClick={() => props.addRemoveSuspectVehicle('numberOfVehicles', -1)}
+            />
+          }
+          {(vehicleNumber === numberOfVehicles && numberOfVehicles < 3) && 
+            <Button 
+              type='button' 
+              content='+ Add Vehicle'
+              onClick={() => props.addRemoveSuspectVehicle('numberOfVehicles', 1)}
+            />
+          }
         </Grid.Column>
       </Grid.Row>
     </Grid>

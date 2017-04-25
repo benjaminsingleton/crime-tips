@@ -155,6 +155,13 @@ export default class Home extends Component {
     }
   }
 
+  addRemoveSuspectVehicle = (field, number) => {
+    const currentCount = this.state.tip[field]
+    const tip = {...this.state.tip}
+    tip[field] = currentCount + number
+    this.setState({tip})
+  }
+
   createTip = (event) => {
     event.preventDefault();
     const tip = {...this.state.tip}
@@ -283,6 +290,7 @@ export default class Home extends Component {
             lang={lang}>
               <TipFormSuspect
                 handleInputChange={this.handleInputChange}
+                addRemoveSuspectVehicle={this.addRemoveSuspectVehicle}
                 tip={this.state.tip}
                 lang={lang}
               />
@@ -300,6 +308,7 @@ export default class Home extends Component {
             lang={lang}>
             <TipFormVehicle
               handleInputChange={this.handleInputChange}
+              addRemoveSuspectVehicle={this.addRemoveSuspectVehicle}
               tip={this.state.tip}
               lang={lang}
             />
