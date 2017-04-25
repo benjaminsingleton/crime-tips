@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { Form, Grid, Segment } from 'semantic-ui-react'
+import { Form, Grid, Segment, Button } from 'semantic-ui-react'
 import { genderOptions, raceOptions, heightOptions, stateOptions } from '../helpers/formOptions'
 
 const SuspectInput = ({props, suspectNumber, numberOfSuspects}) => {
@@ -201,6 +201,24 @@ const SuspectInput = ({props, suspectNumber, numberOfSuspects}) => {
             placeholder={props.lang.suspectComments.placeholder}
             onChange={props.handleInputChange}
           />
+        </Grid.Column>
+      </Grid.Row>
+      <Grid.Row>
+        <Grid.Column floated='right' textAlign='right'>
+          {(suspectNumber === numberOfSuspects && numberOfSuspects > 1) && 
+            <Button 
+              type='button' 
+              content='— Remove Suspect'
+              onClick={() => props.addRemoveSuspectVehicle('numberOfSuspects', -1)}
+            />
+          }
+          {(suspectNumber === numberOfSuspects && numberOfSuspects < 3) && 
+            <Button 
+              type='button' 
+              content='+ Add Suspect'
+              onClick={() => props.addRemoveSuspectVehicle('numberOfSuspects', 1)}
+            />
+          }
         </Grid.Column>
       </Grid.Row>
     </Grid>
