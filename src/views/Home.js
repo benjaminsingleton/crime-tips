@@ -53,32 +53,54 @@ export default class Home extends Component {
                 const tipKey = snap.key
                 this.setState({tipKey})
               })
+          firebaseApp.database().ref('metrics/unreadAbandonedTips').transaction((current_value) => current_value + 1)
     } else if (this.state.tipKey && this.state.tip !== prevState.tip) {
       // create an object that is the diff between the old tip and new tip for updating
       const updated = _.omit(this.state.tip, function(v,k) { return prevState.tip[k] === v; })
       firebaseApp.database().ref(`abandonedTips/${this.state.tipKey}`).update({...updated})
-      // TODO: increase abandoned tip unread count by one using transactions
     }
     
     if (this.state.tipKey && 
         this.state.tip.tipsterHasMedia && 
         (this.state.tip.tipsterHasMedia !== prevState.tip.tipsterHasMedia)) {
       // setup listener only when tipster is going to upload media
-      firebaseApp.database().ref(`abandonedTips/${this.state.tipKey}/attachments`).on('value', function(snapshot) {
+      firebaseApp.database().ref(`abandonedTips/${this.state.tipKey}/attachments`).on('value', (snapshot) => {
           const attachments = snapshot.val()
           const tip = {...this.state.tip}
           tip['attachments'] = attachments
           this.setState({tip})
-      }.bind(this));
+      });
     }
+  }
 
-    if (this.state.showFormModule[this.state.formModules[this.state.moduleIndex]] === false) {
-      if (this.state.moduleIndex > prevState.moduleIndex) {
-        this.setState({moduleIndex: this.state.moduleIndex + 1})
-      } else {
-        this.setState({moduleIndex: this.state.moduleIndex - 1})
-      }
+  componentWillReceiveProps(nextProps) {
+    let newModuleIndex
+    switch (nextProps.match.path) {
+      case '/':
+        newModuleIndex = 0
+        break;
+      case '/suspect':
+        newModuleIndex = 1
+        break;
+      case '/vehicle':
+        newModuleIndex = 2
+        break;
+      case '/drugs':
+        newModuleIndex = 3
+        break;
+      case '/media':
+        newModuleIndex = 4
+        break;
+      case '/final':
+        newModuleIndex = 5
+        break;
+      case '/success':
+        newModuleIndex = 6
+        break;
+      default:
+        console.error('invalid URL')
     }
+    this.setState({ moduleIndex: newModuleIndex })
   }
 
   componentWillUnmount = () => this.state.tipKey && firebaseApp.database().ref(`abandonedTips/${this.state.tipKey}`).off();
@@ -144,10 +166,12 @@ export default class Home extends Component {
 
     firebaseApp.database().ref(`tips/`).push({...this.state.tip})
       .then((snap) => {
-        // TODO: increase tip unread count by one using transactions
+        // increase tip unread count by one using transactions
+        firebaseApp.database().ref('metrics/unreadTips').transaction((current_value) => current_value + 1)
         // delete the abandoned tip record
         firebaseApp.database().ref(`abandonedTips/${this.state.tipKey}`).remove()
-        // TODO: reduce abandoned tip count by one using transactions
+        // Reduce abandoned tip count by one using transactions
+        firebaseApp.database().ref('metrics/unreadAbandonedTips').transaction((current_value) => current_value - 1)
         const tipKey = snap.key
         this.setState({tipKey}) // save new tipKey which users will use as a receipt #, for now
         this.changeFormWizardIndex('next')
@@ -155,7 +179,6 @@ export default class Home extends Component {
   }
 
   validateIntroModule = () => {
-    const { moduleIndex } = this.state
     const crimeTypeError = (this.state.tip.crimeType == null)
     const tipTextError = (this.state.tip.tipText == null || this.state.tip.tipText.length < 20)
 
@@ -169,25 +192,58 @@ export default class Home extends Component {
       }
       this.setState({ error })
     } else {
-      this.setState({
-        moduleIndex: moduleIndex + 1,
-        error: { crimeType: null, tipText: null }
+      const newModuleIndex = this.checkModuleIndex('next')
+      this.setState({ 
+        moduleIndex: newModuleIndex,
+         error: { crimeType: null, tipText: null }
       })
+      this.navigateTo(newModuleIndex)
     }
   }
 
-  changeFormWizardIndex = (direction) => {
+  checkModuleIndex = (direction) => {
     const { moduleIndex } = this.state
+    let changeIndex = true
+    let i = 1
+    let newModuleIndex
+    do {
+      if (direction === 'next') {
+        newModuleIndex = moduleIndex + i;
+      } else {
+        newModuleIndex = moduleIndex - i;
+      };
+      (this.state.showFormModule[this.state.formModules[newModuleIndex]] === false) ? i++ : changeIndex = false;
+    }
+    while (changeIndex);
+    return newModuleIndex
+  }
+
+  navigateTo = (newModuleIndex) => {
+    const formModule = this.state.formModules[newModuleIndex]
+    if (formModule === 'intro') {
+      this.props.history.push('/')
+    } else {
+      this.props.history.push(`/${formModule}`)
+    }    
+  }
+
+  changeFormWizardIndex = (direction) => {
+    let { moduleIndex } = this.state
+    let newModuleIndex
 
     if (direction === 'next') {
       if (moduleIndex === 'change back to zero') {
         // if on first page, check that crime type is entered and tiptext is >20 characters
         this.validateIntroModule()
       } else {
-        this.setState({ moduleIndex: moduleIndex + 1 })
+        newModuleIndex = this.checkModuleIndex(direction)
+        this.setState({ moduleIndex: newModuleIndex })
+        this.navigateTo(newModuleIndex)
       }
     } else if (direction === 'previous') {
-      this.setState({ moduleIndex: moduleIndex - 1 })
+      newModuleIndex = this.checkModuleIndex(direction)
+      this.setState({ moduleIndex: newModuleIndex })
+      this.navigateTo(newModuleIndex)
     };
   }
 

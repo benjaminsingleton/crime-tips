@@ -66,6 +66,12 @@ export default class App extends Component {
         <div style={style}>
           <Switch>
             <Route path='/' exact component={Home} />
+            <Route path='/suspect' exact component={Home} />
+            <Route path='/vehicle' exact component={Home} />
+            <Route path='/drugs' exact component={Home} />
+            <Route path='/media' exact component={Home} />
+            <Route path='/final' exact component={Home} />
+            <Route path='/success' exact component={Home} />
             <Route path='/about' exact component={About} />
             <Route path='/faq' exact component={FAQ} />
             <PublicRoute authed={this.state.authed} path='/login' component={Login} />
