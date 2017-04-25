@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 import { Route, BrowserRouter, Redirect, Switch } from 'react-router-dom'
 import Login from './Login'
-import FAQ from './FAQ'
-import About from './About'
 import Home from './Home';
 import Dashboard from './Dashboard';
 import UserSettings from './UserSettings';
@@ -72,8 +70,8 @@ export default class App extends Component {
             <Route path='/media' exact component={Home} />
             <Route path='/final' exact component={Home} />
             <Route path='/success' exact component={Home} />
-            <Route path='/about' exact component={About} />
-            <Route path='/faq' exact component={FAQ} />
+            <Route path='/about' exact component={Home} />
+            <Route path='/faq' exact component={Home} />
             <PublicRoute authed={this.state.authed} path='/login' component={Login} />
             <PublicRoute authed={this.state.authed} path='/forgot_password' component={ForgotPassword} />
             <PrivateRoute authed={this.state.authed} path='/dashboard' component={Dashboard} />
