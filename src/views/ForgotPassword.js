@@ -28,7 +28,6 @@ export default class ForgotPassword extends Component {
                 <p>Enter your email address and you will receive a link to reset your password.</p>
                 <Form error={this.state.error} onSubmit={this.handleSubmit}>
                   <Form.Input 
-                    label='Email'
                     name='email'
                     type='email'
                     placeholder='Email'
