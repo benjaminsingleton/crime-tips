@@ -249,114 +249,123 @@ export default class Home extends Component {
 
   displayFormModule = (moduleIndex) => {
     const contentToDisplay = this.state.formModules[moduleIndex]
+    const lang = language[this.state.language]
 
     switch (contentToDisplay) {
       case 'intro':
         return (
           <TipFormContainer
-            title="Submit a Tip"
+            title={lang.submitATip}
             changeFormWizardIndex={this.changeFormWizardIndex}
             showFormModule={this.state.showFormModule}
             activeModule='intro'
-            nextButton={true}>
+            nextButton={true}
+            lang={lang}>
               <TipFormIntro
                 handleInputChange={this.handleInputChange}
                 handleCheckChange={this.handleCheckChange}
                 handleFormModuleChange={this.handleFormModuleChange}
                 tip={this.state.tip}
                 error={this.state.error}
-                lang={language[this.state.language]}
+                lang={lang}
               />
           </TipFormContainer>
         )
       case 'suspect':
         return (
           <TipFormContainer 
-            title="Suspect" 
+            title={lang.suspect}
             changeFormWizardIndex={this.changeFormWizardIndex}
             showFormModule={this.state.showFormModule}
             activeModule='suspect'
             previousButton={true}
-            nextButton={true}>
+            nextButton={true}
+            lang={lang}>
               <TipFormSuspect
                 handleInputChange={this.handleInputChange}
                 tip={this.state.tip}
-                lang={language[this.state.language]}
+                lang={lang}
               />
           </TipFormContainer>
         )
       case 'vehicle':
         return (
           <TipFormContainer 
-            title="Suspect Vehicle" 
+            title={lang.vehicle}
             changeFormWizardIndex={this.changeFormWizardIndex}
             showFormModule={this.state.showFormModule}
             activeModule='vehicle'
             previousButton={true}
-            nextButton={true}>
+            nextButton={true}
+            lang={lang}>
             <TipFormVehicle
               handleInputChange={this.handleInputChange}
               tip={this.state.tip}
-              lang={language[this.state.language]}
+              lang={lang}
             />
           </TipFormContainer>
         )
       case 'drugs':
         return (
           <TipFormContainer 
-            title="Drugs" 
+            title={lang.drugs}
             changeFormWizardIndex={this.changeFormWizardIndex}
             showFormModule={this.state.showFormModule}
             activeModule='drugs'
             previousButton={true}
-            nextButton={true}>
+            nextButton={true}
+            lang={lang}>
               <TipFormDrugs
                 handleInputChange={this.handleInputChange}
                 tip={this.state.tip}
-                lang={language[this.state.language]}
+                lang={lang}
               />
           </TipFormContainer>
         )
       case 'media':
         return (
           <TipFormContainer
-            title="Upload Media" 
+            title={lang.mediaCard}
             changeFormWizardIndex={this.changeFormWizardIndex}
             showFormModule={this.state.showFormModule}
             activeModule='media'
             previousButton={true}
-            nextButton={true}>
+            nextButton={true}
+            lang={lang}>
               <TipFormMedia 
                 tip={this.state.tip} 
                 tipKey={this.state.tipKey} 
-                lang={language[this.state.language]}
+                lang={lang}
               />
           </TipFormContainer>
         )
       case 'final':
         return (
           <TipFormContainer
-            title="Conclusion"
+            title={lang.final}
             changeFormWizardIndex={this.changeFormWizardIndex}
             showFormModule={this.state.showFormModule}
             activeModule='final'
             previousButton={true}
             showSubmit={true}
-            createTip={this.createTip}>
+            createTip={this.createTip}
+            lang={lang}>
               <TipFormConclusion
                 handleInputChange={this.handleInputChange}
                 handleCheckChange={this.handleCheckChange}
                 tip={this.state.tip}
-                lang={language[this.state.language]}
+                lang={lang}
               />
           </TipFormContainer>
         )
       case 'success':
         return (
-          <TipFormContainer title="Thank you!" showFormModule={this.state.showFormModule}>
-            <p>You've done your community a great service!</p>
-            <p>You're tip number is: <b>{this.state.tipKey}</b>. Save it as a reference.</p>
-            <p><a onClick={() => this.setState(this.baseState)}>Click here</a> to write another tip.</p>
+          <TipFormContainer 
+            title={lang.thankYou} 
+            showFormModule={this.state.showFormModule}>
+              <p>{lang.finalLine1}</p>
+              <p>{lang.finalLine2a} <b>{this.state.tipKey}</b>. Save it as a reference.</p>
+              <p><a onClick={() => this.setState(this.baseState)}>{lang.finalLine3a}</a> {lang.finalLine3b}</p>
           </TipFormContainer>
         )
       default:

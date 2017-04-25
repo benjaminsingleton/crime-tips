@@ -14,16 +14,16 @@ const FAQ = () => {
 								<b>What is Crime Tips 24/7?</b>
 							</p>
 							<p>
-								Crime Tips 24/7 is a website that allows police departments to receive anonymous tips from 
-								concerned members of the public.
+								Crime Tips 24/7 is a website that allows concerned members of the public to submit anonymous
+								tips to their police department.
 							</p>
 							<br />
 							<p className="prompt">
 								<b>What is a tip?</b>
 							</p>
 							<p>
-								A tip is information about unsolved crimes, wanted fugitives, narcotics activity, bullying,
-								and missing persons, among other issues of interest to the police. Any information you can 
+								A tip is information about an unsolved crime, a wanted fugitive, a missing person, narcotics activity, 
+								suspicious activity, bullying, and any other issue of interest to the police. Any information you can 
 								provide might be of value, no matter how important or unimportant you believe it to be. Tipsters 
 								are not snitches -- they care about their community.
 							</p>
@@ -32,24 +32,24 @@ const FAQ = () => {
 								<b>What is not a tip?</b>
 							</p>
 							<p>
-								The Crime Stoppers program is not a substitute for the 9-1-1 emergency system. In the event 
-								of an emergency, tipsters are encouraged to call the 9-1-1 emergency system immediately!
+								This website is not a substitute for the 9-1-1 emergency system. In the event 
+								of an emergency, call the 9-1-1 emergency system immediately!
 							</p>
 							<br />
 							<p className="prompt">
 								<b>What will you do with the information you get from a tip?</b>
 							</p>
 							<p>
-								Once a tip is received, a detective will review the information and will determine who should 
-								investigate the information provided.
+								Once a tip is received, a detective will review the information and determine who should 
+								investigate the information provided. All tip information will be closely examined.
 							</p>
 							<br />
 							<p className="prompt">
 								<b>How do I know that I will remain anonymous?</b>
 							</p>
 							<p>
-								We guarantee complete anonymity — no IP addresses or any other data (other than the tip). In 
-								fact, we are so transparent about this issue that our source code is publicly available on Github.
+								We guarantee complete anonymity — no IP addresses or any identifying information is saved. In 
+								fact, we have made our source code publicly available on Github so you can even review it yourself.
 							</p>
 							<br />
 							<p className="prompt">
@@ -57,15 +57,15 @@ const FAQ = () => {
 							</p>
 							<p>
 								We understand that providing information can put you in an uncomfortable situation, but the 
-								community depends on people like you to identify criminals so they won’t victimize more people 
-								in the future. As always, call 911 if you are in imminent danger.
+								community depends on people like you to identify known and suspected criminals. As always, 
+								call 911 if you are in imminent danger.
 							</p>
 							<br />
 							<p className="prompt">
 								<b>How do I know if I am eligible to receive a reward?</b>
 							</p>
 							<p>
-								Contact the Department to update your tip information or to check status on your reward. 
+								Contact the Department to update your tip information or to check the status on your reward. 
 								Please have your tip number ready as no information will be provided to you without it. 
 								A representative of the Department will let you know if an arrest has been made and a reward 
 								is available or the status of the investigation.

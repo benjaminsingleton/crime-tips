@@ -1,16 +1,32 @@
 const language = {
   english: {
     submitATip: 'Submit a Tip',
+    incident: 'Incident',
     suspect: 'Suspect',
     vehicle: 'Vehicle',
     drugs: 'Drugs',
     mediaCard: 'Upload Media',
+    mediaBreadcrumb: 'Media',
+    final: 'Final',
     conclusion: 'Conclusion',
     thankYou: 'Thank You!',
     cardSubtitle: 'All tips are completely anonymous. Your community needs your help.',
     next: 'Next',
     previous: 'Previous',
     submit: 'Submit',
+    finalLine1: "You've done your community a great service!",
+    finalLine2a: "You're tip number is:",
+    finalLine2b: 'Save it as a reference.',
+    finalLine3a: 'Click here',
+    finalLine3b: 'to write another tip.',
+    OptionalMsg: 'All of questions are optional so skip any questions you can’t answer.',
+    about: `Founded in 2017, Crime Tips 24/7 was created to enable concerned members of the public 
+            to share information about crimes with the police via a user-friendly form. In the spirit of
+            transparency, Crime Tips 24/7 has been open-sourced and is available at 
+            https://github.com/benjaminsingleton/crime-tips. Police Departments can set up their own tips website
+            for free, or pay Crime Tips 24/7 to manage the site for them. The company was founded
+            by Benjamin Singleton, the Lead for Public Safety and Criminal Justice at Sidewalk Labs 
+            (an Alphabet/Google company) and a former New York Police Department crime analyst.`,
     crimeType: {
       label: 'What kind of crime was committed?',
       placeholder: 'Select a crime type',

@@ -2,10 +2,6 @@ import React from 'react'
 import { Grid, Card, Button, List, Icon, Divider } from 'semantic-ui-react'
 
 const DashboardLeftPanel = ({filterTips, changePanel}) => {
-  const style = {
-    fontSize: '14px',
-    lineHeight: '8px'
-  }
   return (  
     <Grid.Column mobile={16} tablet={8} computer={4} largeScreen={4}>
       <Card>
