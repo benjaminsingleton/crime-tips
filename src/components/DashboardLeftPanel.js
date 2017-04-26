@@ -1,51 +1,44 @@
-import React from 'react'
-import { Grid, Card, Button, List, Icon, Divider } from 'semantic-ui-react'
+import React, { Component } from 'react'
+import { Card, Button, Icon, Menu, Label } from 'semantic-ui-react'
 
-const DashboardLeftPanel = ({filterTips, changePanel}) => {
-  return (  
-    <Grid.Column mobile={16} tablet={8} computer={4} largeScreen={4}>
+export default class DashboardLeftPanel extends Component {
+  state = { activeItem: 'inbox' }
+
+  handleItemClick = (e, { name }) => this.setState({ activeItem: name })
+
+  render() {
+    const { activeItem } = this.state
+    const { filterTips, changePanel } = this.props
+    return (
       <Card>
         <Card.Content>
           <Button content='New Tip' fluid onClick={() => changePanel('form')} />
           <h4>FOLDERS</h4>
-          <List selection relaxed verticalAlign='middle' size='big'>
-            <List.Item onClick={() => filterTips('archived', false)}>
-              <Icon name='inbox' />
-              <List.Content>
-                <List.Header style={{fontWeight: '300'}}>Tip Inbox</List.Header>
-              </List.Content>
-            </List.Item>
-            <List.Item style={{marginTop: '10px'}}>
-              <Icon name='feed' />
-              <List.Content>
-                <List.Header style={{fontWeight: '300'}}>Abandoned Tips</List.Header>
-              </List.Content>
-            </List.Item>
-            <List.Item onClick={() => filterTips('important', true)} style={{marginTop: '10px'}}>
-              <Icon name='star' />
-              <List.Content>
-                <List.Header style={{fontWeight: '300'}}>Important</List.Header>
-              </List.Content>
-            </List.Item>
-            <List.Item onClick={() => filterTips('archived', true)} style={{marginTop: '10px'}}>
-              <Icon name='archive' />
-              <List.Content>
-                <List.Header style={{fontWeight: '300'}}>Archived</List.Header>
-              </List.Content>
-            </List.Item>
-            <Divider />
-            <List.Item style={{marginTop: '10px'}}>
-              <Icon name='mail square' />
-              <List.Content>
-                <List.Header style={{fontWeight: '300'}}>Tip Drafts</List.Header>
-              </List.Content>
-            </List.Item>
-          </List>
+          <Menu vertical fluid>
+            <Menu.Item name='inbox' active={activeItem === 'inbox'} onClick={() => {this.handleItemClick(); filterTips('archived', false)}}>
+              <Label color='teal'>1</Label>
+               <Icon name='inbox' /> Tip Inbox
+            </Menu.Item>
+            <Menu.Item name='abandoned' active={activeItem === 'abandoned'} onClick={() => {this.handleItemClick(); filterTips('', false)}}>
+              <Label>51</Label>
+              <Icon name='feed' /> Abandoned Tips
+            </Menu.Item>
+            <Menu.Item name='important' active={activeItem === 'important'} onClick={() => {this.handleItemClick(); filterTips('important', true)}}>
+              <Label>1</Label>
+              <Icon name='star' /> Important
+            </Menu.Item>
+            <Menu.Item name='archive' active={activeItem === 'archive'} onClick={() => {this.handleItemClick(); filterTips('archived', true)}}>
+              <Label>1</Label>
+              <Icon name='archive' /> Archive
+            </Menu.Item>
+            <Menu.Item name='draft' active={activeItem === 'draft'} onClick={() => {this.handleItemClick(); filterTips('', false)}}>
+              <Label>1</Label>
+              <Icon name='mail square' /> Tip Drafts
+            </Menu.Item>
+          </Menu>
           <h4>CATEGORIES</h4>
         </Card.Content>
       </Card>
-    </Grid.Column>
-  )
+    )
+  }
 }
-
-export default DashboardLeftPanel
