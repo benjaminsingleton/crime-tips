@@ -77,8 +77,12 @@ export default class Dashboard extends Component {
         <DashboardMetrics />
         <Grid container columns={4}>
           <Grid.Row>
-            <DashboardLeftPanel filterTips={this.filterTips} changePanel={this.changePanel} /> 
-            {/*{dashboardRightPanel}*/}
+            <Grid.Column mobile={16} tablet={16} computer={6} largeScreen={4}>
+              <DashboardLeftPanel filterTips={this.filterTips} changePanel={this.changePanel} /> 
+            </Grid.Column>
+            <Grid.Column mobile={16} tablet={16} computer={10} largeScreen={12}>
+              {/*{dashboardRightPanel}*/}
+            </Grid.Column>
           </Grid.Row>
         </Grid>
       </Layout>
