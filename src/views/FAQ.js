@@ -12,7 +12,7 @@ const FAQ = ({ lang }) => {
 				<p><b>{lang.faq2Question}</b></p>
 				<p>{lang.faq2Answer}</p>
 				<br />
-				<p><b>{lang.faq3Question}?</b></p>
+				<p><b>{lang.faq3Question}</b></p>
 				<p>{lang.faq3Answer}</p>
 				<br />
 				<p><b>{lang.faq4Question}</b></p>
