@@ -24,7 +24,7 @@ export default class DashboardMetrics extends Component {
 
   render() {
     const style = {
-      row: {margin: '10px 2px 8px 2px'},
+      row: {margin: '4px'},
       title: {
         fontSize: '16px',
         lineHeight: '24px'
@@ -37,9 +37,9 @@ export default class DashboardMetrics extends Component {
       }
     }
     return (
-      <Grid container columns={4}>
+      <Grid columns={4} stackable doubling container>
         <Grid.Row>
-          <Grid.Column mobile={16} tablet={8} computer={4} largeScreen={4}>
+          <Grid.Column>
             <Card centered fluid>
               <Card.Content header='Unread Tips' />
               <Card.Content>
@@ -48,29 +48,29 @@ export default class DashboardMetrics extends Component {
               </Card.Content>
             </Card>
           </Grid.Column>
-          <Grid.Column mobile={16} tablet={8} computer={4} largeScreen={4}>
+          <Grid.Column>
             <Card centered fluid>
               <Card.Content header='Tips Received - 24hrs' />
               <Card.Content>
-                <div>{this.state.metrics.tipsReceivedLast24Hours}</div>
+                <div style={style.metric}>{this.state.metrics.tipsReceivedLast24Hours}</div>
                 <div style={style.detail}>Since {getMonthAndDay(oneDayAgoDate())}</div>
               </Card.Content>
             </Card>
           </Grid.Column>
-          <Grid.Column mobile={16} tablet={8} computer={4} largeScreen={4}>
+          <Grid.Column>
             <Card centered fluid>
               <Card.Content header='Tips Received - YTD' />
               <Card.Content>
-                <div>{this.state.metrics.tipsReceivedYTD}</div>
+                <div style={style.metric}>{this.state.metrics.tipsReceivedYTD}</div>
                 <div style={style.detail}>Since January 1</div>
               </Card.Content>
             </Card>
           </Grid.Column>
-          <Grid.Column mobile={16} tablet={8} computer={4} largeScreen={4}>
+          <Grid.Column>
             <Card centered fluid>
               <Card.Content header='Abandoned Tips' />
               <Card.Content>
-                <div>{this.state.metrics.unreadAbandonedTips}</div>
+                <div style={style.metric}>{this.state.metrics.unreadAbandonedTips}</div>
                 <div style={style.detail}>Never completed</div>
               </Card.Content>
             </Card>
