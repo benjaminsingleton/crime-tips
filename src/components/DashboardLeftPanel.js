@@ -10,7 +10,7 @@ export default class DashboardLeftPanel extends Component {
     const { activeItem } = this.state
     const { filterTips, changePanel } = this.props
     return (
-      <Card>
+      <Card fluid>
         <Card.Content>
           <Button content='New Tip' fluid onClick={() => changePanel('form')} />
           <h4>FOLDERS</h4>
