@@ -71,17 +71,17 @@ export default class Dashboard extends Component {
   }
 
   render() {
-    // const dashboardRightPanel = this.renderDashboardRightPanel()
+    const dashboardRightPanel = this.renderDashboardRightPanel()
     return (
       <Layout>
         <DashboardMetrics />
-        <Grid container columns={4}>
+        <Grid columns={4}>
           <Grid.Row>
             <Grid.Column mobile={16} tablet={16} computer={6} largeScreen={4}>
               <DashboardLeftPanel filterTips={this.filterTips} changePanel={this.changePanel} /> 
             </Grid.Column>
             <Grid.Column mobile={16} tablet={16} computer={10} largeScreen={12}>
-              {/*{dashboardRightPanel}*/}
+              {dashboardRightPanel}
             </Grid.Column>
           </Grid.Row>
         </Grid>
