@@ -1,22 +1,8 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types';
-import {Card, CardText, CardActions} from 'material-ui/Card';
-import IconButton from 'material-ui/IconButton';
-import ActionGrade from 'material-ui/svg-icons/action/grade';
-import ContentArchive from 'material-ui/svg-icons/content/archive';
-import TextField from 'material-ui/TextField';
-import RaisedButton from 'material-ui/RaisedButton';
-import {
-  Table,
-  TableBody,
-  TableHeader,
-  TableHeaderColumn,
-  TableRow,
-  TableRowColumn
-} from 'material-ui/Table';
-import EditorAttachFile from 'material-ui/svg-icons/editor/attach-file';
-import {tipTimeFormat, reverse} from '../helpers/helpers'
-import {firebaseApp, databaseRef} from '../helpers/firebase'
+import { Card, Button, Input, Table, Icon, Checkbox } from 'semantic-ui-react'
+import { tipTimeFormat, reverse } from '../helpers/helpers'
+import { firebaseApp } from '../helpers/firebase'
 
 export default class Mailbox extends Component {
   constructor () {
@@ -40,7 +26,7 @@ export default class Mailbox extends Component {
   }
 
   componentWillMount() {
-    databaseRef.child('tips')
+    firebaseApp.database().ref('tips')
       .orderByChild(this.props.tipFilter.criteria)
       .equalTo(this.props.tipFilter.value)
       .limitToLast(1000)
@@ -51,11 +37,11 @@ export default class Mailbox extends Component {
     }.bind(this));
   }
 
-  componentWillUnmount = () => databaseRef.child('tips').off();
+  componentWillUnmount = () => firebaseApp.database().ref('tips').off();
 
   componentWillReceiveProps(nextProps) {
     if (this.props.tipFilter !== nextProps.tipFilter) {
-      databaseRef.child('tips')
+      firebaseApp.database().ref('tips')
         .orderByChild(nextProps.tipFilter.criteria)
         .equalTo(nextProps.tipFilter.value)
         .limitToLast(1000)
@@ -119,9 +105,9 @@ export default class Mailbox extends Component {
         tips[key]['important'] = false
       }
 
-      databaseRef.child('tips/' + key).update({...tips[key]})
+      firebaseApp.database().ref('tips/' + key).update({...tips[key]})
 
-      databaseRef.child(`logs/`).push({
+      firebaseApp.database().ref(`logs/`).push({
         user: user,
         tip: key,
         action: criteria,
@@ -129,7 +115,7 @@ export default class Mailbox extends Component {
         timestamp: timestamp
       });
 
-      databaseRef.child(`userActivity/${user}`).push({
+      firebaseApp.database().ref(`userActivity/${user}`).push({
         tip: key,
         action: criteria,
         status: status,
@@ -145,19 +131,19 @@ export default class Mailbox extends Component {
   showTipDetail(key) {
     // Tip marked as read when clicked
     if (this.state.tips[key].read === false) {
-      databaseRef.child('tips/' + key).update({read: true})
+      firebaseApp.database().ref('tips/' + key).update({read: true})
     }
 
     // Log activity to 'logs' and 'users/uid' for auditing purposes
     const user = this.state.uid;
     const timestamp = Date.now()
-    databaseRef.child('logs/').push({
+    firebaseApp.database().ref('logs/').push({
         user: user,
         tip: key,
         action: 'read',
         timestamp: timestamp
     });
-    databaseRef.child(`userActivity/${user}`).push({
+    firebaseApp.database().ref(`userActivity/${user}`).push({
         tip: key,
         action: 'read',
         timestamp: timestamp
@@ -172,82 +158,71 @@ export default class Mailbox extends Component {
   renderMailboxRows(tipKeysToDisplay) {
     const tips = this.state.tips
     const mailboxRows = tipKeysToDisplay.map(key => 
-      <TableRow key={key}>
-        <TableRowColumn style={{width: '10%'}}>
-          {tips[key].important ? <ActionGrade/> : null}
-        </TableRowColumn>
-        <TableRowColumn style={{width: '20%'}}>
-          <a onClick={() => this.showTipDetail(key)}>
-            {tips[key].read ? tips[key].crimeType : <b>{tips[key].crimeType}</b>}
-          </a>
-        </TableRowColumn>
-        <TableRowColumn style={{width: '45%'}}>
-          <a onClick={() => this.showTipDetail(key)}>
-            {tips[key].read ? tips[key].tipText : <b>{tips[key].tipText}</b>
-            }
-          </a>
-        </TableRowColumn>
-        <TableRowColumn style={{width: '10%'}}>
-          <a onClick={() => this.showTipDetail(key)}>
-            {tips[key].attachment ? <EditorAttachFile style={{height: '20px', width: '20px'}}/> : null}
-          </a>
-        </TableRowColumn>
-        <TableRowColumn style={{width: '15%', textAlign: 'right'}}>
-          <a onClick={() => this.showTipDetail(key)}>
-            {tips[key].read ? tipTimeFormat(tips[key].timestampStart) : <b>{tipTimeFormat(tips[key].timestampStart)}</b>}
-          </a>
-        </TableRowColumn>
-      </TableRow>)
+      <Table.Row key={key}>
+        <Table.Cell width={1} textAlign='center'>
+          <Checkbox />
+        </Table.Cell>
+        <Table.Cell width={1} onClick={() => this.showTipDetail(key)}>
+          {tips[key].important ? <Icon name='star' /> : <Icon name='empty star' disabled />}
+          <Icon name='computer' disabled/>
+        </Table.Cell>
+        <Table.Cell width={4} onClick={() => this.showTipDetail(key)}>
+          {tips[key].read ? tips[key].crimeType : <b>{tips[key].crimeType}</b>}
+        </Table.Cell>
+        <Table.Cell width={8} onClick={() => this.showTipDetail(key)}>
+            {tips[key].read ? tips[key].tipText : <b>{tips[key].tipText}</b>}
+        </Table.Cell>
+        <Table.Cell width={1} onClick={() => this.showTipDetail(key)}>
+          {tips[key].attachment ? <Icon name='attach' style={{height: '20px', width: '20px'}} /> : null}
+        </Table.Cell>
+        <Table.Cell width={2} textAlign='right' onClick={() => this.showTipDetail(key)}>
+          {tips[key].read ? tipTimeFormat(tips[key].timestampStart) : <b>{tipTimeFormat(tips[key].timestampStart)}</b>}
+        </Table.Cell>
+      </Table.Row>)
     return mailboxRows
   }
 
   render () {    
     return (
-      <div className="col-xs-12 col-sm-8 col-md-9 col-lg-9">
-        <Card>
-          <CardText>
-            <h2 style={{ float: 'left'}}>Tip Inbox</h2>
-            <form style={{float: 'right'}}>
-              <TextField
-                hintText="Search tip text"
-                style={{margin: '0 5px'}}
-                value={this.state.searchTerm}
-                onChange={(e) => this.searchTips(e.target.value)} />
-            </form>
-            <IconButton
-              style={{float: 'right', margin: '0 20px'}}
-              onTouchTap={() => this.markTipAs('archived')}>
-              <ContentArchive/>
-            </IconButton>
-            <IconButton
-              onTouchTap={() => this.markTipAs('important')}
-              style={{float: 'right'}}>
-              <ActionGrade/>
-            </IconButton>
-            <div style={{clear: 'both'}}></div>
-            <Table
-              multiSelectable={true}
-              onRowSelection={(selectedRows) => this.addSelectedItem(selectedRows)} >
-              <TableHeader displaySelectAll={false}>
-                <TableRow>
-                  <TableHeaderColumn style={{width: '10%'}}>Status</TableHeaderColumn>
-                  <TableHeaderColumn style={{width: '20%'}}>Crime Type</TableHeaderColumn>
-                  <TableHeaderColumn style={{width: '45%'}}>Tip Text</TableHeaderColumn>
-                  <TableHeaderColumn style={{width: '10%'}}>File(s)</TableHeaderColumn>
-                  <TableHeaderColumn style={{width: '15%', textAlign: 'right'}}>Date</TableHeaderColumn>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {(this.state.tipKeysToDisplay.length === 0) ? null : this.renderMailboxRows(this.state.tipKeysToDisplay)}
-              </TableBody>
-            </Table>
-          </CardText>
-          <CardActions style={{textAlign: 'right'}}>
-            {this.state.showPreviousButton && <RaisedButton label="Previous" default={true} onTouchTap={() => this.changePage(-1)} />}
-            {this.state.showNextButton && <RaisedButton label="Next" default={true} onTouchTap={() => this.changePage(1)} />}
-          </CardActions>
-        </Card>
-      </div>
+      <Card fluid>
+        <Card.Content>
+          <h2 style={{ float: 'left'}}>Tip Inbox</h2>
+          <form style={{float: 'right'}}>
+            <Input 
+              icon='search' 
+              placeholder='Search...' 
+              tyle={{margin: '0 5px'}}
+              value={this.state.searchTerm}
+              onChange={(e) => this.searchTips(e.target.value)}
+            />
+          </form>
+          <Button icon='archive' style={{float: 'right', margin: '0 20px'}}  onClick={() => this.markTipAs('archived')} />
+          <Button icon='star' style={{float: 'right'}}  onClick={() => this.markTipAs('important')} />
+          <div style={{clear: 'both'}}></div>
+        </Card.Content>
+        <Card.Content>
+          <Table basic='very' fixed singleLine style={{ cursor: 'pointer' }}>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell width={1} />
+                <Table.HeaderCell width={1} />
+                <Table.HeaderCell width={3}>Crime Type</Table.HeaderCell>
+                <Table.HeaderCell width={8}>Tip Text</Table.HeaderCell>
+                <Table.HeaderCell width={1}>File(s)</Table.HeaderCell>
+                <Table.HeaderCell width={2} textAlign='right'>Date</Table.HeaderCell>
+              </Table.Row>
+            </Table.Header>
+
+            <Table.Body>
+              {(this.state.tipKeysToDisplay.length === 0) ? null : this.renderMailboxRows(this.state.tipKeysToDisplay)}
+            </Table.Body>
+          </Table>
+        <div style={{textAlign: 'right'}}>
+        {this.state.showPreviousButton && <Button content="Previous" onClick={() => this.changePage(-1)} />}
+        {this.state.showNextButton && <Button content="Next" onClick={() => this.changePage(1)} />}
+       </div>
+       </Card.Content>
+      </Card>
     )
   }
 }
