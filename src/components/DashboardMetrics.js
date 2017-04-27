@@ -37,7 +37,7 @@ export default class DashboardMetrics extends Component {
       }
     }
     return (
-      <Grid columns={4} stackable doubling container>
+      <Grid columns={4} stackable doubling>
         <Grid.Row>
           <Grid.Column>
             <Card centered fluid>
@@ -68,7 +68,7 @@ export default class DashboardMetrics extends Component {
           </Grid.Column>
           <Grid.Column>
             <Card centered fluid>
-              <Card.Content header='Abandoned Tips' />
+              <Card.Content header='Abandoned Tips - YTD' />
               <Card.Content>
                 <div style={style.metric}>{this.state.metrics.unreadAbandonedTips}</div>
                 <div style={style.detail}>Never completed</div>
