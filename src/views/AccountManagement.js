@@ -1,48 +1,25 @@
-import React, {Component} from 'react';
-import {Card, CardHeader, CardText} from 'material-ui/Card';
+import React, { Component } from 'react';
+import { Grid, Card, Segment, Form, Button, Table, Message } from 'semantic-ui-react';
 import Layout from '../components/Layout'
-import Divider from 'material-ui/Divider';
-import TextField from 'material-ui/TextField';
-import Checkbox from 'material-ui/Checkbox';
-import RaisedButton from 'material-ui/RaisedButton';
-import {firebaseApp} from '../helpers/firebase'
+import { firebaseApp } from '../helpers/firebase'
 
-export default class AccountManagement extends Component {
-  constructor () {
-    super()
-    this.state = {
-      users: {},
-      showCreateUser: true,
-      rank: '',
-      firstName: '',
-      lastName: '',
-      admin: false,
-      email: '',
-      password: '',
-      createUserMessage: null,
-      editUserId: null,
-    }
-    this.baseState = this.state
-    this.createUser = this.createUser.bind(this)
-    this.makeUserRows = this.makeUserRows.bind(this)
+class CreateUser extends Component {
+  state = {
+    success: false,
+    error: false
   }
 
-  componentWillMount() {
-    firebaseApp.database().ref('users').on('value', function(snapshot) {
-        const users = snapshot.val()
-        this.setState({users})
-    }.bind(this));
+  handleInputChange = (e, { name, value }) => this.setState({[name]: value})
+
+  handleCheckChange = () => {
+    const admin = this.state.admin ? !this.state.admin : true
+    this.setState({ admin })
   }
 
-  componentWillUnmount = () => firebaseApp.database().ref('users').off();
-
-  handleTextChange = (name, event) => this.setState({[name]: event.target.value})
-
-  handleCheckboxChange = (name, event, isInputChecked) => this.setState({[name]: isInputChecked})
-
-  createUser() { 
+  createUser = (e) => {
+    e.preventDefault()
     firebaseApp.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
-      .then(function(user) {
+      .then((user) => {
           const userData = {
             'rank': this.state.rank,
             'firstName': this.state.firstName,
@@ -53,118 +30,215 @@ export default class AccountManagement extends Component {
             'accountActive': true,
           }
           firebaseApp.database().ref(`users/${user.uid}`).update({...userData})
-          this.setState({
-            rank: '',
-            firstName: '',
-            lastName: '',
-            admin: false,
-            email: '',
-            password: '',
-            createUserMessage: 'Account successfully created.'
-          })
-      }.bind(this))
-      .catch(function(error) {
-        console.log(error.code, error.message)
-        this.setState({createUserMessage: error.message})
-      }.bind(this));
+            .then(() => {
+              this.setState({
+                rank: '',
+                firstName: '',
+                lastName: '',
+                admin: false,
+                email: '',
+                password: '',
+                success: true,
+                message: 'Account successfully created.',
+                error: false
+              })
+            })
+            .catch((error) => this.setState({ error: true, message: error.message }));
+      })
+      .catch((error) => {
+        console.error('error')
+        this.setState({ error: true, message: error.message })
+      });
   }
 
-  editUser = (editUserId) => this.setState({editUserId})
+  render() {
+    return (
+      <Segment>
+        <Form 
+          success={this.state.success} 
+          error={this.state.error} 
+          onSubmit={(e) => this.createUser(e)}>
+          <Grid stackable columns={3}>
+            <Grid.Row>
+              <Grid.Column width={16}>
+                <Message
+                  error
+                  content={this.state.message}
+                />
+                <Message
+                  success
+                  content={this.state.message}
+                />
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row>
+              <Grid.Column>
+                <Form.Input
+                  label='Rank'
+                  name='rank'
+                  value={this.state.rank}
+                  onChange={this.handleInputChange} 
+                />
+              </Grid.Column>
+              <Grid.Column>
+                <Form.Input
+                  label='First name'
+                  name='firstName'
+                  value={this.state.firstName}
+                  onChange={this.handleInputChange} 
+                />
+              </Grid.Column>
+              <Grid.Column>
+                <Form.Input
+                  label='Last name'
+                  name='lastName'
+                  value={this.state.lastName}
+                  onChange={this.handleInputChange} 
+                />
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row>
+              <Grid.Column>
+                <Form.Input
+                  label='Email'
+                  name='email'
+                  value={this.state.email}
+                  type="email"
+                  onChange={this.handleInputChange} 
+                />
+              </Grid.Column>
+              <Grid.Column>
+                <Form.Input
+                  label='Password'
+                  name='password'
+                  value={this.state.password}
+                  type="password"
+                  onChange={this.handleInputChange} 
+                />
+              </Grid.Column>
+              <Grid.Column>
+                <Form.Checkbox
+                  label='Admin?'
+                  name='admin'
+                  checked={this.state.admin}
+                  onChange={() => this.handleCheckChange()}
+                />
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row>
+              <Grid.Column />
+              <Grid.Column />
+              <Grid.Column textAlign='right'>
+                <Form.Button content="Create User" color='violet' />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </Form>
+      </Segment>
+    )
+  }
+}
 
-  makeUserRows(userId) {
+class EditUser extends Component {
+  state ={
+    error: false,
+    success: false
+  }
+
+  handleInputChange = (e, { name, value }) => this.setState({[name]: value})
+
+  handleCheckChange = () => {
+    const admin = this.state.admin ? !this.state.admin : true
+    this.setState({ admin })
+  }
+
+  saveChanges = (e) => {
+    e.preventDefault()
+    this.setState({ showEditUser: false })
+  }
+
+  render() {
+    return (
+      <Segment>
+        <Form onSubmit={(e) => this.saveChanges(e)}>
+          <Form.Button content='Save Changes' color='violet' />
+        </Form>
+      </Segment>
+    )
+  }
+}
+
+
+export default class AccountManagement extends Component {
+  state = {
+    users: {},
+    showCreateUser: true,
+    showEditUser: true,  // change to false
+    editUserId: null
+  }
+
+  componentWillMount() {
+    firebaseApp.database().ref('users').on('value', (snapshot) => {
+        const users = snapshot.val()
+        this.setState({ users })
+    });
+  }
+
+  componentWillUnmount = () => firebaseApp.database().ref('users').off();
+
+  editUser = (editUserId) => this.setState({ editUserId, showEditUser: true })
+
+  makeUserRows = (userId) => {
     const user = this.state.users[userId]
     return (
-      <tr key={userId}>
-        <td>{userId}</td>
-        <td>{user.rank}</td>
-        <td>{user.firstName}</td>
-        <td>{user.lastName}</td>
-        <td>{user.email}</td>
-        <td>{user.admin ? 'True' : 'False'}</td>
-        <td>{user.notifications ? 'True' : 'False'}</td>
-        <td>{user.accountActive ? 'True' : 'False'}</td>
-        <td><button onClick={() => this.editUser(userId)}>Edit</button></td>
-      </tr>
+      <Table.Row key={userId}>
+        <Table.Cell>{user.rank}</Table.Cell>
+        <Table.Cell>{user.firstName}</Table.Cell>
+        <Table.Cell>{user.lastName}</Table.Cell>
+        <Table.Cell>{user.email}</Table.Cell>
+        <Table.Cell>{user.admin ? 'True' : 'False'}</Table.Cell>
+        <Table.Cell>{user.notifications ? 'True' : 'False'}</Table.Cell>
+        <Table.Cell>{user.accountActive ? 'True' : 'False'}</Table.Cell>
+        <Table.Cell><Button content='Edit' onClick={() => this.editUser(userId)} /></Table.Cell>
+      </Table.Row>
     )
   }
 
   render() {
     const userRows = Object.keys(this.state.users).map(userId => this.makeUserRows(userId))
 
-    const createUser = (
-      <div>
-        {this.state.createUserMessage ? <p><b>{this.state.createUserMessage}</b></p> : null}
-        <div>
-          <TextField
-            value={this.state.rank}
-            floatingLabelText="Rank"
-            onChange={this.handleTextChange.bind(null, "rank")} 
-          />
-          <TextField
-            value={this.state.firstName}
-            floatingLabelText="First name"
-            onChange={this.handleTextChange.bind(null, "firstName")} 
-          />
-          <TextField
-            value={this.state.lastName}
-            floatingLabelText="Last name"
-            onChange={this.handleTextChange.bind(null, "lastName")} 
-          />
-        </div>
-        <div>
-          <TextField
-            value={this.state.email}
-            floatingLabelText="Email"
-            type="email"
-            onChange={this.handleTextChange.bind(null, "email")} 
-          />
-          <TextField
-            value={this.state.password}
-            floatingLabelText="Password"
-            type="password"
-            onChange={this.handleTextChange.bind(null, "password")} 
-          />
-          <Checkbox
-            label="Admin?"
-            checked={this.state.admin}
-            onCheck={this.handleCheckboxChange.bind(null, "admin")}
-          />
-          <RaisedButton label="Create User" primary={true} onTouchTap={() => this.createUser()} />
-        </div>
-        <Divider />
-      </div>)
-
     return (
       <Layout>
-        <div className="row" style={{margin: '60px 2px 30px 2px'}}>
-          <div className="col-xs-12 col-sm-offset-12 col-sm-8 col-md-offset-2 col-md-8 col-lg-offset-2 col-lg-8">
-            <Card>
-              <CardHeader title="Account Management"/>
-              <Divider />
-              <CardText>
-                {this.state.showCreateUser ? createUser : null}
-                <table>
-                  <thead>
-                  <tr>
-                    <th>User ID</th>
-                    <th>Rank</th>
-                    <th>First name</th>
-                    <th>Last name</th>
-                    <th>Email</th>
-                    <th>Admin</th>
-                    <th>Notifications</th>
-                    <th>Account active?</th>
-                    <th>Edit</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  {userRows}
-                  </tbody>
-                </table>
-              </CardText>
-            </Card>
-          </div>
-        </div>
+        <Grid columns={1} centered>
+          <Grid.Row>
+            <Grid.Column mobile={16} tablet={12} computer={10} largeScreen={10}>
+              <Card fluid>
+                <Card.Content header="Account Management" />
+                <Card.Content>
+                  {this.state.showCreateUser ? <CreateUser /> : null}
+                  {this.state.showEditUser ? <EditUser user={this.state.users[this.state.editUserId]} /> : null}
+                  <Table>
+                    <Table.Header>
+                      <Table.Row>
+                        <Table.HeaderCell>Rank</Table.HeaderCell>
+                        <Table.HeaderCell>First name</Table.HeaderCell>
+                        <Table.HeaderCell>Last name</Table.HeaderCell>
+                        <Table.HeaderCell>Email</Table.HeaderCell>
+                        <Table.HeaderCell>Admin</Table.HeaderCell>
+                        <Table.HeaderCell>Notifications</Table.HeaderCell>
+                        <Table.HeaderCell>Account active?</Table.HeaderCell>
+                        <Table.HeaderCell></Table.HeaderCell>
+                      </Table.Row>
+                    </Table.Header>
+                    <Table.Body>
+                      {userRows}
+                    </Table.Body>
+                  </Table>
+                </Card.Content>
+              </Card>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
       </Layout>
     )
   }
