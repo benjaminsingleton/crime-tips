@@ -1,48 +1,37 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types';
+import { Card, Button, TextArea } from 'semantic-ui-react'
 import _ from 'underscore'
-import {tipTimeFormatLong} from '../helpers/helpers'
-import {Card, CardHeader, CardText, CardActions} from 'material-ui/Card';
-import RaisedButton from 'material-ui/RaisedButton';
-import Divider from 'material-ui/Divider';
-import TextField from 'material-ui/TextField';
 import moment from 'moment'
-import {firebaseApp, databaseRef} from '../helpers/firebase'
+import { tipTimeFormatLong } from '../helpers/helpers'
+import { firebaseApp } from '../helpers/firebase'
 
 export default class TipDetail extends Component {
-  constructor() {
-    super()
-    this.state = {
-      uid: firebaseApp.auth().currentUser.uid,
-      panelDisplay: {
-        1: true,
-        2: true,
-        3: true,
-        4: true,
-        5: true,
-        6: true,
-        7: true,
-        8: true,
-        9: true
-      },
-      tip: {},
-      noteAuthors: {}
-    }
-    this.togglePanel = this.togglePanel.bind(this)
-    this.handleTextChange = this.handleTextChange.bind(this)
-    this.createUserNote = this.createUserNote.bind(this)
-    this.displayUserNotes = this.displayUserNotes.bind(this)
+  state = {
+    uid: firebaseApp.auth().currentUser.uid,
+    panelDisplay: {
+      1: true,
+      2: true,
+      3: true,
+      4: true,
+      5: true,
+      6: true,
+      7: true,
+      8: true,
+      9: true
+    },
+    tip: {},
+    noteAuthors: {}
   }
 
-  componentWillMount() {
-    // get tip
-    databaseRef.child(`tips/${this.props.tipDetailKey}`).on('value', function(snapshot) {
+  componentWillMount = () => {
+    firebaseApp.database().ref(`tips/${this.props.tipDetailKey}`).on('value', (snapshot) => {
         const tip = snapshot.val()
         this.setState({tip})
-    }.bind(this));
+    });
   }
 
-   componentWillUnmount = () => databaseRef.child(`tips/${this.props.tipDetailKey}`).off();
+  componentWillUnmount = () => firebaseApp.database().ref(`tips/${this.props.tipDetailKey}`).off();
 
   componentDidUpdate(prevProps, prevState) {
     if (_.isEmpty(prevState.tip) && !_.isEmpty(this.state.tip)) {
@@ -52,16 +41,16 @@ export default class TipDetail extends Component {
       const noteAuthors = {...this.state.noteAuthors}
 
       if (userNoteKeys) userNoteKeys.map(key => 
-        databaseRef.child(`users/${userNotes[key].uid}/account`).once('value', function(snapshot) {
+        firebaseApp.database().ref(`users/${userNotes[key].uid}/account`).once('value', (snapshot) => {
           const user = snapshot.val()
           noteAuthors[key] = `${user.rank} ${user.firstName} ${user.lastName}`
           this.setState({noteAuthors})
-        }.bind(this))
+        })
       )
     }
   }
 
-  togglePanel(panelNumber) {
+  togglePanel = (panelNumber) => {
     const panelDisplay = {...this.state.panelDisplay}
     panelDisplay[panelNumber] = !panelDisplay[panelNumber]
     this.setState({panelDisplay})
@@ -69,8 +58,8 @@ export default class TipDetail extends Component {
 
   handleTextChange = (event) => {this.setState({userNote: event.target.value})}
 
-  createUserNote() {
-    databaseRef.child(`tips/${this.props.tipDetail.key}/userNotes/`).push({
+  createUserNote = () => {
+    firebaseApp.database().ref(`tips/${this.props.tipDetail.key}/userNotes/`).push({
       note: this.state.userNote,
       uid: this.state.uid,
       timestamp: Date.now()
@@ -78,14 +67,14 @@ export default class TipDetail extends Component {
     this.setState({userNote: ''})
   }
 
-  deleteUserNote(userNoteKey) {
-    databaseRef.child(`tips/${this.props.tipDetail.key}/userNotes/${userNoteKey}`).update({
+  deleteUserNote = (userNoteKey) => {
+    firebaseApp.database().ref(`tips/${this.props.tipDetail.key}/userNotes/${userNoteKey}`).update({
       deleted: true,
       deleted_timestamp: Date.now()
     })
   }
 
-  displayUserNotes(userNotes) {
+  displayUserNotes = (userNotes) => {
     const notDeletedUserNoteKeys = Object.keys(userNotes).filter(key => !userNotes[key].deleted)
     const style = {
       card: {margin: '10px'},
@@ -94,21 +83,20 @@ export default class TipDetail extends Component {
     }
     const userNotesToDisplay = notDeletedUserNoteKeys.map(key => 
         <Card style={style.card} key={key}>
-          <CardHeader 
-            title={`${this.state.noteAuthors[key]}, ${moment(new Date(userNotes[key].timestamp)).format('MMMM Do YYYY, h:mm a')}`}
+          <Card.Content 
+            header={`${this.state.noteAuthors[key]}, ${moment(new Date(userNotes[key].timestamp)).format('MMMM Do YYYY, h:mm a')}`}
             style={style.header} 
           />
-          <CardText>
+          <Card.Content>
             <p>{userNotes[key].note}</p>
-          </CardText>
+          </Card.Content>
           {(userNotes[key].uid === this.state.uid)
-            ? <CardActions style={style.actions}>
-                <RaisedButton 
+            ? <Card.Content style={style.actions}>
+                <Button 
                   label="Delete" 
-                  default={true} 
-                  onTouchTap={() => this.deleteUserNote(key)} 
+                  onClick={() => this.deleteUserNote(key)} 
                 />
-              </CardActions>
+              </Card.Content>
             : null
           }
         </Card>
@@ -127,24 +115,23 @@ export default class TipDetail extends Component {
     }
     return (
       <div className="col-xs-12 col-sm-8 col-md-9 col-lg-9">
-        <Card>
-          <CardText>
+        <Card fluid>
+          <Card.Content>
             <h2>Tip Detail</h2>
             <p>Crime Type: {tip.crimeType}</p>
             <p>Date Time: {tipTimeFormatLong(tip.dateTime)}</p>
-          </CardText>
-          <Divider />
-          <Card expanded={this.state.panelDisplay[1]} onExpandChange={() => this.togglePanel(1)} style={style.card}>
-            <CardHeader title="1. Tip Summary" actAsExpander={true} showExpandableButton={true} style={style.header} />
-            <CardText expandable={true}>
+          </Card.Content>
+          <Card fluid style={style.card}>
+            <Card.Content header="1. Incident" style={style.header} />
+            <Card.Content>
               <p><span className="detail-prompt">What kind of crime was committed?</span> <b>{tip.crimeType}</b></p>
               <p><span className="detail-prompt">Please tell us the information you wanted to share.</span> <b>{tip.tipText}</b></p>
               <p><span className="detail-prompt">How are you aware of this crime?</span> <b>{tip.tipsterAwareOfCrimeMethod}</b></p>
-            </CardText>
+            </Card.Content>
           </Card>
-          <Card expanded={this.state.panelDisplay[2]} onExpandChange={() => this.togglePanel(2)} style={style.card}>
-            <CardHeader title="2. Suspect Description" actAsExpander={true} showExpandableButton={true} style={style.header} />
-            <CardText expandable={true}>
+          <Card fluid style={style.card}>
+            <Card.Content header="2. Suspect" style={style.header} />
+            <Card.Content>
               <p><span className="detail-prompt">What is the suspect's government name?</span> <b>{tip.suspectFullName}</b></p>
               <p><span className="detail-prompt">If the suspect has a nickname, provide it here:</span> <b>{tip.suspectNickname}</b></p>
               <p><span className="detail-prompt">What is the suspect's exact date of birth?</span> <b>{tip.suspectDateOfBirth}</b></p>
@@ -157,11 +144,11 @@ export default class TipDetail extends Component {
               <p><span className="detail-prompt">What is the suspect's eye color?</span> <b>{tip.suspectEyeColor}</b></p>
               <p><span className="detail-prompt">If the suspect has tattoos, piercings or markings, please describe them.</span> <b>{tip.suspectTatoosPiercingsMarkings}</b></p>
               <p><span className="detail-prompt">What is the suspect's social media account?</span> <b>{tip.suspectSocialMedia}</b></p>
-            </CardText>
+            </Card.Content>
           </Card>
-          <Card expanded={this.state.panelDisplay[3]} onExpandChange={() => this.togglePanel(3)} style={style.card}>
-            <CardHeader title="3. Suspect Location" actAsExpander={true} showExpandableButton={true} style={style.header} />
-            <CardText expandable={true}>
+          <Card fluid style={style.card}>
+            <Card.Content header="3. Vehicle" style={style.header} />
+            <Card.Content>
               <p><span className="detail-prompt">Where does the suspect hang out?</span> <b>{tip.suspectHangoutLocation}</b></p>
               <p><span className="detail-prompt">What is the suspect's home address?</span> <b>{tip.suspectAddressLine1}</b></p>
               <p><span className="detail-prompt">What is the suspect's apartment number?</span> <b>{tip.suspectAddressLine2}</b></p>
@@ -177,23 +164,11 @@ export default class TipDetail extends Component {
               <p><span className="detail-prompt">Where is the weapon kept?</span> <b>{tip.suspectCarryWeaponLocation}</b></p>
               <p><span className="detail-prompt">The suspect is in a gang / crew.</span> <b>{tip.suspectInAGang}</b></p>
               <p><span className="detail-prompt">What is the name of the gang / crew?</span> <b>{tip.suspectGangName}</b></p>
-            </CardText>
+            </Card.Content>
           </Card>
-          <Card expanded={this.state.panelDisplay[4]} onExpandChange={() => this.togglePanel(4)} style={style.card}>
-            <CardHeader title="4. Suspect Employment" actAsExpander={true} showExpandableButton={true} style={style.header} />
-            <CardText expandable={true}>
-              <p><span className="detail-prompt">Who is the suspect's employer?</span> <b>{tip.suspectEmployer}</b></p>
-              <p><span className="detail-prompt">What kind of work does the suspect do?</span> <b>{tip.suspectEmploymentType}</b></p>
-              <p><span className="detail-prompt">I know the address where the suspect works.</span> <b>{tip.tipsterKnowsEmployerAddress}</b></p>
-              <p><span className="detail-prompt">Address Line 1</span> <b>{tip.employerAddressLine1}</b></p>
-              <p><span className="detail-prompt">Address Line 2</span> <b>{tip.employerAddressLine2}</b></p>
-              <p><span className="detail-prompt">City / Borough</span> <b>{tip.employerCity}</b></p>
-              <p><span className="detail-prompt">State</span> <b>{tip.employerState}</b></p>
-            </CardText>
-          </Card>
-          <Card expanded={this.state.panelDisplay[5]} onExpandChange={() => this.togglePanel(5)} style={style.card}>
-            <CardHeader title="5. Suspect Vehicle" actAsExpander={true} showExpandableButton={true} style={style.header} />
-            <CardText expandable={true}>
+          <Card fluid style={style.card}>
+            <Card.Content header="4. Drugs" style={style.header} />
+            <Card.Content>
               <p><span className="detail-prompt">What is the vehicle's make?</span> <b>{tip.suspectVehicleMake}</b></p>
               <p><span className="detail-prompt">What is the vehicle's model?</span> <b>{tip.suspectVehicleModel}</b></p>
               <p><span className="detail-prompt">What is the color of the vehicle?</span> <b>{tip.suspectVehicleColor}</b></p>
@@ -204,53 +179,51 @@ export default class TipDetail extends Component {
               <p><span className="detail-prompt">The suspect keeps a weapon in the vehicle.</span> <b>{tip.suspectHasWeaponInVehicle}</b></p>
               <p><span className="detail-prompt">What type of weapon?</span> <b>{tip.suspectVehicleWeaponType}</b></p>
               <p><span className="detail-prompt">Where is the weapon kept?</span> <b>{tip.suspectVehicleWeaponLocation}</b></p>
-            </CardText>
+            </Card.Content>
           </Card>
-          <Card expanded={this.state.panelDisplay[6]} onExpandChange={() => this.togglePanel(6)} style={style.card}>
-            <CardHeader title="6. Drugs" actAsExpander={true} showExpandableButton={true} style={style.header} />
-            <CardText expandable={true}>
+          <Card fluid style={style.card}>
+            <Card.Content header="5. Media" style={style.header} />
+            <Card.Content>
               <p><span className="detail-prompt">What drug is possessed / being sold?</span> <b>{tip.drugTypes}</b></p>
               <p><span className="detail-prompt">How are the drugs being sold?</span> <b>{tip.drugSaleMethod}</b></p>
               <p><span className="detail-prompt">What time of day are drugs sold?</span> <b>{tip.drugSaleTime}</b></p>
               <p><span className="detail-prompt">What is the phone number dialed to buy drugs?</span> <b>{tip.drugSalePhoneNumber}</b></p>
-            </CardText>
+            </Card.Content>
           </Card>
-          <Card expanded={this.state.panelDisplay[7]} onExpandChange={() => this.togglePanel(7)} style={style.card}>
-            <CardHeader title="7. Media" actAsExpander={true} showExpandableButton={true} style={style.header} />
-            <CardText expandable={true}>
+          <Card fluid style={style.card}>
+            <Card.Content header="6. Final" style={style.header} />
+            <Card.Content>
               <p>Media goes here.</p>
-            </CardText>
+            </Card.Content>
           </Card>
-          <Card expanded={this.state.panelDisplay[8]} onExpandChange={() => this.togglePanel(8)} style={style.card}>
-            <CardHeader title="8. Conclusion" actAsExpander={true} showExpandableButton={true} style={style.header} />
-            <CardText expandable={true}>
+          <Card fluid style={style.card}>
+            <Card.Content header="8. Conclusion" style={style.header} />
+            <Card.Content>
               <p><span className="detail-prompt">How did you find out about online crime tips?</span> <b>{tip.tipsterWebsiteDiscoveryMethod}</b></p>
               <p><span className="detail-prompt">I want to be contacted by the police.</span> <b>{tip.tipsterWantsToBeContacted}</b></p>
               <p><span className="detail-prompt">Please provide contact tip.</span> <b>{tip.tipsterContacttip}</b></p>
-            </CardText>
+            </Card.Content>
           </Card>
-          <Card expanded={this.state.panelDisplay[9]} onExpandChange={() => this.togglePanel(9)} style={style.card}>
-            <CardHeader title="** User Notes **" actAsExpander={true} showExpandableButton={true} style={style.header} />
-            <CardText expandable={true}>
+          <Card fluid style={style.card}>
+            <Card.Content header="** User Notes **" style={style.header} />
+            <Card.Content>
               {userNotes}
-              <TextField
-                hintText="Add new note here"
-                multiLine={true}
-                fullWidth={true}
+              <TextArea
+                placeholder="Add new note here"
                 value={this.state.userNote}
                 onChange={this.handleTextChange}
                 style={{marginTop: '14px'}}
               />
               <div style={{textAlign: 'right'}}>
-              <RaisedButton label="Add Note" primary={true} onTouchTap={(e) => this.createUserNote(e)}/>
+                <Button label="Add Note" color='violet' onClick={(e) => this.createUserNote(e)}/>
               </div>
-            </CardText>
+            </Card.Content>
           </Card>
-          <CardActions style={{textAlign: 'right'}}>
-            <RaisedButton label="Print" default={true} />
-            <RaisedButton label="Email" default={true}/>
-            <RaisedButton label="Archive" primary={true}/>
-          </CardActions>
+          <Card.Context textAlign='right'>
+            <Button label="Print" />
+            <Button label="Email" />
+            <Button label="Archive" />
+          </Card.Context>
         </Card>
       </div>
     )
