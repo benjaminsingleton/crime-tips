@@ -10,9 +10,7 @@ const NoMatch = () => {
 					<Card centered fluid>
 						<Card.Content header='404' meta='Page Not Found' />
 						<Card.Content>
-							<p>
-								Sorry, but the page you are looking for has not been found.
-							</p>
+							<p>Sorry, but the page you are looking for has not been found.</p>
 						</Card.Content>
 					</Card>
 				</Grid.Column>

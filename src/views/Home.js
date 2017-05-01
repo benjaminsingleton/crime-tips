@@ -58,7 +58,7 @@ export default class Home extends Component {
           firebaseApp.database().ref('metrics/unreadAbandonedTips').transaction((current_value) => current_value + 1)
     } else if (this.state.tipKey && this.state.tip !== prevState.tip) {
       // create an object that is the diff between the old tip and new tip for updating
-      const updated = _.omit(this.state.tip, function(v,k) { return prevState.tip[k] === v; })
+      const updated = _.omit(this.state.tip, (v,k) => { return prevState.tip[k] === v; })
       firebaseApp.database().ref(`abandonedTips/${this.state.tipKey}`).update({...updated})
     }
     
