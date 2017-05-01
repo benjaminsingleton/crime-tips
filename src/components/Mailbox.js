@@ -1,55 +1,47 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types';
 import { Card, Button, Input, Table, Icon, Checkbox } from 'semantic-ui-react'
 import { tipTimeFormat, reverse } from '../helpers/helpers'
 import { firebaseApp } from '../helpers/firebase'
 
 export default class Mailbox extends Component {
-  constructor () {
-    super()
-    this.state = {
-      uid: firebaseApp.auth().currentUser.uid,
-      tips: {},
-      tipKeysToDisplay: [],
-      selectedTipKeys: [],
-      searchTerm: '',
-      currentPage: 0,
-      tipsPerPage: 10,
-      showPreviousButton: false,
-      showNextButton: true
-    }
-    this.addSelectedItem = this.addSelectedItem.bind(this)
-    this.changePage = this.changePage.bind(this)
-    this.markTipAs = this.markTipAs.bind(this)
-    this.renderMailboxRows = this.renderMailboxRows.bind(this)
-    this.showTipDetail = this.showTipDetail.bind(this)
+  state = {
+    uid: firebaseApp.auth().currentUser.uid,
+    tips: {},
+    tipKeysToDisplay: [],
+    selectedTipKeys: [],
+    searchTerm: '',
+    currentPage: 0,
+    tipsPerPage: 10,
+    showPreviousButton: false,
+    showNextButton: true
   }
 
-  componentWillMount() {
+  componentWillMount = () => {
     firebaseApp.database().ref('tips')
       .orderByChild(this.props.tipFilter.criteria)
       .equalTo(this.props.tipFilter.value)
       .limitToLast(1000)
-      .on('value', function(snapshot) {
+      .on('value', (snapshot) => {
         const tips = reverse(snapshot.val())
         const tipKeysToDisplay = Object.keys(tips).slice(0, this.state.tipsPerPage)
         this.setState({tips, tipKeysToDisplay})
-    }.bind(this));
+    });
   }
 
   componentWillUnmount = () => firebaseApp.database().ref('tips').off();
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps = (nextProps) => {
     if (this.props.tipFilter !== nextProps.tipFilter) {
       firebaseApp.database().ref('tips')
         .orderByChild(nextProps.tipFilter.criteria)
         .equalTo(nextProps.tipFilter.value)
         .limitToLast(1000)
-        .on('value', function(snapshot) {
+        .on('value', (snapshot) => {
           const tips = reverse(snapshot.val())
           const tipKeysToDisplay = Object.keys(tips).slice(0, this.state.tipsPerPage)
           this.setState({tips, tipKeysToDisplay})
-      }.bind(this));
+      });
     }
   }
 
@@ -75,7 +67,7 @@ export default class Mailbox extends Component {
     }
   }
 
-  changePage(value) {
+  changePage = (value) => {
     const nextPage = this.state.currentPage + value
     const tipsPerPage = this.state.tipsPerPage
     const startIndex = nextPage * tipsPerPage
@@ -85,13 +77,13 @@ export default class Mailbox extends Component {
     this.setState({currentPage: nextPage, tipKeysToDisplay})
   }
 
-  addSelectedItem(selectedRows) {
+  addSelectedItem = (selectedRows) => {
     const selectedTipKeys = []
     selectedRows.map((index) => selectedTipKeys.push(this.state.tipKeysToDisplay[index]))
     this.setState({selectedTipKeys})
   }
 
-  markTipAs(criteria) {
+  markTipAs = (criteria) => {
     const user = this.state.uid;
     const timestamp = Date.now()
     const tips = {...this.state.tips};
@@ -128,7 +120,7 @@ export default class Mailbox extends Component {
     this.setState({tips, selectedTipKeys: []});
   }
 
-  showTipDetail(key) {
+  showTipDetail = (key) => {
     // Tip marked as read when clicked
     if (this.state.tips[key].read === false) {
       firebaseApp.database().ref('tips/' + key).update({read: true})
@@ -155,7 +147,7 @@ export default class Mailbox extends Component {
 
   searchTips = (searchTerm) => this.setState({searchTerm, currentPage: 0});
 
-  renderMailboxRows(tipKeysToDisplay) {
+  renderMailboxRows = (tipKeysToDisplay) => {
     const tips = this.state.tips
     const mailboxRows = tipKeysToDisplay.map(key => 
       <Table.Row key={key}>

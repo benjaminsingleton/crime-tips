@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Form, Grid, Message } from 'semantic-ui-react'
 import { crimeTypeOptions } from '../helpers/formOptions'
 
-const TipFormIntro = (props) => {  
+const TipFormIntro = (props) => {
   return (
     <Form error={props.error.crimeType || props.error.tipText}>
       <Grid stackable columns={2}>

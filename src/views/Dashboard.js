@@ -8,18 +8,13 @@ import TipDetail from '../components/TipDetail'
 import TipLongForm from '../components/TipLongForm'
 
 export default class Dashboard extends Component {
-  constructor() {
-    super()
-    this.state = {
-      panelToDisplay: 'mailbox',
-      tipFilter: {
-        'criteria': 'archived',
-        'value': false
-      },
-      tipDetailKey: null
-    }
-    this.renderDashboardRightPanel = this.renderDashboardRightPanel.bind(this)
-    this.filterTips = this.filterTips.bind(this)
+  state = {
+    panelToDisplay: 'mailbox',
+    tipFilter: {
+      'criteria': 'archived',
+      'value': false
+    },
+    tipDetailKey: null
   }
 
   componentWillMount() {
@@ -36,7 +31,7 @@ export default class Dashboard extends Component {
     }
   }
 
-  filterTips(criteria, value) {
+  filterTips = (criteria, value) => {
     this.setState({
       tipFilter: {
         'criteria': criteria, 
@@ -51,7 +46,7 @@ export default class Dashboard extends Component {
 
   setTipDetailKey = (tipDetailKey) => this.setState({tipDetailKey, panelToDisplay: 'detail'})
 
-  renderDashboardRightPanel() {
+  renderDashboardRightPanel = () => {
     switch(this.state.panelToDisplay) {
       case 'mailbox':
         return (
