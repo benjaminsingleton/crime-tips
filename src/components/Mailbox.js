@@ -77,47 +77,52 @@ export default class Mailbox extends Component {
     this.setState({currentPage: nextPage, tipKeysToDisplay})
   }
 
-  addSelectedItem = (selectedRows) => {
-    const selectedTipKeys = []
-    selectedRows.map((index) => selectedTipKeys.push(this.state.tipKeysToDisplay[index]))
+  addSelectedItem = (selectedTipKey) => {
+    const selectedTipKeys = this.state.selectedTipKeys
+
+    const index = selectedTipKeys.indexOf(selectedTipKey)
+    if (index === -1) {
+      selectedTipKeys.push(selectedTipKey)
+    } else {
+      selectedTipKeys.splice(index, 1)
+    };
     this.setState({selectedTipKeys})
   }
 
-  markTipAs = (criteria) => {
+  markTipAs = (key, criteria) => {
     const user = this.state.uid;
     const timestamp = Date.now()
     const tips = {...this.state.tips};
 
-    // toggle criteria boolean value and log activity
-    function updateItem(criteria, key) {
-      const status = !tips[key][criteria]
-      tips[key][criteria] = status
+    const status = !tips[key][criteria]
+    tips[key][criteria] = status
 
-      if (criteria==='archived' && status ===true) {
-        tips[key]['important'] = false
-      }
+    if (criteria==='archived' && status ===true) {
+      tips[key]['important'] = false
+    }
 
-      firebaseApp.database().ref('tips/' + key).update({...tips[key]})
+    firebaseApp.database().ref('tips/' + key).update({...tips[key]})
 
-      firebaseApp.database().ref(`logs/`).push({
-        user: user,
-        tip: key,
-        action: criteria,
-        status: status,
-        timestamp: timestamp
-      });
+    firebaseApp.database().ref(`logs/`).push({
+      user: user,
+      tip: key,
+      action: criteria,
+      status: status,
+      timestamp: timestamp
+    });
 
-      firebaseApp.database().ref(`userActivity/${user}`).push({
-        tip: key,
-        action: criteria,
-        status: status,
-        timestamp: timestamp
-      });
-    };
+    firebaseApp.database().ref(`userActivity/${user}`).push({
+      tip: key,
+      action: criteria,
+      status: status,
+      timestamp: timestamp
+    });
+  };
 
-    this.state.selectedTipKeys.map(key => updateItem(criteria, key))
+  markSelectedTipsAs = (criteria) => {
+    this.state.selectedTipKeys.map(key => this.markTipAs(key, criteria))
 
-    this.setState({tips, selectedTipKeys: []});
+    this.setState({selectedTipKeys: []});
   }
 
   showTipDetail = (key) => {
@@ -152,10 +157,13 @@ export default class Mailbox extends Component {
     const mailboxRows = tipKeysToDisplay.map(key => 
       <Table.Row key={key}>
         <Table.Cell width={1} textAlign='center'>
-          <Checkbox />
+          <Checkbox checked={this.state.selectedTipKeys.indexOf(key) !== -1} onChange={() => this.addSelectedItem(key)}/>
         </Table.Cell>
-        <Table.Cell width={1} onClick={() => this.showTipDetail(key)}>
-          {tips[key].important ? <Icon name='star' /> : <Icon name='empty star' disabled />}
+        <Table.Cell width={1}>
+          {tips[key].important ?
+              <Icon name='star' onClick={() => this.markTipAs(key, 'important')} /> 
+            : <Icon name='empty star' disabled onClick={() => this.markTipAs(key, 'important')}/>
+            }
           <Icon name='computer' disabled/>
         </Table.Cell>
         <Table.Cell width={4} onClick={() => this.showTipDetail(key)}>
@@ -183,13 +191,13 @@ export default class Mailbox extends Component {
             <Input 
               icon='search' 
               placeholder='Search...' 
-              tyle={{margin: '0 5px'}}
+              style={{margin: '0 5px'}}
               value={this.state.searchTerm}
               onChange={(e) => this.searchTips(e.target.value)}
             />
           </form>
-          <Button icon='archive' style={{float: 'right', margin: '0 20px'}}  onClick={() => this.markTipAs('archived')} />
-          <Button icon='star' style={{float: 'right'}}  onClick={() => this.markTipAs('important')} />
+          <Button icon='archive' style={{float: 'right', margin: '0 20px'}}  onClick={() => this.markSelectedTipsAs('archived')} />
+          <Button icon='star' style={{float: 'right'}}  onClick={() => this.markSelectedTipsAs('important')} />
           <div style={{clear: 'both'}}></div>
         </Card.Content>
         <Card.Content>
@@ -204,7 +212,6 @@ export default class Mailbox extends Component {
                 <Table.HeaderCell width={2} textAlign='right'>Date</Table.HeaderCell>
               </Table.Row>
             </Table.Header>
-
             <Table.Body>
               {(this.state.tipKeysToDisplay.length === 0) ? null : this.renderMailboxRows(this.state.tipKeysToDisplay)}
             </Table.Body>
