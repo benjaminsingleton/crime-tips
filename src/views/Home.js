@@ -406,7 +406,7 @@ export default class Home extends Component {
           <Grid.Column mobile={16} tablet={12} computer={10} largeScreen={10}>
             {displayComponent}
           </Grid.Column>
-			  </Grid>
+        </Grid>
       </Layout>
     );
   }
