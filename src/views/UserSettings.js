@@ -35,7 +35,7 @@ export default class UserSettings extends Component {
     firebaseApp.database().ref(`userActivity/${this.state.uid}`).off()
   }
 
-  handleInputChange = (name, event) => this.setState({[name]: event.target.value})
+  handleInputChange = (e, { name, value }) => this.setState({[name]: value})
 
   onToggle = () => {
     const notifications = !this.state.userDetails.notifications
@@ -193,14 +193,16 @@ export default class UserSettings extends Component {
                     content={this.state.emailMsg}
                   />
                   <Form.Input
-                    placeholder="New email" 
-                    type="email"
+                    placeholder='New email'
+                    type='email'
+                    name='newEmail'
                     value={this.state.newEmail}
                     onChange={this.handleInputChange}
                   />
                   <Form.Input 
-                    placeholder="Repeat new email"
-                    type="email"
+                    placeholder='Repeat new email'
+                    type='email'
+                    name='newEmailRepeat'
                     value={this.state.newEmailRepeat}
                     onChange={this.handleInputChange}
                   />
@@ -233,12 +235,14 @@ export default class UserSettings extends Component {
                   <Form.Input
                     placeholder='New password'
                     type='password'
+                    name='newPassword'
                     value={this.state.newPassword}
                     onChange={this.handleInputChange}
                   />
                   <Form.Input 
                     placeholder='Repeat new password'
                     type='password'
+                    name='newPasswordRepeat'
                     value={this.state.newPasswordRepeat}
                     onChange={this.handleInputChange}
                   />
