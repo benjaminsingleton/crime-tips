@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types';
-import { Card, Button, TextArea } from 'semantic-ui-react'
+import { Card, Form, Button } from 'semantic-ui-react'
 import _ from 'underscore'
 import moment from 'moment'
 import { tipTimeFormatLong } from '../helpers/helpers'
@@ -208,22 +208,21 @@ export default class TipDetail extends Component {
             <Card.Content header="** User Notes **" style={style.header} />
             <Card.Content>
               {userNotes}
-              <TextArea
+              <Form onSubmit={(e) => this.createUserNote(e)}>
+              <Form.TextArea
                 placeholder="Add new note here"
                 value={this.state.userNote}
                 onChange={this.handleTextChange}
                 style={{marginTop: '14px'}}
               />
               <div style={{textAlign: 'right'}}>
-                <Button label="Add Note" color='violet' onClick={(e) => this.createUserNote(e)}/>
+                <Form.Button content="Add Note" color='violet' />
               </div>
+              </Form>
             </Card.Content>
           </Card>
-          <Card.Context textAlign='right'>
-            <Button label="Print" />
-            <Button label="Email" />
-            <Button label="Archive" />
-          </Card.Context>
+          <Card.Content>
+          </Card.Content>
         </Card>
       </div>
     )
