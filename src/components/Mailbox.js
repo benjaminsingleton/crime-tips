@@ -129,6 +129,7 @@ export default class Mailbox extends Component {
     // Tip marked as read when clicked
     if (this.state.tips[key].read === false) {
       firebaseApp.database().ref('tips/' + key).update({read: true})
+      firebaseApp.database().ref('metrics/unreadTips').transaction((current_value) => current_value - 1)
     }
 
     // Log activity to 'logs' and 'users/uid' for auditing purposes
@@ -162,9 +163,12 @@ export default class Mailbox extends Component {
         <Table.Cell width={1}>
           {tips[key].important ?
               <Icon name='star' onClick={() => this.markTipAs(key, 'important')} /> 
-            : <Icon name='empty star' disabled onClick={() => this.markTipAs(key, 'important')}/>
+            : <Icon name='empty star' disabled onClick={() => this.markTipAs(key, 'important')} />
             }
-          <Icon name='computer' disabled/>
+          {tips[key].tipType === 'web' ?
+              <Icon name='computer' disabled />
+            : <Icon name='phone' disabled />
+            }
         </Table.Cell>
         <Table.Cell width={4} onClick={() => this.showTipDetail(key)}>
           {tips[key].read ? tips[key].crimeType : <b>{tips[key].crimeType}</b>}
