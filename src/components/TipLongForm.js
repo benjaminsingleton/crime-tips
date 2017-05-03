@@ -1,168 +1,122 @@
-import React, {Component} from 'react'
-import {Card, CardHeader, CardText, CardActions} from 'material-ui/Card';
-import RaisedButton from 'material-ui/RaisedButton';
-import Divider from 'material-ui/Divider';
+import React, { Component } from 'react'
+import { Card, Button } from 'semantic-ui-react'
 import TipFormIntro from '../components/TipFormIntro'
 import TipFormSuspect from '../components/TipFormSuspect'
 import TipFormVehicle from '../components/TipFormVehicle'
 import TipFormDrugs from '../components/TipFormDrugs'
 import TipFormMedia from '../components/TipFormMedia'
 import TipFormConclusion from '../components/TipFormConclusion'
-import {firebaseApp, databaseRef} from '../helpers/firebase'
+import { firebaseApp } from '../helpers/firebase'
+import { language } from '../helpers/languages'
 
-class TipLongForm extends Component {
-
-  constructor() {
-    super()
-    this.state = {
-      tip: {
-        archived: false,
-        read: true,
-        attachment: false,
-        type: 'phone',
-      },
-      panelDisplay: {
-        1: true,
-        2: false,
-        3: false,
-        4: false,
-        5: false,
-        6: false,
-        7: false,
-        8: false
-      }
+export default class TipLongForm extends Component {
+  state = {
+    tip: {
+      archived: false,
+      read: true,
+      attachment: false,
+      type: 'phone',
     }
-
-    this.handleSelectChange = this.handleSelectChange.bind(this);
-    this.handleTextChange = this.handleTextChange.bind(this);
-    this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
-    this.handleDatePickerChange = this.handleDatePickerChange.bind(this);
-    this.createTip = this.createTip.bind(this)
-    this.togglePanel = this.togglePanel.bind(this)
   }
 
-  handleSelectChange(name, event, index, value) {
+  handleInputChange = (e, { name, value }) => {
     const tip = {...this.state.tip}
     tip[name] = value
     this.setState({tip})
   }
 
-  handleTextChange(name, event) {
+  handleCheckChange = (e, { name }) => {
     const tip = {...this.state.tip}
-    tip[name] = event.target.value
+    tip[name] = tip[name] ? !tip[name] : true
     this.setState({tip})
   }
 
-  handleCheckboxChange(name, event, isInputChecked) {
-    const tip = {...this.state.tip}
-    tip[name] = isInputChecked
-    this.setState({tip})
-  }
-
-  handleDatePickerChange(name, nothing, date) {
-    const tip = {...this.state.tip}
-    console.log(name, date)
-    tip[name] = date
-    this.setState({tip})
-  }
-
-  togglePanel(panelNumber) {
-    const panelDisplay = {...this.state.panelDisplay}
-    panelDisplay[panelNumber] = !panelDisplay[panelNumber]
-    this.setState({panelDisplay})
-  }
-
-  createTip(event) {
+  createTip = (event) => {
     event.preventDefault();
     var tip = {...this.state.tip}
     tip['submitted'] = true
     tip['timestamp'] = Date.now()
     tip['uid'] = firebaseApp.auth().currentUser.uid
-    databaseRef.child('tips/').push({...tip})
+    firebaseApp.database().ref('tips/').push({...tip})
     this.setState({tip: {}});
     this.props.filterTips('archived', false)
   }
 
   render() {
+    const lang = language['english']
     const style = {
       card: {margin: '10px'},
-      header: {backgroundColor: '#E0E0E0'}
+      header: {backgroundColor: '#E0E0E0'},
+      actions: {textAlign: 'right'}
     }
-
     return (
-      <div className="col-xs-12 col-sm-8 col-md-9 col-lg-9">
-        <Card>
-          <CardText>
-            <h2>New Crime Tip</h2>
-          </CardText>
-          <Divider />
-          <Card expanded={this.state.panelDisplay[1]} onExpandChange={() => this.togglePanel(1)} style={style.card}>
-            <CardHeader title="1. Tip Summary" actAsExpander={true} showExpandableButton={true} style={style.header} />
-            <CardText expandable={true}>
-              <TipFormIntro 
-                tip={this.state.tip}
-                handleSelectChange={this.handleSelectChange} 
-                handleTextChange={this.handleTextChange}
-                errorText={false}
-              />
-            </CardText>
-          </Card>
-          <Card expanded={this.state.panelDisplay[2]} onExpandChange={() => this.togglePanel(2)} style={style.card}>
-            <CardHeader title="2. Suspect" actAsExpander={true} showExpandableButton={true} style={style.header} />
-            <CardText expandable={true}>
-              <TipFormSuspect
-                tip={this.state.tip}
-                handleSelectChange={this.handleSelectChange} 
-                handleTextChange={this.handleTextChange} 
-                handleDatePickerChange={this.handleDatePickerChange} 
-              />
-            </CardText>
-          </Card>
-          <Card expanded={this.state.panelDisplay[3]} onExpandChange={() => this.togglePanel(3)} style={style.card}>
-            <CardHeader title="5. Vehicle" actAsExpander={true} showExpandableButton={true} style={style.header} />
-            <CardText expandable={true}>
-              <TipFormVehicle
-                tip={this.state.tip}
-                handleSelectChange={this.handleSelectChange} 
-                handleTextChange={this.handleTextChange} 
-                handleCheckboxChange={this.handleCheckboxChange} />
-            </CardText>
-          </Card>
-          <Card expanded={this.state.panelDisplay[6]} onExpandChange={() => this.togglePanel(6)} style={style.card}>
-            <CardHeader title="6. Drugs" actAsExpander={true} showExpandableButton={true} style={style.header} />
-            <CardText expandable={true}>
-              <TipFormDrugs
-                tip={this.state.tip}
-                handleSelectChange={this.handleSelectChange} 
-                handleTextChange={this.handleTextChange} 
-                handleCheckboxChange={this.handleCheckboxChange} />
-            </CardText>
-          </Card>
-          <Card expanded={this.state.panelDisplay[7]} onExpandChange={() => this.togglePanel(7)} style={style.card}>
-            <CardHeader title="7. Media" actAsExpander={true} showExpandableButton={true} style={style.header} />
-            <CardText expandable={true}>
-              <TipFormMedia tip={this.state.tip} />
-            </CardText>
-          </Card>
-          <Card expanded={this.state.panelDisplay[8]} onExpandChange={() => this.togglePanel(8)} style={style.card}>
-            <CardHeader title="8. Conclusion" actAsExpander={true} showExpandableButton={true} style={style.header} />
-            <CardText expandable={true}>
-              <TipFormConclusion
-                tip={this.state.tip}
-                handleSelectChange={this.handleSelectChange} 
-                handleTextChange={this.handleTextChange} 
-                handleCheckboxChange={this.handleCheckboxChange} />
-            </CardText>
-          </Card>
-          <CardActions style={{textAlign: 'right'}}>
-            <RaisedButton label="Discard" secondary={true} />
-            <RaisedButton label="Save Draft" default={true} />
-            <RaisedButton label="Submit" primary={true} onTouchTap={(e) => this.createTip(e)} />
-          </CardActions>
+      <Card fluid>
+        <Card.Content header='New Crime Tip' />
+        <Card fluid style={style.card}>
+          <Card.Content header='1. Incident' style={style.header} />
+          <Card.Content>
+            <TipFormIntro 
+              tip={this.state.tip}
+              handleInputChange={this.handleInputChange} 
+              handleCheckChange={this.handleCheckChange}
+              lang={lang}
+              handleFormModuleChange={this.handleFormModuleChange}
+              errorText={false}
+            />
+          </Card.Content>
         </Card>
-      </div>
+        <Card fluid style={style.card}>
+          <Card.Content header='2. Suspect' style={style.header} />
+          <Card.Content>
+            <TipFormSuspect
+              tip={this.state.tip}
+              handleInputChange={this.handleInputChange}
+              lang={lang}
+            />
+          </Card.Content>
+        </Card>
+        <Card fluid style={style.card}>
+          <Card.Content header='3. Vehicle' style={style.header} />
+          <Card.Content>
+            <TipFormVehicle
+              tip={this.state.tip}
+              handleInputChange={this.handleInputChange}
+              lang={lang}
+            />
+          </Card.Content>
+        </Card>
+        <Card fluid style={style.card}>
+          <Card.Content title='4. Drugs' style={style.header} />
+          <Card.Content>
+            <TipFormDrugs
+              tip={this.state.tip}
+              handleInputChange={this.handleInputChange}
+              lang={lang}
+            />
+          </Card.Content>
+        </Card>
+        <Card fluid style={style.card}>
+          <Card.Content title='5. Media' style={style.header} />
+          <Card.Content>
+            <TipFormMedia tip={this.state.tip} />
+          </Card.Content>
+        </Card>
+        <Card fluid style={style.card}>
+          <Card.Content header='6. Final' style={style.header} />
+          <Card.Content>
+            <TipFormConclusion
+              tip={this.state.tip}
+              handleInputChange={this.handleInputChange}
+              lang={lang}
+            />
+          </Card.Content>
+        </Card>
+        <Card.Content style={{textAlign: 'right'}}>
+          <Button content='Discard' />
+          <Button content='Save Draft' />
+          <Button content='Submit' color='violet' onClick={(e) => this.createTip(e)} />
+        </Card.Content>
+      </Card>
     )
   }
 }
-
-export default TipLongForm
