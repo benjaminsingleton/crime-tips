@@ -9,17 +9,6 @@ import { firebaseApp } from '../helpers/firebase'
 export default class TipDetail extends Component {
   state = {
     uid: firebaseApp.auth().currentUser.uid,
-    panelDisplay: {
-      1: true,
-      2: true,
-      3: true,
-      4: true,
-      5: true,
-      6: true,
-      7: true,
-      8: true,
-      9: true
-    },
     tip: {},
     noteAuthors: {}
   }
@@ -197,7 +186,7 @@ export default class TipDetail extends Component {
             </Card.Content>
           </Card>
           <Card fluid style={style.card}>
-            <Card.Content header="8. Conclusion" style={style.header} />
+            <Card.Content header="7. Conclusion" style={style.header} />
             <Card.Content>
               <p><span className="detail-prompt">How did you find out about online crime tips?</span> <b>{tip.tipsterWebsiteDiscoveryMethod}</b></p>
               <p><span className="detail-prompt">I want to be contacted by the police.</span> <b>{tip.tipsterWantsToBeContacted}</b></p>
