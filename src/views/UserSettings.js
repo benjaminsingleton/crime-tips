@@ -122,7 +122,7 @@ export default class UserSettings extends Component {
     const email = firebaseApp.auth().currentUser.email
 
     function activityText(key) {
-      const tipLink = <Link to={`tips/${key}`} style={{textDecoration: 'none'}}>tip</Link>
+      const tipLink = <Link to={`tip/${key}`} style={{textDecoration: 'none'}}>tip</Link>
 
       switch (userActivity[key].action) {
         case 'read':
