@@ -166,19 +166,19 @@ const language = {
       placeholder: 'Additional details'
     },
     vehicleMake: {
-      label: 'What is the vehicle make?',
+      label: 'Make',
       placeholder: 'Select a make'
     },
     vehicleModel: {
-      label: 'What is the vehicle model?',
+      label: 'Model',
       placeholder: 'Select a model'
     },
     vehicleColor: {
-      label: 'What is the color of the vehicle?',
+      label: 'Color',
       placeholder: 'Select a color'
     },
     vehiclePlate: {
-      label: 'What is the license plate number?',
+      label: 'License plate number',
       placeholder: 'License plate number'
     },
     vehicleLocation: {
