@@ -32,7 +32,7 @@ export default class DashboardLeftPanel extends Component {
     return (
       <Card fluid>
         <Card.Content>
-          <Button content='New Tip' fluid onClick={() => this.props.changePanel('form')} />
+          <Button content='New Tip' fluid color='violet' onClick={() => this.props.changePanel('form')} />
           <h4>FOLDERS</h4>
           <Menu vertical fluid>
             <Menu.Item name='inbox' active={activeItem === 'inbox'} onClick={this.handleItemClick}>
