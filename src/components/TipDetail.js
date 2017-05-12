@@ -23,14 +23,14 @@ export default class TipDetail extends Component {
   componentWillUnmount = () => firebaseApp.database().ref(`tips/${this.props.tipDetailKey}`).off();
 
   componentDidUpdate(prevProps, prevState) {
-    if (_.isEmpty(prevState.tip) && !_.isEmpty(this.state.tip)) {
+    if (prevState.tip !== this.state.tip) {
       // get names of note authors
       const userNotes = this.state.tip.userNotes
       const userNoteKeys = userNotes ? Object.keys(userNotes).filter(key => !userNotes[key].deleted) : null
       const noteAuthors = {...this.state.noteAuthors}
 
       if (userNoteKeys) userNoteKeys.map(key => 
-        firebaseApp.database().ref(`users/${userNotes[key].uid}/account`).once('value', (snapshot) => {
+        firebaseApp.database().ref(`users/${userNotes[key].uid}`).once('value', (snapshot) => {
           const user = snapshot.val()
           noteAuthors[key] = `${user.rank} ${user.firstName} ${user.lastName}`
           this.setState({noteAuthors})
@@ -47,8 +47,9 @@ export default class TipDetail extends Component {
 
   handleTextChange = (event) => {this.setState({userNote: event.target.value})}
 
-  createUserNote = () => {
-    firebaseApp.database().ref(`tips/${this.props.tipDetail.key}/userNotes/`).push({
+  createUserNote = (e) => {
+    e.preventDefault()
+    firebaseApp.database().ref(`tips/${this.props.tipDetailKey}/userNotes/`).push({
       note: this.state.userNote,
       uid: this.state.uid,
       timestamp: Date.now()
@@ -57,7 +58,7 @@ export default class TipDetail extends Component {
   }
 
   deleteUserNote = (userNoteKey) => {
-    firebaseApp.database().ref(`tips/${this.props.tipDetail.key}/userNotes/${userNoteKey}`).update({
+    firebaseApp.database().ref(`tips/${this.props.tipDetailKey}/userNotes/${userNoteKey}`).update({
       deleted: true,
       deleted_timestamp: Date.now()
     })
@@ -71,7 +72,7 @@ export default class TipDetail extends Component {
       actions: {textAlign: 'right'}
     }
     const userNotesToDisplay = notDeletedUserNoteKeys.map(key => 
-        <Card style={style.card} key={key}>
+        <Card fluid style={style.card} key={key}>
           <Card.Content 
             header={`${this.state.noteAuthors[key]}, ${moment(new Date(userNotes[key].timestamp)).format('MMMM Do YYYY, h:mm a')}`}
             style={style.header} 
@@ -82,7 +83,7 @@ export default class TipDetail extends Component {
           {(userNotes[key].uid === this.state.uid)
             ? <Card.Content style={style.actions}>
                 <Button 
-                  label="Delete" 
+                  content="Delete" 
                   onClick={() => this.deleteUserNote(key)} 
                 />
               </Card.Content>
@@ -113,84 +114,72 @@ export default class TipDetail extends Component {
           <Card fluid style={style.card}>
             <Card.Content header="1. Incident" style={style.header} />
             <Card.Content>
-              <p><span className="detail-prompt">What kind of crime was committed?</span> <b>{tip.crimeType}</b></p>
-              <p><span className="detail-prompt">Please tell us the information you wanted to share.</span> <b>{tip.tipText}</b></p>
-              <p><span className="detail-prompt">How are you aware of this crime?</span> <b>{tip.tipsterAwareOfCrimeMethod}</b></p>
+              <p>What kind of crime was committed? <b>{tip.crimeType}</b></p>
+              <p>Please tell us the information you wanted to share. <b>{tip.tipText}</b></p>
+              <p>Where did the crime take place? <b>{tip.crimeLocation}</b></p>
+              <p>When did the crime occur? <b>{tip.crimeDate}</b></p>
+              <p>How many suspects were involved? <b>{tip.numberOfSuspects}</b></p>
+              <p>How many vehicles were involved? <b>{tip.numberOfVehicles}</b></p>
+              <p>I have media to upload. <b>{tip.tipsterHasMedia}</b></p>
             </Card.Content>
           </Card>
           <Card fluid style={style.card}>
-            <Card.Content header="2. Suspect" style={style.header} />
+            <Card.Content header="2. Suspect(s)" style={style.header} />
             <Card.Content>
-              <p><span className="detail-prompt">What is the suspect's government name?</span> <b>{tip.suspectFullName}</b></p>
-              <p><span className="detail-prompt">If the suspect has a nickname, provide it here:</span> <b>{tip.suspectNickname}</b></p>
-              <p><span className="detail-prompt">What is the suspect's exact date of birth?</span> <b>{tip.suspectDateOfBirth}</b></p>
-              <p><span className="detail-prompt">What is the suspect's age?</span> <b>{tip.suspectAge}</b></p>
-              <p><span className="detail-prompt">What is the suspect's gender?</span> <b>{tip.suspectGender}</b></p>
-              <p><span className="detail-prompt">What is the suspect's race?</span> <b>{tip.suspectRace}</b></p>
-              <p><span className="detail-prompt">What is the suspect's height?</span> <b>{tip.suspectHeight}</b></p>
-              <p><span className="detail-prompt">What is the suspect's weight?</span> <b>{tip.suspectWeight}</b></p>
-              <p><span className="detail-prompt">What is the suspect's hair color?</span> <b>{tip.suspectHairColor}</b></p>
-              <p><span className="detail-prompt">What is the suspect's eye color?</span> <b>{tip.suspectEyeColor}</b></p>
-              <p><span className="detail-prompt">If the suspect has tattoos, piercings or markings, please describe them.</span> <b>{tip.suspectTatoosPiercingsMarkings}</b></p>
-              <p><span className="detail-prompt">What is the suspect's social media account?</span> <b>{tip.suspectSocialMedia}</b></p>
+              <p>Full name: <b>{tip.suspectFullName}</b></p>
+              <p>Nickname / alias: <b>{tip.suspectNickname}</b></p>
+              <p>Date of Birth: <b>{tip.suspectDateOfBirth}</b></p>
+              <p>Approximate Age: <b>{tip.suspectAge}</b></p>
+              <p>Gender: <b>{tip.suspectGender}</b></p>
+              <p>Race: <b>{tip.suspectRace}</b></p>
+              <p>Height: <b>{tip.suspectHeight}</b></p>
+              <p>Weight: <b>{tip.suspectWeight}</b></p>
+              <p>Hair Color: <b>{tip.suspectHairColor}</b></p>
+              <p>Eye Color: <b>{tip.suspectEyeColor}</b></p>
+              <p>Home Address: <b>{tip.suspectAddress}</b></p>
+              <p>City: <b>{tip.suspectCity}</b></p>
+              <p>State: <b>{tip.suspectState}</b></p>
+              <p>Phone Number: <b>{tip.suspectPhone}</b></p>
+              <p>Scars, Marks, Tattoos, Piercings: <b>{tip.suspectMarkings}</b></p>
+              <p>Gang: <b>{tip.suspectGang}</b></p>
+              <p>Social Media: <b>{tip.suspectSocialMedia}</b></p>
+              <p>Does the suspect carry weapons? What kind? <b>{tip.suspectWeapon}</b></p>
+              <p>Place of employment: <b>{tip.suspectWeapon}</b></p>
+              <p>Is there anything else we should know about the suspect? <b>{tip.suspectComments}</b></p>
             </Card.Content>
           </Card>
           <Card fluid style={style.card}>
-            <Card.Content header="3. Vehicle" style={style.header} />
+            <Card.Content header="3. Vehicle(s)" style={style.header} />
             <Card.Content>
-              <p><span className="detail-prompt">Where does the suspect hang out?</span> <b>{tip.suspectHangoutLocation}</b></p>
-              <p><span className="detail-prompt">What is the suspect's home address?</span> <b>{tip.suspectAddressLine1}</b></p>
-              <p><span className="detail-prompt">What is the suspect's apartment number?</span> <b>{tip.suspectAddressLine2}</b></p>
-              <p><span className="detail-prompt">What city does the suspect live in?</span> <b>{tip.suspectCity}</b></p>
-              <p><span className="detail-prompt">What state does the suspect live in?</span> <b>{tip.suspectState}</b></p>
-              <p><span className="detail-prompt">The suspect has a weapon in the house.</span> <b>{tip.suspectHasWeaponInHouse}</b></p>
-              <p><span className="detail-prompt">What type of weapon?</span> <b>{tip.suspectHomeWeaponType}</b></p>
-              <p><span className="detail-prompt">Where is the weapon kept?</span> <b>{tip.suspectHomeWeaponLocation}</b></p>
-              <p><span className="detail-prompt">The suspect has a dogs / animals in the house.</span> <b>{tip.suspectHasAnimalInHouse}</b></p>
-              <p><span className="detail-prompt">What kind of animal(s)?</span> <b>{tip.suspectAnimalType}</b></p>
-              <p><span className="detail-prompt">The suspect often carries a weapon.</span> <b>{tip.suspectCarriesWeapon}</b></p>
-              <p><span className="detail-prompt">What type of weapon?</span> <b>{tip.suspectCarryWeaponType}</b></p>
-              <p><span className="detail-prompt">Where is the weapon kept?</span> <b>{tip.suspectCarryWeaponLocation}</b></p>
-              <p><span className="detail-prompt">The suspect is in a gang / crew.</span> <b>{tip.suspectInAGang}</b></p>
-              <p><span className="detail-prompt">What is the name of the gang / crew?</span> <b>{tip.suspectGangName}</b></p>
+              <p>Make: <b>{tip.suspectVehicleMake}</b></p>
+              <p>Model: <b>{tip.suspectVehicleModel}</b></p>
+              <p>Color: <b>{tip.suspectVehicleColor}</b></p>
+              <p>License Plate Number: <b>{tip.suspectVehiclePlateNumber}</b></p>
+              <p>Where can the vehicle usually be found? <b>{tip.suspectVehicleLocation}</b></p>
+              <p>Please note if the vehicle has any identifying marks, scratches, bumper stickers, etc. <b>{tip.suspectVehicleMarkings}</b></p>
             </Card.Content>
           </Card>
           <Card fluid style={style.card}>
             <Card.Content header="4. Drugs" style={style.header} />
             <Card.Content>
-              <p><span className="detail-prompt">What is the vehicle's make?</span> <b>{tip.suspectVehicleMake}</b></p>
-              <p><span className="detail-prompt">What is the vehicle's model?</span> <b>{tip.suspectVehicleModel}</b></p>
-              <p><span className="detail-prompt">What is the color of the vehicle?</span> <b>{tip.suspectVehicleColor}</b></p>
-              <p><span className="detail-prompt">What is the vehicle's license plate number?</span> <b>{tip.suspectVehiclePlateNumber}</b></p>
-              <p><span className="detail-prompt">What state is on the license plate?</span> <b>{tip.suspectVehicleState}</b></p>
-              <p><span className="detail-prompt">What year was the car made?</span> <b>{tip.suspectVehicleYear}</b></p>
-              <p><span className="detail-prompt">Where is the vehicle usually located / parked?</span> <b>{tip.suspectVehicleLocation}</b></p>
-              <p><span className="detail-prompt">The suspect keeps a weapon in the vehicle.</span> <b>{tip.suspectHasWeaponInVehicle}</b></p>
-              <p><span className="detail-prompt">What type of weapon?</span> <b>{tip.suspectVehicleWeaponType}</b></p>
-              <p><span className="detail-prompt">Where is the weapon kept?</span> <b>{tip.suspectVehicleWeaponLocation}</b></p>
+              <p>What drug is possessed / being sold? <b>{tip.drugTypes}</b></p>
+              <p>How are the drugs being sold? <b>{tip.drugSaleMethod}</b></p>
+              <p>What time of day are drugs sold? <b>{tip.drugSaleTime}</b></p>
+              <p>What is the phone number dialed to buy drugs? <b>{tip.drugSalePhoneNumber}</b></p>
             </Card.Content>
           </Card>
           <Card fluid style={style.card}>
             <Card.Content header="5. Media" style={style.header} />
             <Card.Content>
-              <p><span className="detail-prompt">What drug is possessed / being sold?</span> <b>{tip.drugTypes}</b></p>
-              <p><span className="detail-prompt">How are the drugs being sold?</span> <b>{tip.drugSaleMethod}</b></p>
-              <p><span className="detail-prompt">What time of day are drugs sold?</span> <b>{tip.drugSaleTime}</b></p>
-              <p><span className="detail-prompt">What is the phone number dialed to buy drugs?</span> <b>{tip.drugSalePhoneNumber}</b></p>
+              <p>Media goes here.</p>
             </Card.Content>
           </Card>
           <Card fluid style={style.card}>
             <Card.Content header="6. Final" style={style.header} />
             <Card.Content>
-              <p>Media goes here.</p>
-            </Card.Content>
-          </Card>
-          <Card fluid style={style.card}>
-            <Card.Content header="7. Conclusion" style={style.header} />
-            <Card.Content>
-              <p><span className="detail-prompt">How did you find out about online crime tips?</span> <b>{tip.tipsterWebsiteDiscoveryMethod}</b></p>
-              <p><span className="detail-prompt">I want to be contacted by the police.</span> <b>{tip.tipsterWantsToBeContacted}</b></p>
-              <p><span className="detail-prompt">Please provide contact tip.</span> <b>{tip.tipsterContacttip}</b></p>
+              <p>How did you find out about online crime tips? <b>{tip.tipsterWebsiteDiscoveryMethod}</b></p>
+              <p>I want to be contacted by the police. <b>{tip.tipsterWantsToBeContacted}</b></p>
+              <p>Please provide contact tip. <b>{tip.tipsterContacttip}</b></p>
             </Card.Content>
           </Card>
           <Card fluid style={style.card}>
