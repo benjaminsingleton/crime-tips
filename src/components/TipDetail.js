@@ -165,7 +165,7 @@ export default class TipDetail extends Component {
               <p>What drug is possessed / being sold? <b>{tip.drugTypes}</b></p>
               <p>How are the drugs being sold? <b>{tip.drugSaleMethod}</b></p>
               <p>What time of day are drugs sold? <b>{tip.drugSaleTime}</b></p>
-              <p>What is the phone number dialed to buy drugs? <b>{tip.drugSalePhoneNumber}</b></p>
+              <p>What is the phone number used to buy drugs? <b>{tip.drugSalePhoneNumber}</b></p>
             </Card.Content>
           </Card>
           <Card fluid style={style.card}>
@@ -177,6 +177,7 @@ export default class TipDetail extends Component {
           <Card fluid style={style.card}>
             <Card.Content header="6. Final" style={style.header} />
             <Card.Content>
+              <p>How are you aware of this crime? <b>{tip.tipsterAwareOfCrimeMethod}</b></p>
               <p>How did you find out about online crime tips? <b>{tip.tipsterWebsiteDiscoveryMethod}</b></p>
               <p>I want to be contacted by the police. <b>{tip.tipsterWantsToBeContacted}</b></p>
               <p>Please provide contact tip. <b>{tip.tipsterContacttip}</b></p>
