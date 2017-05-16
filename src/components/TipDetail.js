@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types';
-import { Card, Form, Button } from 'semantic-ui-react'
+import { Card, Form, Button, Confirm } from 'semantic-ui-react'
 import _ from 'underscore'
 import moment from 'moment'
 import { tipTimeFormatLong } from '../helpers/helpers'
@@ -10,7 +10,8 @@ export default class TipDetail extends Component {
   state = {
     uid: firebaseApp.auth().currentUser.uid,
     tip: {},
-    noteAuthors: {}
+    noteAuthors: {},
+    open: false
   }
 
   componentWillMount = () => {
@@ -62,6 +63,7 @@ export default class TipDetail extends Component {
       deleted: true,
       deleted_timestamp: Date.now()
     })
+    this.setState({ open: false })
   }
 
   displayUserNotes = (userNotes) => {
@@ -84,7 +86,12 @@ export default class TipDetail extends Component {
             ? <Card.Content style={style.actions}>
                 <Button 
                   content="Delete" 
-                  onClick={() => this.deleteUserNote(key)} 
+                  onClick={() => this.setState({ open: true })} 
+                />
+                <Confirm
+                  open={this.state.open}
+                  onCancel={() => this.setState({ open: false })}
+                  onConfirm={() => this.deleteUserNote(key)}
                 />
               </Card.Content>
             : null
@@ -201,6 +208,9 @@ export default class TipDetail extends Component {
             </Card.Content>
           </Card>
           <Card.Content>
+            <Button content="Archive" />
+            <Button content="Email" />
+            <Button content="Save as PDF" />
           </Card.Content>
         </Card>
       </div>
