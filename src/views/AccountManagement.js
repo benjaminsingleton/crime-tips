@@ -160,8 +160,91 @@ class EditUser extends Component {
   render() {
     return (
       <Segment>
-        <Form onSubmit={(e) => this.saveChanges(e)}>
-          <Form.Button content='Save Changes' color='violet' />
+        <Form 
+          success={this.state.success} 
+          error={this.state.error} 
+          onSubmit={(e) => this.saveChanges(e)}>
+          <Grid stackable columns={3}>
+            <Grid.Row>
+              <Grid.Column width={16}>
+                <Message
+                  error
+                  content={this.state.message}
+                />
+                <Message
+                  success
+                  content={this.state.message}
+                />
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row>
+              <Grid.Column>
+                <Form.Input
+                  label='Rank'
+                  name='rank'
+                  value={this.state.rank}
+                  onChange={this.handleInputChange} 
+                />
+              </Grid.Column>
+              <Grid.Column>
+                <Form.Input
+                  label='First name'
+                  name='firstName'
+                  value={this.state.firstName}
+                  onChange={this.handleInputChange} 
+                />
+              </Grid.Column>
+              <Grid.Column>
+                <Form.Input
+                  label='Last name'
+                  name='lastName'
+                  value={this.state.lastName}
+                  onChange={this.handleInputChange} 
+                />
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row>
+              <Grid.Column>
+                <Form.Input
+                  label='Email'
+                  name='email'
+                  value={this.state.email}
+                  type="email"
+                  onChange={this.handleInputChange} 
+                />
+              </Grid.Column>
+              <Grid.Column>
+                <Form.Checkbox
+                  label='Admin?'
+                  name='admin'
+                  checked={this.state.admin}
+                  onChange={() => this.handleCheckChange()}
+                />
+                <Form.Checkbox
+                  label='Notifications?'
+                  name='notifications'
+                  checked={this.state.admin}
+                  onChange={() => this.handleCheckChange()}
+                />
+                <Form.Checkbox
+                  label='Acount active?'
+                  name='accountActive'
+                  checked={this.state.admin}
+                  onChange={() => this.handleCheckChange()}
+                />
+              </Grid.Column>
+              <Grid.Column>
+                <Form.Button content="Reset Password" />
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row>
+              <Grid.Column />
+              <Grid.Column />
+              <Grid.Column textAlign='right'>
+                <Form.Button content="Save Changes" color='violet' />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
         </Form>
       </Segment>
     )
