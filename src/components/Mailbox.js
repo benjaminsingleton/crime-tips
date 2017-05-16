@@ -162,7 +162,7 @@ export default class Mailbox extends Component {
         </Table.Cell>
         <Table.Cell width={1}>
           {tips[key].important ?
-              <Icon name='star' onClick={() => this.markTipAs(key, 'important')} /> 
+              <Icon name='star' color='yellow' onClick={() => this.markTipAs(key, 'important')} /> 
             : <Icon name='empty star' disabled onClick={() => this.markTipAs(key, 'important')} />
             }
           {tips[key].tipType === 'web' ?
@@ -201,7 +201,6 @@ export default class Mailbox extends Component {
             />
           </form>
           <Button icon='archive' style={{float: 'right', margin: '0 20px'}}  onClick={() => this.markSelectedTipsAs('archived')} />
-          <Button icon='star' style={{float: 'right'}}  onClick={() => this.markSelectedTipsAs('important')} />
           <div style={{clear: 'both'}}></div>
         </Card.Content>
         <Card.Content>
