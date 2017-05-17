@@ -140,9 +140,23 @@ class CreateUser extends Component {
 }
 
 class EditUser extends Component {
-  state ={
+  state = {
     error: false,
-    success: false
+    success: false,
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.user !== this.props.user) {
+      this.setState({
+        rank: nextProps.user.rank,
+        firstName: nextProps.user.firstName,
+        lastName: nextProps.user.lastName,
+        email: nextProps.user.email,
+        admin: nextProps.user.admin,
+        notifications: nextProps.user.notifications,
+        accountActive: nextProps.user.accountActive
+      })
+    }
   }
 
   handleInputChange = (e, { name, value }) => this.setState({[name]: value})
@@ -152,8 +166,43 @@ class EditUser extends Component {
     this.setState({ admin })
   }
 
+  resetPassword = () => {
+    firebaseApp.auth().sendPasswordResetEmail(this.state.email).then(() => {
+      this.setState({ success: true, error: false })
+    }, (error) => {
+      this.setState({ error: true, success: false })
+    });
+  }
+
   saveChanges = (e) => {
     e.preventDefault()
+    const userData = {
+      'rank': this.state.rank,
+      'firstName': this.state.firstName,
+      'lastName': this.state.lastName,
+      'email': this.state.email,
+      'admin': this.state.admin,
+      'notifications': this.state.notifications,
+      'accountActive': this.state.accountActive,
+    }
+    firebaseApp.database().ref(`users/${this.props.uid}`).update({...userData})
+      .then(() => {
+        this.setState({
+          rank: '',
+          firstName: '',
+          lastName: '',
+          email: '',
+          admin: false,
+          notifications: false,
+          accountActive: false,
+          success: true,
+          message: 'Account successfully created.',
+          error: false
+        })
+      })
+      .catch((error) => {
+        this.setState({ error: true, message: error.message })
+      })
     this.setState({ showEditUser: false })
   }
 
@@ -223,13 +272,13 @@ class EditUser extends Component {
                 <Form.Checkbox
                   label='Notifications?'
                   name='notifications'
-                  checked={this.state.admin}
+                  checked={this.state.notifications}
                   onChange={() => this.handleCheckChange()}
                 />
                 <Form.Checkbox
                   label='Acount active?'
                   name='accountActive'
-                  checked={this.state.admin}
+                  checked={this.state.accountActive}
                   onChange={() => this.handleCheckChange()}
                 />
               </Grid.Column>
