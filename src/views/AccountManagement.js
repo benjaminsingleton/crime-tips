@@ -3,8 +3,6 @@ import { Grid, Card, Segment, Form, Button, Table, Message } from 'semantic-ui-r
 import Layout from '../components/Layout'
 import { firebaseApp } from '../helpers/firebase'
 
-// neha comment
-
 class CreateUser extends Component {
   state = {
     success: false,
