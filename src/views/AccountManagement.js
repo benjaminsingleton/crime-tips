@@ -140,23 +140,30 @@ class CreateUser extends Component {
 }
 
 class EditUser extends Component {
-  state = {
-    error: false,
-    success: false,
+  constructor(props) {
+    super(props)
+    this.state = {
+      error: false,
+      rank: props.user.rank,
+      firstName: props.user.firstName,
+      lastName: props.user.lastName,
+      email: props.user.email,
+      admin: props.user.admin,
+      notifications: props.user.notifications,
+      accountActive: props.user.accountActive
+    }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.user !== this.props.user) {
-      this.setState({
-        rank: nextProps.user.rank,
-        firstName: nextProps.user.firstName,
-        lastName: nextProps.user.lastName,
-        email: nextProps.user.email,
-        admin: nextProps.user.admin,
-        notifications: nextProps.user.notifications,
-        accountActive: nextProps.user.accountActive
-      })
-    }
+    this.setState({
+      rank: nextProps.user.rank,
+      firstName: nextProps.user.firstName,
+      lastName: nextProps.user.lastName,
+      email: nextProps.user.email,
+      admin: nextProps.user.admin,
+      notifications: nextProps.user.notifications,
+      accountActive: nextProps.user.accountActive
+    })
   }
 
   handleInputChange = (e, { name, value }) => this.setState({[name]: value})
@@ -195,22 +202,18 @@ class EditUser extends Component {
           admin: false,
           notifications: false,
           accountActive: false,
-          success: true,
-          message: 'Account successfully created.',
-          error: false
         })
       })
       .catch((error) => {
         this.setState({ error: true, message: error.message })
       })
-    this.setState({ showEditUser: false })
+    this.props.toggle('showEditUser')
   }
 
   render() {
     return (
       <Segment>
         <Form 
-          success={this.state.success} 
           error={this.state.error} 
           onSubmit={(e) => this.saveChanges(e)}>
           <Grid stackable columns={3}>
@@ -218,10 +221,6 @@ class EditUser extends Component {
               <Grid.Column width={16}>
                 <Message
                   error
-                  content={this.state.message}
-                />
-                <Message
-                  success
                   content={this.state.message}
                 />
               </Grid.Column>
@@ -288,7 +287,9 @@ class EditUser extends Component {
             </Grid.Row>
             <Grid.Row>
               <Grid.Column />
-              <Grid.Column />
+              <Grid.Column>
+                <Form.Button content='Cancel' onClick={(e) => {e.preventDefault(); this.props.toggle('showEditUser')}} />
+              </Grid.Column>
               <Grid.Column textAlign='right'>
                 <Form.Button content="Save Changes" color='violet' />
               </Grid.Column>
@@ -300,12 +301,11 @@ class EditUser extends Component {
   }
 }
 
-
 export default class AccountManagement extends Component {
   state = {
     users: {},
     showCreateUser: true,
-    showEditUser: true,  // change to false
+    showEditUser: false,
     editUserId: null
   }
 
@@ -319,6 +319,8 @@ export default class AccountManagement extends Component {
   componentWillUnmount = () => firebaseApp.database().ref('users').off();
 
   editUser = (editUserId) => this.setState({ editUserId, showEditUser: true })
+
+  toggle = (toToggle) => this.setState({ [toToggle]: !this.state[toToggle] })
 
   makeUserRows = (userId) => {
     const user = this.state.users[userId]
@@ -347,8 +349,14 @@ export default class AccountManagement extends Component {
               <Card fluid>
                 <Card.Content header="Account Management" />
                 <Card.Content>
-                  {this.state.showCreateUser ? <CreateUser /> : null}
-                  {this.state.showEditUser ? <EditUser user={this.state.users[this.state.editUserId]} /> : null}
+                  {this.state.showCreateUser ? <CreateUser toggle={this.toggle} /> : null}
+                  {this.state.showEditUser ? 
+                    <EditUser 
+                      uid={this.state.editUserId}
+                      user={this.state.users[this.state.editUserId]} 
+                      toggle={this.toggle} 
+                    />
+                    : null}
                   <Table>
                     <Table.Header>
                       <Table.Row>
