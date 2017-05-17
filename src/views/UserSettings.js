@@ -5,7 +5,7 @@ import Layout from '../components/Layout'
 import { firebaseApp } from '../helpers/firebase'
 import { relativeTime, reverse } from '../helpers/helpers'
 
-// neha
+// neha comment
 
 export default class UserSettings extends Component {
   state = {
