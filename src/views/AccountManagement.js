@@ -6,18 +6,34 @@ import { firebaseApp } from '../helpers/firebase'
 class CreateUser extends Component {
   state = {
     success: false,
-    error: false
+    error: false,
+    rank: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    admin: false
   }
 
   handleInputChange = (e, { name, value }) => this.setState({[name]: value})
 
   handleCheckChange = () => {
-    const admin = this.state.admin ? !this.state.admin : true
+    const admin = !this.state.admin
     this.setState({ admin })
   }
 
   createUser = (e) => {
     e.preventDefault()
+    if (this.state.rank === '' || this.state.firstName === '' || this.state.lastName === '' || 
+        this.state.email === '' || this.state.password === '') {
+      this.setState({ 
+        error: true, 
+        header: 'Error!',
+        message: 'None of the following fields can be blank: Rank, First Name, Last Name, Email and Password.' 
+      })
+      return null
+    }
+
     firebaseApp.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
       .then((user) => {
           const userData = {
@@ -40,14 +56,24 @@ class CreateUser extends Component {
                 password: '',
                 success: true,
                 message: 'Account successfully created.',
+                header: 'Success!',
                 error: false
               })
             })
-            .catch((error) => this.setState({ error: true, message: error.message }));
+            .catch((error) => {
+              this.setState({ 
+                error: true,
+                header: 'Error', 
+                message: error.message 
+              })
+            });
       })
       .catch((error) => {
-        console.error('error')
-        this.setState({ error: true, message: error.message })
+        this.setState({ 
+          error: true,
+          header: 'Error!',
+          message: error.message 
+        })
       });
   }
 
@@ -61,10 +87,6 @@ class CreateUser extends Component {
           <Grid stackable columns={3}>
             <Grid.Row>
               <Grid.Column width={16}>
-                <Message
-                  error
-                  content={this.state.message}
-                />
                 <Message
                   success
                   content={this.state.message}
@@ -126,6 +148,15 @@ class CreateUser extends Component {
               </Grid.Column>
             </Grid.Row>
             <Grid.Row>
+              <Grid.Column width={16}>
+                <Message
+                  error
+                  header={this.state.header}
+                  content={this.state.message}
+                />
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row>
               <Grid.Column />
               <Grid.Column />
               <Grid.Column textAlign='right'>
@@ -173,9 +204,18 @@ class EditUser extends Component {
     this.setState({ admin })
   }
 
-  resetPassword = () => {
+  resetPassword = (e) => {
+    e.preventDefault()
+    if (this.state.email === '') {
+      this.setState({ 
+        error: true,
+        header: 'Error!',
+        message: 'In order to reset the password, the email field cannot be blank.' 
+      })
+      return null
+    }
     firebaseApp.auth().sendPasswordResetEmail(this.state.email).then(() => {
-      this.setState({ success: true, error: false })
+      this.setState({ error: false })
     }, (error) => {
       this.setState({ error: true, success: false })
     });
@@ -183,6 +223,16 @@ class EditUser extends Component {
 
   saveChanges = (e) => {
     e.preventDefault()
+
+    if (this.state.rank === '' || this.state.firstName === '' || this.state.lastName === '' || this.state.email === '') {
+      this.setState({ 
+        error: true, 
+        header: 'Error!',
+        message: 'None of the following fields can be blank: Rank, First Name, Last Name and Email.' 
+      })
+      return null
+    }
+
     const userData = {
       'rank': this.state.rank,
       'firstName': this.state.firstName,
@@ -218,14 +268,6 @@ class EditUser extends Component {
           onSubmit={(e) => this.saveChanges(e)}>
           <Grid stackable columns={3}>
             <Grid.Row>
-              <Grid.Column width={16}>
-                <Message
-                  error
-                  content={this.state.message}
-                />
-              </Grid.Column>
-            </Grid.Row>
-            <Grid.Row>
               <Grid.Column>
                 <Form.Input
                   label='Rank'
@@ -260,6 +302,7 @@ class EditUser extends Component {
                   type="email"
                   onChange={this.handleInputChange} 
                 />
+                 <Form.Button size='small' content="Reset Password" onClick={(e) => this.resetPassword(e)}/>
               </Grid.Column>
               <Grid.Column>
                 <Form.Checkbox
@@ -274,24 +317,32 @@ class EditUser extends Component {
                   checked={this.state.notifications}
                   onChange={() => this.handleCheckChange()}
                 />
-                <Form.Checkbox
-                  label='Acount active?'
-                  name='accountActive'
-                  checked={this.state.accountActive}
-                  onChange={() => this.handleCheckChange()}
-                />
               </Grid.Column>
-              <Grid.Column>
-                <Form.Button content="Reset Password" />
+                <Form.Checkbox
+                    label='Acount active?'
+                    name='accountActive'
+                    checked={this.state.accountActive}
+                    onChange={() => this.handleCheckChange()}
+                  />
+              <Grid.Column />
+            </Grid.Row>
+            <Grid.Row>
+              <Grid.Column width={16}>
+                <Message
+                  error
+                  header={this.state.header}
+                  content={this.state.message}
+                />
               </Grid.Column>
             </Grid.Row>
             <Grid.Row>
               <Grid.Column />
-              <Grid.Column>
-                <Form.Button content='Cancel' onClick={(e) => {e.preventDefault(); this.props.toggle('showEditUser')}} />
-              </Grid.Column>
+              <Grid.Column />
               <Grid.Column textAlign='right'>
-                <Form.Button content="Save Changes" color='violet' />
+                <Form.Group>
+                  <Form.Button content='Cancel' onClick={(e) => {e.preventDefault(); this.props.toggle('showEditUser')}} width={8} />
+                  <Form.Button content="Save" color='violet' width={8} />
+                </Form.Group>
               </Grid.Column>
             </Grid.Row>
           </Grid>
