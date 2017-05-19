@@ -357,7 +357,7 @@ export default class AccountManagement extends Component {
                       toggle={this.toggle} 
                     />
                     : null}
-                  <Table>
+                  <Table style={{display: 'inline-block', overflowX: 'scroll'}}>
                     <Table.Header>
                       <Table.Row>
                         <Table.HeaderCell>Rank</Table.HeaderCell>
