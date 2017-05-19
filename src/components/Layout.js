@@ -1,14 +1,16 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import Navigation from '../components/Navigation';
 
-import Navigation from '../components/Navigation'
-
-const Layout = (props) => {
-  return (
-    <div>
-      <Navigation /> 
-      {props.children}
-    </div>
+const Layout = props => (
+  <div>
+    <Navigation />
+    {props.children}
+  </div>
   );
-}
+
+Layout.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 export default Layout;
