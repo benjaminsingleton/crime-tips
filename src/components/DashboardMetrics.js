@@ -1,22 +1,22 @@
-import React, {Component} from 'react'
-import { Grid, Card } from 'semantic-ui-react'
-import { firebaseApp } from '../helpers/firebase'
-import { oneDayAgoDate, getMonthAndDay } from '../helpers/helpers'
+import React, { Component } from 'react';
+import { Grid, Card } from 'semantic-ui-react';
+import { firebaseApp } from '../helpers/firebase';
+import { oneDayAgoDate, getMonthAndDay } from '../helpers/helpers';
 
 export default class DashboardMetrics extends Component {
   state = {
     metrics: {
-        unreadTips: null,
-        tipsReceivedLast24Hours: null,
-        tipsReceivedYTD: null,
-        unreadAbandonedTips: null,
-    }
+      unreadTips: null,
+      tipsReceivedLast24Hours: null,
+      tipsReceivedYTD: null,
+      unreadAbandonedTips: null,
+    },
   }
 
   componentWillMount = () => {
     firebaseApp.database().ref('metrics').on('value', (snapshot) => {
-        const metrics = snapshot.val()
-        this.setState({metrics})
+      const metrics = snapshot.val();
+      this.setState({ metrics });
     });
   }
 
@@ -24,24 +24,24 @@ export default class DashboardMetrics extends Component {
 
   render() {
     const style = {
-      row: {margin: '4px'},
+      row: { margin: '4px' },
       title: {
         fontSize: '16px',
-        lineHeight: '24px'
+        lineHeight: '24px',
       },
-      metric: {fontSize: '24px'},
+      metric: { fontSize: '24px' },
       detail: {
         fontSize: '12px',
         color: 'rgb(117, 117, 117)',
-        marginTop: '8px'
-      }
-    }
+        marginTop: '8px',
+      },
+    };
     return (
       <Grid columns={4} stackable doubling>
         <Grid.Row>
           <Grid.Column>
             <Card centered fluid>
-              <Card.Content header='Unread Tips' />
+              <Card.Content header="Unread Tips" />
               <Card.Content>
                 <div style={style.metric}>{this.state.metrics.unreadTips}</div>
                 <div style={style.detail}>To be reviewed</div>
@@ -50,7 +50,7 @@ export default class DashboardMetrics extends Component {
           </Grid.Column>
           <Grid.Column>
             <Card centered fluid>
-              <Card.Content header='Tips Received - 24hrs' />
+              <Card.Content header="Tips Received - 24hrs" />
               <Card.Content>
                 <div style={style.metric}>{this.state.metrics.tipsReceivedLast24Hours}</div>
                 <div style={style.detail}>Since {getMonthAndDay(oneDayAgoDate())}</div>
@@ -59,7 +59,7 @@ export default class DashboardMetrics extends Component {
           </Grid.Column>
           <Grid.Column>
             <Card centered fluid>
-              <Card.Content header='Tips Received - YTD' />
+              <Card.Content header="Tips Received - YTD" />
               <Card.Content>
                 <div style={style.metric}>{this.state.metrics.tipsReceivedYTD}</div>
                 <div style={style.detail}>Since January 1</div>
@@ -68,7 +68,7 @@ export default class DashboardMetrics extends Component {
           </Grid.Column>
           <Grid.Column>
             <Card centered fluid>
-              <Card.Content header='Abandoned Tips - YTD' />
+              <Card.Content header="Abandoned Tips - YTD" />
               <Card.Content>
                 <div style={style.metric}>{this.state.metrics.unreadAbandonedTips}</div>
                 <div style={style.detail}>Never completed</div>
@@ -77,6 +77,6 @@ export default class DashboardMetrics extends Component {
           </Grid.Column>
         </Grid.Row>
       </Grid>
-    )
+    );
   }
 }

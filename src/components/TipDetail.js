@@ -1,115 +1,118 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Card, Form, Button, Confirm } from 'semantic-ui-react'
-import _ from 'underscore'
-import moment from 'moment'
-import { tipTimeFormatLong } from '../helpers/helpers'
-import { firebaseApp } from '../helpers/firebase'
+import { Card, Form, Button, Confirm } from 'semantic-ui-react';
+import moment from 'moment';
+import { tipTimeFormatLong } from '../helpers/helpers';
+import { firebaseApp } from '../helpers/firebase';
 
 export default class TipDetail extends Component {
   state = {
     uid: firebaseApp.auth().currentUser.uid,
     tip: {},
     noteAuthors: {},
-    open: false
+    open: false,
   }
 
   componentWillMount = () => {
     firebaseApp.database().ref(`tips/${this.props.tipDetailKey}`).on('value', (snapshot) => {
-        const tip = snapshot.val()
-        this.setState({tip})
+      const tip = snapshot.val();
+      this.setState({ tip });
     });
   }
-
-  componentWillUnmount = () => firebaseApp.database().ref(`tips/${this.props.tipDetailKey}`).off();
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.tip !== this.state.tip) {
       // get names of note authors
-      const userNotes = this.state.tip.userNotes
-      const userNoteKeys = userNotes ? Object.keys(userNotes).filter(key => !userNotes[key].deleted) : null
-      const noteAuthors = {...this.state.noteAuthors}
+      const userNotes = this.state.tip.userNotes;
+      const userNoteKeys = userNotes ?
+        Object.keys(userNotes).filter(key => !userNotes[key].deleted)
+        : null;
+      const noteAuthors = { ...this.state.noteAuthors };
 
-      if (userNoteKeys) userNoteKeys.map(key => 
+      if (userNoteKeys) {
+        userNoteKeys.map(key =>
         firebaseApp.database().ref(`users/${userNotes[key].uid}`).once('value', (snapshot) => {
-          const user = snapshot.val()
-          noteAuthors[key] = `${user.rank} ${user.firstName} ${user.lastName}`
-          this.setState({noteAuthors})
-        })
-      )
+          const user = snapshot.val();
+          noteAuthors[key] = `${user.rank} ${user.firstName} ${user.lastName}`;
+          this.setState({ noteAuthors });
+        }),
+      );
+      }
     }
   }
 
+  componentWillUnmount = () => firebaseApp.database().ref(`tips/${this.props.tipDetailKey}`).off();
+
   togglePanel = (panelNumber) => {
-    const panelDisplay = {...this.state.panelDisplay}
-    panelDisplay[panelNumber] = !panelDisplay[panelNumber]
-    this.setState({panelDisplay})
+    const panelDisplay = { ...this.state.panelDisplay };
+    panelDisplay[panelNumber] = !panelDisplay[panelNumber];
+    this.setState({ panelDisplay });
   }
 
-  handleTextChange = (event) => {this.setState({userNote: event.target.value})}
+  handleTextChange = (event) => { this.setState({ userNote: event.target.value }); }
 
   createUserNote = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     firebaseApp.database().ref(`tips/${this.props.tipDetailKey}/userNotes/`).push({
       note: this.state.userNote,
       uid: this.state.uid,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
-    this.setState({userNote: ''})
+    this.setState({ userNote: '' });
   }
 
   deleteUserNote = (userNoteKey) => {
     firebaseApp.database().ref(`tips/${this.props.tipDetailKey}/userNotes/${userNoteKey}`).update({
       deleted: true,
-      deleted_timestamp: Date.now()
-    })
-    this.setState({ open: false })
+      deleted_timestamp: Date.now(),
+    });
+    this.setState({ open: false });
   }
 
   displayUserNotes = (userNotes) => {
-    const notDeletedUserNoteKeys = Object.keys(userNotes).filter(key => !userNotes[key].deleted)
+    const notDeletedUserNoteKeys = Object.keys(userNotes).filter(key => !userNotes[key].deleted);
     const style = {
-      card: {margin: '10px'},
-      header: {backgroundColor: '#E0E0E0'},
-      actions: {textAlign: 'right'}
-    }
-    const userNotesToDisplay = notDeletedUserNoteKeys.map(key => 
-        <Card fluid style={style.card} key={key}>
-          <Card.Content 
-            header={`${this.state.noteAuthors[key]}, ${moment(new Date(userNotes[key].timestamp)).format('MMMM Do YYYY, h:mm a')}`}
-            style={style.header} 
-          />
-          <Card.Content>
-            <p>{userNotes[key].note}</p>
-          </Card.Content>
-          {(userNotes[key].uid === this.state.uid)
+      card: { margin: '10px' },
+      header: { backgroundColor: '#E0E0E0' },
+      actions: { textAlign: 'right' },
+    };
+    const userNotesToDisplay = notDeletedUserNoteKeys.map(key =>
+      (<Card fluid style={style.card} key={key}>
+        <Card.Content
+          header={`${this.state.noteAuthors[key]}, ${moment(new Date(userNotes[key].timestamp)).format('MMMM Do YYYY, h:mm a')}`}
+          style={style.header}
+        />
+        <Card.Content>
+          <p>{userNotes[key].note}</p>
+        </Card.Content>
+        {(userNotes[key].uid === this.state.uid)
             ? <Card.Content style={style.actions}>
-                <Button 
-                  content="Delete" 
-                  onClick={() => this.setState({ open: true })} 
-                />
-                <Confirm
-                  open={this.state.open}
-                  onCancel={() => this.setState({ open: false })}
-                  onConfirm={() => this.deleteUserNote(key)}
-                />
-              </Card.Content>
+              <Button
+                content="Delete"
+                onClick={() => this.setState({ open: true })}
+              />
+              <Confirm
+                open={this.state.open}
+                onCancel={() => this.setState({ open: false })}
+                onConfirm={() => this.deleteUserNote(key)}
+              />
+            </Card.Content>
             : null
           }
-        </Card>
-      )
+      </Card>),
+      );
 
-    return userNotesToDisplay
+    return userNotesToDisplay;
   }
 
   render() {
-    const tip = this.state.tip
-    const userNotes = tip.userNotes ? this.displayUserNotes(tip.userNotes) : null
+    const tip = this.state.tip;
+    const userNotes = tip.userNotes ? this.displayUserNotes(tip.userNotes) : null;
     const style = {
-      card: {margin: '10px'},
-      header: {backgroundColor: '#E0E0E0'},
-      actions: {textAlign: 'right'}
-    }
+      card: { margin: '10px' },
+      header: { backgroundColor: '#E0E0E0' },
+      actions: { textAlign: 'right' },
+    };
     return (
       <div className="col-xs-12 col-sm-8 col-md-9 col-lg-9">
         <Card fluid>
@@ -152,7 +155,9 @@ export default class TipDetail extends Component {
               <p>Social Media: <b>{tip.suspectSocialMedia}</b></p>
               <p>Does the suspect carry weapons? What kind? <b>{tip.suspectWeapon}</b></p>
               <p>Place of employment: <b>{tip.suspectWeapon}</b></p>
-              <p>Is there anything else we should know about the suspect? <b>{tip.suspectComments}</b></p>
+              <p>Is there anything else we should know about the suspect?
+                <b> {tip.suspectComments}</b>
+              </p>
             </Card.Content>
           </Card>
           <Card fluid style={style.card}>
@@ -163,7 +168,9 @@ export default class TipDetail extends Component {
               <p>Color: <b>{tip.suspectVehicleColor}</b></p>
               <p>License Plate Number: <b>{tip.suspectVehiclePlateNumber}</b></p>
               <p>Where can the vehicle usually be found? <b>{tip.suspectVehicleLocation}</b></p>
-              <p>Please note if the vehicle has any identifying marks, scratches, bumper stickers, etc. <b>{tip.suspectVehicleMarkings}</b></p>
+              <p>Please note if the vehicle has any identifying marks, scratches, stickers, etc.
+                <b> {tip.suspectVehicleMarkings}</b>
+              </p>
             </Card.Content>
           </Card>
           <Card fluid style={style.card}>
@@ -185,7 +192,9 @@ export default class TipDetail extends Component {
             <Card.Content header="6. Final" style={style.header} />
             <Card.Content>
               <p>How are you aware of this crime? <b>{tip.tipsterAwareOfCrimeMethod}</b></p>
-              <p>How did you find out about online crime tips? <b>{tip.tipsterWebsiteDiscoveryMethod}</b></p>
+              <p>How did you find out about online crime tips?
+                <b> {tip.tipsterWebsiteDiscoveryMethod}</b>
+              </p>
               <p>I want to be contacted by the police. <b>{tip.tipsterWantsToBeContacted}</b></p>
               <p>Please provide contact tip. <b>{tip.tipsterContacttip}</b></p>
             </Card.Content>
@@ -194,16 +203,16 @@ export default class TipDetail extends Component {
             <Card.Content header="** User Notes **" style={style.header} />
             <Card.Content>
               {userNotes}
-              <Form onSubmit={(e) => this.createUserNote(e)}>
-              <Form.TextArea
-                placeholder="Add new note here"
-                value={this.state.userNote}
-                onChange={this.handleTextChange}
-                style={{marginTop: '14px'}}
-              />
-              <div style={{textAlign: 'right'}}>
-                <Form.Button content="Add Note" color='violet' />
-              </div>
+              <Form onSubmit={e => this.createUserNote(e)}>
+                <Form.TextArea
+                  placeholder="Add new note here"
+                  value={this.state.userNote}
+                  onChange={this.handleTextChange}
+                  style={{ marginTop: '14px' }}
+                />
+                <div style={{ textAlign: 'right' }}>
+                  <Form.Button content="Add Note" color="violet" />
+                </div>
               </Form>
             </Card.Content>
           </Card>
@@ -214,10 +223,10 @@ export default class TipDetail extends Component {
           </Card.Content>
         </Card>
       </div>
-    )
+    );
   }
 }
 
 TipDetail.propTypes = {
-  tipDetailKey: PropTypes.string.isRequired
-}
+  tipDetailKey: PropTypes.string.isRequired,
+};
