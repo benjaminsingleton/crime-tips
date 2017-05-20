@@ -94,9 +94,8 @@ export default class Home extends Component {
               });
       firebaseApp.database().ref('metrics/unreadAbandonedTips').transaction(currentValue => currentValue + 1);
     } else if (this.state.tipKey && this.state.tip !== prevState.tip) {
-      // create an object that is the diff between the old tip and new tip for updating
-      const updated = _.omit(this.state.tip, (v, k) => prevState.tip[k] === v);
-      firebaseApp.database().ref(`abandonedTips/${this.state.tipKey}`).update({ ...updated });
+      // debounce to prevent input lag as a result of updating database
+      _.debounce(this.updateTip(this.state.tip, prevState.tip), 200);
     }
 
     if (this.state.tipKey &&
@@ -113,6 +112,12 @@ export default class Home extends Component {
   }
 
   componentWillUnmount = () => this.state.tipKey && firebaseApp.database().ref(`abandonedTips/${this.state.tipKey}`).off();
+
+  updateTip = (tipNow, tipPrev) => {
+    // creates an object that is the diff between the old tip and new tip for updating
+    const updated = _.omit(tipNow, (v, k) => tipPrev[k] === v);
+    firebaseApp.database().ref(`abandonedTips/${this.state.tipKey}`).update({ ...updated });
+  }
 
   handleInputChange = (e, { name, value }) => {
     const tip = { ...this.state.tip };
@@ -428,7 +433,6 @@ export default class Home extends Component {
 Home.propTypes = {
   match: PropTypes.shape({
     path: PropTypes.string,
-    params: PropTypes.string,
   }).isRequired,
   history: PropTypes.shape({
     push: PropTypes.func,
