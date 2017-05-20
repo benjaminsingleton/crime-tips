@@ -226,4 +226,4 @@ const language = {
   },
 };
 
-export default language;
+export { language };

@@ -208,14 +208,14 @@ const SuspectInput = props => (
           <Button
             type="button"
             content="— Remove Suspect"
-            onClick={() => props.addRemoveSuspectVehicle('props.numberOfSuspects', -1)}
+            onClick={() => props.addRemoveSuspectVehicle('numberOfSuspects', -1)}
           />
         }
         {(props.suspectNumber === props.numberOfSuspects && props.numberOfSuspects < 3) &&
           <Button
             type="button"
             content="+ Add Suspect"
-            onClick={() => props.addRemoveSuspectVehicle('props.numberOfSuspects', 1)}
+            onClick={() => props.addRemoveSuspectVehicle('numberOfSuspects', 1)}
           />
         }
       </Grid.Column>
@@ -234,13 +234,13 @@ SuspectInput.propTypes = {
 
 const TipFormSuspect = (props) => {
   const suspectInputs = [];
-  for (let i = 1; i < props.numberOfSuspects + 1; i++) {
+  for (let i = 1; i < props.tip.numberOfSuspects + 1; i++) {
     suspectInputs.push(
       <SuspectInput
         key={i}
-        props={props}
         suspectNumber={i}
-        numberOfSuspects={props.numberOfSuspects}
+        numberOfSuspects={props.tip.numberOfSuspects}
+        {...props}
       />,
     );
   }
@@ -255,7 +255,7 @@ const TipFormSuspect = (props) => {
 };
 
 TipFormSuspect.propTypes = {
-  numberOfSuspects: PropTypes.number.isRequired,
+  tip: PropTypes.object.isRequired,
 };
 
 export default TipFormSuspect;

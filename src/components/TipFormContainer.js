@@ -75,7 +75,7 @@ TipFormContainer.propTypes = {
   lang: PropTypes.object.isRequired,
   title: PropTypes.string.isRequired,
   changeFormWizardIndex: PropTypes.func.isRequired,
-  createTip: PropTypes.func.isRequired,
+  createTip: PropTypes.func,
   showFormModule: PropTypes.shape({
     suspect: PropTypes.bool,
     vehicle: PropTypes.bool,
@@ -92,6 +92,7 @@ TipFormContainer.defaultProps = {
   previousButton: false,
   nextButton: false,
   showSubmit: false,
+  createTip: null,
 };
 
 export default TipFormContainer;

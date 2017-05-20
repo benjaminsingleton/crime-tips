@@ -22,6 +22,18 @@ function PrivateRoute({ component: Component, authed, ...rest }) {
   );
 }
 
+PrivateRoute.propTypes = {
+  location: PropTypes.shape({
+    state: PropTypes.string,
+  }),
+  component: PropTypes.func.isRequired,
+  authed: PropTypes.bool.isRequired,
+};
+
+PrivateRoute.defaultProps = {
+  location: null,
+};
+
 function PublicRoute({ component: Component, authed, ...rest }) {
   return (
     <Route
@@ -34,11 +46,8 @@ function PublicRoute({ component: Component, authed, ...rest }) {
 }
 
 export default class App extends Component {
-  constructor() {
-    super();
-    this.state = {
-      authed: false,
-    };
+  state = {
+    authed: false,
   }
 
   componentWillMount() {
@@ -50,9 +59,11 @@ export default class App extends Component {
       }
     });
   }
+
   componentWillUnmount() {
     this.removeListener();
   }
+
   render() {
     const style = {
       background: '#2196F3',
@@ -89,18 +100,14 @@ export default class App extends Component {
   }
 }
 
-PrivateRoute.propTypes = {
+PublicRoute.propTypes = {
   location: PropTypes.shape({
-    state: PropTypes.string,
-  }).isRequired,
-  component: PropTypes.element.isRequired,
+    state: PropTypes.object,
+  }),
+  component: PropTypes.func.isRequired,
   authed: PropTypes.bool.isRequired,
 };
 
-PublicRoute.propTypes = {
-  location: PropTypes.shape({
-    state: PropTypes.string,
-  }).isRequired,
-  component: PropTypes.element.isRequired,
-  authed: PropTypes.bool.isRequired,
+PublicRoute.defaultProps = {
+  location: null,
 };

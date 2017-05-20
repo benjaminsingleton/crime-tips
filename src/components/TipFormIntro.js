@@ -132,8 +132,8 @@ TipFormIntro.propTypes = {
   tip: PropTypes.object.isRequired,
   lang: PropTypes.object.isRequired,
   error: PropTypes.shape({
-    tipText: PropTypes.string,
-    crimeType: PropTypes.string,
+    tipText: PropTypes.bool,
+    crimeType: PropTypes.bool,
   }).isRequired,
 };
 

@@ -82,14 +82,14 @@ const VehicleInput = props => (
           <Button
             type="button"
             content="— Remove Vehicle"
-            onClick={() => props.addRemoveSuspectVehicle('props.numberOfVehicles', -1)}
+            onClick={() => props.addRemoveSuspectVehicle('numberOfVehicles', -1)}
           />
         }
         {(props.vehicleNumber === props.numberOfVehicles && props.numberOfVehicles < 3) &&
           <Button
             type="button"
             content="+ Add Vehicle"
-            onClick={() => props.addRemoveSuspectVehicle('props.numberOfVehicles', 1)}
+            onClick={() => props.addRemoveSuspectVehicle('numberOfVehicles', 1)}
           />
         }
       </Grid.Column>
@@ -108,13 +108,13 @@ VehicleInput.propTypes = {
 
 const TipFormVehicle = (props) => {
   const vehicleInputs = [];
-  for (let i = 1; i < props.numberOfVehicles + 1; i++) {
+  for (let i = 1; i < props.tip.numberOfVehicles + 1; i++) {
     vehicleInputs.push(
       <VehicleInput
         key={i}
-        props={props}
         vehicleNumber={i}
-        numberOfVehicles={props.numberOfVehicles}
+        numberOfVehicles={props.tip.numberOfVehicles}
+        {...props}
       />);
   }
 
@@ -128,7 +128,7 @@ const TipFormVehicle = (props) => {
 };
 
 TipFormVehicle.propTypes = {
-  numberOfVehicles: PropTypes.number.isRequired,
+  tip: PropTypes.object.isRequired,
 };
 
 export default TipFormVehicle;

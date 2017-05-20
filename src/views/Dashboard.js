@@ -90,7 +90,9 @@ export default class Dashboard extends Component {
 Dashboard.propTypes = {
   match: PropTypes.shape({
     path: PropTypes.string,
-    params: PropTypes.string,
+    params: PropTypes.shape({
+      tipId: PropTypes.string,
+    }),
   }).isRequired,
   history: PropTypes.shape({
     push: PropTypes.func,
