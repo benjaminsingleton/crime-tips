@@ -9,4 +9,10 @@ const config = {
 
 const firebaseApp = firebase.initializeApp(config);
 
+export function incrementUnreadAbandonedTipsCount() {
+  firebaseApp.database().ref('metrics/unreadAbandonedTips')
+    .transaction(currentValue => currentValue + 1);
+  return null;
+}
+
 export { firebaseApp };
