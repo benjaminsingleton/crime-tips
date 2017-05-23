@@ -83,19 +83,10 @@ export default class Home extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (!this.state.tipKey &&
-        !this.state.gettingTipKey &&
-        this.state.tip.tipText && this.state.tip.tipText.length >= 20) {
-      this.setState({ gettingTipKey: true });
-      firebaseApp.database().ref('abandonedTips/').push({ ...this.state.tip })
-              .then((snap) => {
-                const tipKey = snap.key;
-                this.setState({ tipKey });
-              });
-      firebaseApp.database().ref('metrics/unreadAbandonedTips').transaction(currentValue => currentValue + 1);
-    } else if (this.state.tipKey && this.state.tip !== prevState.tip) {
-      // debounce to prevent input lag as a result of updating database
+    if (this.state.tipKey) {
       _.debounce(this.updateTip(this.state.tip, prevState.tip), 200);
+    } else if (this.state.tip.tipText.length >= 20) {
+      _.once(this.createTip());
     }
 
     if (this.state.tipKey &&
@@ -111,10 +102,17 @@ export default class Home extends Component {
     }
   }
 
-  componentWillUnmount = () => this.state.tipKey && firebaseApp.database().ref(`abandonedTips/${this.state.tipKey}`).off();
+  createTip = () => {
+    firebaseApp.database().ref('abandonedTips/').push({ ...this.state.tip })
+      .then((snap) => {
+        const tipKey = snap.key;
+        this.setState({ tipKey });
+        incrementUnreadAbandonedTipsCount();
+      });
+  }
 
   updateTip = (tipNow, tipPrev) => {
-    // creates an object that is the diff between the old tip and new tip for updating
+    //  diff between the old tip and new tip
     const updated = _.omit(tipNow, (v, k) => tipPrev[k] === v);
     firebaseApp.database().ref(`abandonedTips/${this.state.tipKey}`).update({ ...updated });
   }
