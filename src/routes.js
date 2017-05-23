@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Route, BrowserRouter, Redirect, Switch } from 'react-router-dom';
-import Login from './Login';
-import Home from './Home';
-import Dashboard from './Dashboard';
-import UserSettings from './UserSettings';
-import AccountManagement from './AccountManagement';
-import LoggedOut from './LoggedOut';
-import ForgotPassword from './ForgotPassword';
-import NoMatch from './NoMatch';
-import { firebaseApp } from '../helpers/firebase';
+import Login from './views/Login';
+import Home from './views/Home';
+import Dashboard from './views/Dashboard';
+import UserSettings from './views/UserSettings';
+import AccountManagement from './views/AccountManagement';
+import LoggedOut from './views/LoggedOut';
+import ForgotPassword from './views/ForgotPassword';
+import NoMatch from './views/NoMatch';
+import { firebaseApp } from './helpers/firebase';
 
 function PrivateRoute({ component: Component, authed, ...rest }) {
   return (
@@ -44,6 +44,18 @@ function PublicRoute({ component: Component, authed, ...rest }) {
     />
   );
 }
+
+PublicRoute.propTypes = {
+  location: PropTypes.shape({
+    state: PropTypes.object,
+  }),
+  component: PropTypes.func.isRequired,
+  authed: PropTypes.bool.isRequired,
+};
+
+PublicRoute.defaultProps = {
+  location: null,
+};
 
 export default class App extends Component {
   state = {
@@ -99,15 +111,3 @@ export default class App extends Component {
     );
   }
 }
-
-PublicRoute.propTypes = {
-  location: PropTypes.shape({
-    state: PropTypes.object,
-  }),
-  component: PropTypes.func.isRequired,
-  authed: PropTypes.bool.isRequired,
-};
-
-PublicRoute.defaultProps = {
-  location: null,
-};
