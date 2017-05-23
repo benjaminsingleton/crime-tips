@@ -1,6 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Route, BrowserRouter, Redirect, Switch } from 'react-router-dom';
+import Incident from './components/tip/Incident';
+import Suspect from './components/tip/Suspect';
+import Vehicle from './components/tip/Vehicle';
+import Drugs from './components/tip/Drugs';
+import Media from './components/tip/Media';
+import Final from './components/tip/Final';
+import Success from './components/tip/Success';
 import Login from './views/Login';
 import Home from './views/Home';
 import Dashboard from './views/Dashboard';
@@ -88,23 +95,25 @@ export default class App extends Component {
       <BrowserRouter>
         <div style={style}>
           <Switch>
-            <Route path="/" exact component={Home} />
-            <Route path="/suspect" exact component={Home} />
-            <Route path="/vehicle" exact component={Home} />
-            <Route path="/drugs" exact component={Home} />
-            <Route path="/media" exact component={Home} />
-            <Route path="/final" exact component={Home} />
-            <Route path="/success" exact component={Home} />
-            <Route path="/about" exact component={Home} />
-            <Route path="/faq" exact component={Home} />
-            <PublicRoute authed={this.state.authed} path="/login" component={Login} />
-            <PublicRoute authed={this.state.authed} path="/forgot_password" component={ForgotPassword} />
-            <PrivateRoute authed={this.state.authed} path="/dashboard" component={Dashboard} />
-            <PrivateRoute authed={this.state.authed} path="/settings" component={UserSettings} />
-            <PrivateRoute authed={this.state.authed} path="/account_management" component={AccountManagement} />
-            <PrivateRoute authed={this.state.authed} path="/tip/:tipId" component={Dashboard} />
-            <PrivateRoute authed={this.state.authed} path="/logout" component={LoggedOut} />
-            <Route component={NoMatch} />
+            <Route path="/" exact component={Layout}>
+              <Route path="/report_a_tip" exact component={Incident} />
+              <Route path="/suspect" exact component={Suspect} />
+              <Route path="/vehicle" exact component={Vehicle} />
+              <Route path="/drugs" exact component={Drugs} />
+              <Route path="/media" exact component={Media} />
+              <Route path="/final" exact component={Final} />
+              <Route path="/success" exact component={Success} />
+              <Route path="/about" exact component={About} />
+              <Route path="/faq" exact component={FAQ} />
+              <PublicRoute authed={this.state.authed} path="/login" component={Login} />
+              <PublicRoute authed={this.state.authed} path="/forgot_password" component={ForgotPassword} />
+              <PrivateRoute authed={this.state.authed} path="/dashboard" component={Dashboard} />
+              <PrivateRoute authed={this.state.authed} path="/settings" component={UserSettings} />
+              <PrivateRoute authed={this.state.authed} path="/account_management" component={AccountManagement} />
+              <PrivateRoute authed={this.state.authed} path="/tip/:tipId" component={Dashboard} />
+              <PrivateRoute authed={this.state.authed} path="/logout" component={LoggedOut} />
+              <Route component={NoMatch} />
+            </Route>
           </Switch>
         </div>
       </BrowserRouter>

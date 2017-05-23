@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Form } from 'semantic-ui-react';
 import { drugTypeOptions, drugSaleMethodOptions } from '../helpers/formOptions';
 
-const TipFormDrugs = props => (
+const Drugs = props => (
   <Form>
     <Form.Select
       label={props.lang.drugType.label}
@@ -38,10 +38,10 @@ const TipFormDrugs = props => (
   </Form>
 );
 
-TipFormDrugs.propTypes = {
+Drugs.propTypes = {
   handleInputChange: PropTypes.func.isRequired,
   lang: PropTypes.object.isRequired,
   tip: PropTypes.object.isRequired,
 };
 
-export default TipFormDrugs;
+export default Drugs;

@@ -232,7 +232,7 @@ SuspectInput.propTypes = {
   addRemoveSuspectVehicle: PropTypes.func.isRequired,
 };
 
-const TipFormSuspect = (props) => {
+const Suspect = (props) => {
   const suspectInputs = [];
   for (let i = 1; i < props.tip.numberOfSuspects + 1; i++) {
     suspectInputs.push(
@@ -254,8 +254,8 @@ const TipFormSuspect = (props) => {
   );
 };
 
-TipFormSuspect.propTypes = {
+Suspect.propTypes = {
   tip: PropTypes.object.isRequired,
 };
 
-export default TipFormSuspect;
+export default Suspect;

@@ -6,7 +6,7 @@ import {
   websiteDiscoveryMethodOptions,
 } from '../helpers/formOptions';
 
-const TipFormConclusion = props => (
+const Final = props => (
   <Form>
     <Grid stackable columns={2}>
       <Grid.Row>
@@ -56,11 +56,11 @@ const TipFormConclusion = props => (
   </Form>
   );
 
-TipFormConclusion.propTypes = {
+Final.propTypes = {
   handleInputChange: PropTypes.func.isRequired,
   handleCheckChange: PropTypes.func.isRequired,
   tip: PropTypes.object.isRequired,
   lang: PropTypes.object.isRequired,
 };
 
-export default TipFormConclusion;
+export default Final;

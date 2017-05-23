@@ -2,14 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Card, Button, Container, Breadcrumb, Icon } from 'semantic-ui-react';
 
-const TipFormContainer = props => (
+const FormContainer = props => (
   <Card centered fluid style={{ marginBottom: '14px' }}>
     <Card.Content header={props.title} meta={props.lang.cardSubtitle} />
     <Card.Content>
       <Container textAlign="center">
         <Breadcrumb>
-          <Breadcrumb.Section active={props.activeModule === 'intro'}>
-            <Icon disabled={props.activeModule !== 'intro'} name="marker" />{props.lang.incident}
+          <Breadcrumb.Section active={props.activeModule === 'incident'}>
+            <Icon disabled={props.activeModule !== 'incident'} name="marker" />{props.lang.incident}
           </Breadcrumb.Section>
           <Breadcrumb.Divider icon="right arrow" />
           {props.showFormModule.suspect === true &&
@@ -70,7 +70,7 @@ const TipFormContainer = props => (
   </Card>
 );
 
-TipFormContainer.propTypes = {
+FormContainer.propTypes = {
   activeModule: PropTypes.string.isRequired,
   lang: PropTypes.object.isRequired,
   title: PropTypes.string.isRequired,
@@ -88,11 +88,11 @@ TipFormContainer.propTypes = {
   showSubmit: PropTypes.bool,
 };
 
-TipFormContainer.defaultProps = {
+FormContainer.defaultProps = {
   previousButton: false,
   nextButton: false,
   showSubmit: false,
   createTip: null,
 };
 
-export default TipFormContainer;
+export default FormContainer;

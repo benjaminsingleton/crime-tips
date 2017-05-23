@@ -106,7 +106,7 @@ VehicleInput.propTypes = {
   addRemoveSuspectVehicle: PropTypes.func.isRequired,
 };
 
-const TipFormVehicle = (props) => {
+const Vehicle = (props) => {
   const vehicleInputs = [];
   for (let i = 1; i < props.tip.numberOfVehicles + 1; i++) {
     vehicleInputs.push(
@@ -127,8 +127,8 @@ const TipFormVehicle = (props) => {
   );
 };
 
-TipFormVehicle.propTypes = {
+Vehicle.propTypes = {
   tip: PropTypes.object.isRequired,
 };
 
-export default TipFormVehicle;
+export default Vehicle;

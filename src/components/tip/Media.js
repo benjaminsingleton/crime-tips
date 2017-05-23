@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Form, Input, Button, Segment, Progress } from 'semantic-ui-react';
 import { firebaseApp } from '../helpers/firebase';
 
-export default class TipFormMedia extends Component {
+export default class Media extends Component {
   state = {
     uploadPercent: 0,
     filename: '',
@@ -115,7 +115,7 @@ export default class TipFormMedia extends Component {
   }
 }
 
-TipFormMedia.propTypes = {
+Media.propTypes = {
   tip: PropTypes.object.isRequired,
   tipKey: PropTypes.string.isRequired,
   lang: PropTypes.object.isRequired,
