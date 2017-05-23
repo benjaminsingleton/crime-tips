@@ -12,7 +12,7 @@ import TipFormMedia from '../components/TipFormMedia';
 import TipFormConclusion from '../components/TipFormConclusion';
 import About from '../views/About';
 import FAQ from '../views/FAQ';
-import { firebaseApp } from '../helpers/firebase';
+import { firebaseApp, incrementUnreadAbandonedTipsCount } from '../helpers/firebase';
 import { language } from '../helpers/languages';
 
 export default class Home extends Component {
