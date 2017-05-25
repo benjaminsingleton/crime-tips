@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Grid, Card, Segment, Form, Button, Table, Message } from 'semantic-ui-react';
-import Layout from '../components/Layout'
-import { firebaseApp } from '../helpers/firebase'
+import Layout from '../components/Layout';
+import { firebaseApp } from '../helpers/firebase';
 
 class CreateUser extends Component {
   state = {
@@ -15,7 +16,7 @@ class CreateUser extends Component {
     admin: false
   }
 
-  handleInputChange = (e, { name, value }) => this.setState({[name]: value})
+  handleInputChange = (e, { name, value }) => this.setState({ [name]: value })
 
   handleCheckChange = () => {
     const admin = !this.state.admin
@@ -31,21 +32,21 @@ class CreateUser extends Component {
         header: 'Error!',
         message: 'None of the following fields can be blank: Rank, First Name, Last Name, Email and Password.' 
       })
-      return null
+      return;
     }
 
     firebaseApp.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
       .then((user) => {
-          const userData = {
-            'rank': this.state.rank,
-            'firstName': this.state.firstName,
-            'lastName': this.state.lastName,
-            'email': this.state.email,
-            'admin': this.state.admin,
-            'notifications': true,
-            'accountActive': true,
-          }
-          firebaseApp.database().ref(`users/${user.uid}`).update({...userData})
+        const userData = {
+          rank: this.state.rank,
+          firstName: this.state.firstName,
+          lastName: this.state.lastName,
+          email: this.state.email,
+          admin: this.state.admin,
+          notifications: true,
+          accountActive: true,
+        };
+        firebaseApp.database().ref(`users/${user.uid}`).update({ ...userData })
             .then(() => {
               this.setState({
                 rank: '',
@@ -80,10 +81,11 @@ class CreateUser extends Component {
   render() {
     return (
       <Segment>
-        <Form 
-          success={this.state.success} 
-          error={this.state.error} 
-          onSubmit={(e) => this.createUser(e)}>
+        <Form
+          success={this.state.success}
+          error={this.state.error}
+          onSubmit={e => this.createUser(e)}
+        >
           <Grid stackable columns={3}>
             <Grid.Row>
               <Grid.Column width={16}>
@@ -96,52 +98,52 @@ class CreateUser extends Component {
             <Grid.Row>
               <Grid.Column>
                 <Form.Input
-                  label='Rank'
-                  name='rank'
+                  label="Rank"
+                  name="rank"
                   value={this.state.rank}
-                  onChange={this.handleInputChange} 
+                  onChange={this.handleInputChange}
                 />
               </Grid.Column>
               <Grid.Column>
                 <Form.Input
-                  label='First name'
-                  name='firstName'
+                  label="First name"
+                  name="firstName"
                   value={this.state.firstName}
-                  onChange={this.handleInputChange} 
+                  onChange={this.handleInputChange}
                 />
               </Grid.Column>
               <Grid.Column>
                 <Form.Input
-                  label='Last name'
-                  name='lastName'
+                  label="Last name"
+                  name="lastName"
                   value={this.state.lastName}
-                  onChange={this.handleInputChange} 
+                  onChange={this.handleInputChange}
                 />
               </Grid.Column>
             </Grid.Row>
             <Grid.Row>
               <Grid.Column>
                 <Form.Input
-                  label='Email'
-                  name='email'
+                  label="Email"
+                  name="email"
                   value={this.state.email}
                   type="email"
-                  onChange={this.handleInputChange} 
+                  onChange={this.handleInputChange}
                 />
               </Grid.Column>
               <Grid.Column>
                 <Form.Input
-                  label='Password'
-                  name='password'
+                  label="Password"
+                  name="password"
                   value={this.state.password}
                   type="password"
-                  onChange={this.handleInputChange} 
+                  onChange={this.handleInputChange}
                 />
               </Grid.Column>
               <Grid.Column>
                 <Form.Checkbox
-                  label='Admin?'
-                  name='admin'
+                  label="Admin?"
+                  name="admin"
                   checked={this.state.admin}
                   onChange={() => this.handleCheckChange()}
                 />
@@ -159,20 +161,20 @@ class CreateUser extends Component {
             <Grid.Row>
               <Grid.Column />
               <Grid.Column />
-              <Grid.Column textAlign='right'>
-                <Form.Button content="Create User" color='violet' />
+              <Grid.Column textAlign="right">
+                <Form.Button content="Create User" color="violet" />
               </Grid.Column>
             </Grid.Row>
           </Grid>
         </Form>
       </Segment>
-    )
+    );
   }
 }
 
 class EditUser extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       error: false,
       rank: props.user.rank,
@@ -181,8 +183,8 @@ class EditUser extends Component {
       email: props.user.email,
       admin: props.user.admin,
       notifications: props.user.notifications,
-      accountActive: props.user.accountActive
-    }
+      accountActive: props.user.accountActive,
+    };
   }
 
   componentWillReceiveProps(nextProps) {
@@ -193,15 +195,15 @@ class EditUser extends Component {
       email: nextProps.user.email,
       admin: nextProps.user.admin,
       notifications: nextProps.user.notifications,
-      accountActive: nextProps.user.accountActive
-    })
+      accountActive: nextProps.user.accountActive,
+    });
   }
 
-  handleInputChange = (e, { name, value }) => this.setState({[name]: value})
+  handleInputChange = (e, { name, value }) => this.setState({ [name]: value })
 
   handleCheckChange = () => {
-    const admin = this.state.admin ? !this.state.admin : true
-    this.setState({ admin })
+    const admin = this.state.admin ? !this.state.admin : true;
+    this.setState({ admin });
   }
 
   resetPassword = (e) => {
@@ -217,7 +219,7 @@ class EditUser extends Component {
     firebaseApp.auth().sendPasswordResetEmail(this.state.email).then(() => {
       this.setState({ error: false })
     }, (error) => {
-      this.setState({ error: true, success: false })
+      this.setState({ error: true, success: false, message: error.message });
     });
   }
 
@@ -234,15 +236,15 @@ class EditUser extends Component {
     }
 
     const userData = {
-      'rank': this.state.rank,
-      'firstName': this.state.firstName,
-      'lastName': this.state.lastName,
-      'email': this.state.email,
-      'admin': this.state.admin,
-      'notifications': this.state.notifications,
-      'accountActive': this.state.accountActive,
-    }
-    firebaseApp.database().ref(`users/${this.props.uid}`).update({...userData})
+      rank: this.state.rank,
+      firstName: this.state.firstName,
+      lastName: this.state.lastName,
+      email: this.state.email,
+      admin: this.state.admin,
+      notifications: this.state.notifications,
+      accountActive: this.state.accountActive,
+    };
+    firebaseApp.database().ref(`users/${this.props.uid}`).update({ ...userData })
       .then(() => {
         this.setState({
           rank: '',
@@ -252,68 +254,69 @@ class EditUser extends Component {
           admin: false,
           notifications: false,
           accountActive: false,
-        })
+        });
       })
       .catch((error) => {
-        this.setState({ error: true, message: error.message })
-      })
-    this.props.toggle('showEditUser')
+        this.setState({ error: true, message: error.message });
+      });
+    this.props.toggle('showEditUser');
   }
 
   render() {
     return (
       <Segment>
-        <Form 
-          error={this.state.error} 
-          onSubmit={(e) => this.saveChanges(e)}>
+        <Form
+          error={this.state.error}
+          onSubmit={e => this.saveChanges(e)}
+        >
           <Grid stackable columns={3}>
             <Grid.Row>
               <Grid.Column>
                 <Form.Input
-                  label='Rank'
-                  name='rank'
+                  label="Rank"
+                  name="rank"
                   value={this.state.rank}
-                  onChange={this.handleInputChange} 
+                  onChange={this.handleInputChange}
                 />
               </Grid.Column>
               <Grid.Column>
                 <Form.Input
-                  label='First name'
-                  name='firstName'
+                  label="First name"
+                  name="firstName"
                   value={this.state.firstName}
-                  onChange={this.handleInputChange} 
+                  onChange={this.handleInputChange}
                 />
               </Grid.Column>
               <Grid.Column>
                 <Form.Input
-                  label='Last name'
-                  name='lastName'
+                  label="Last name"
+                  name="lastName"
                   value={this.state.lastName}
-                  onChange={this.handleInputChange} 
+                  onChange={this.handleInputChange}
                 />
               </Grid.Column>
             </Grid.Row>
             <Grid.Row>
               <Grid.Column>
                 <Form.Input
-                  label='Email'
-                  name='email'
+                  label="Email"
+                  name="email"
                   value={this.state.email}
                   type="email"
-                  onChange={this.handleInputChange} 
+                  onChange={this.handleInputChange}
                 />
                  <Form.Button size='small' content="Reset Password" onClick={(e) => this.resetPassword(e)}/>
               </Grid.Column>
               <Grid.Column>
                 <Form.Checkbox
-                  label='Admin?'
-                  name='admin'
+                  label="Admin?"
+                  name="admin"
                   checked={this.state.admin}
                   onChange={() => this.handleCheckChange()}
                 />
                 <Form.Checkbox
-                  label='Notifications?'
-                  name='notifications'
+                  label="Notifications?"
+                  name="notifications"
                   checked={this.state.notifications}
                   onChange={() => this.handleCheckChange()}
                 />
@@ -348,33 +351,47 @@ class EditUser extends Component {
           </Grid>
         </Form>
       </Segment>
-    )
+    );
   }
 }
+
+EditUser.propTypes = {
+  user: PropTypes.shape({
+    rank: PropTypes.string,
+    firstName: PropTypes.string,
+    lastName: PropTypes.string,
+    email: PropTypes.string,
+    admin: PropTypes.bool,
+    notifications: PropTypes.bool,
+    accountActive: PropTypes.bool,
+  }).isRequired,
+  toggle: PropTypes.func.isRequired,
+  uid: PropTypes.string.isRequired,
+};
 
 export default class AccountManagement extends Component {
   state = {
     users: {},
     showCreateUser: true,
     showEditUser: false,
-    editUserId: null
+    editUserId: null,
   }
 
   componentWillMount() {
     firebaseApp.database().ref('users').on('value', (snapshot) => {
-        const users = snapshot.val()
-        this.setState({ users })
+      const users = snapshot.val();
+      this.setState({ users });
     });
   }
 
   componentWillUnmount = () => firebaseApp.database().ref('users').off();
 
-  editUser = (editUserId) => this.setState({ editUserId, showEditUser: true })
+  editUser = editUserId => this.setState({ editUserId, showEditUser: true })
 
-  toggle = (toToggle) => this.setState({ [toToggle]: !this.state[toToggle] })
+  toggle = toToggle => this.setState({ [toToggle]: !this.state[toToggle] })
 
   makeUserRows = (userId) => {
-    const user = this.state.users[userId]
+    const user = this.state.users[userId];
     return (
       <Table.Row key={userId}>
         <Table.Cell>{user.rank}</Table.Cell>
@@ -384,13 +401,13 @@ export default class AccountManagement extends Component {
         <Table.Cell>{user.admin ? 'True' : 'False'}</Table.Cell>
         <Table.Cell>{user.notifications ? 'True' : 'False'}</Table.Cell>
         <Table.Cell>{user.accountActive ? 'True' : 'False'}</Table.Cell>
-        <Table.Cell><Button content='Edit' onClick={() => this.editUser(userId)} /></Table.Cell>
+        <Table.Cell><Button content="Edit" onClick={() => this.editUser(userId)} /></Table.Cell>
       </Table.Row>
-    )
+    );
   }
 
   render() {
-    const userRows = Object.keys(this.state.users).map(userId => this.makeUserRows(userId))
+    const userRows = Object.keys(this.state.users).map(userId => this.makeUserRows(userId));
 
     return (
       <Layout>
@@ -401,14 +418,14 @@ export default class AccountManagement extends Component {
                 <Card.Content header="Account Management" />
                 <Card.Content>
                   {this.state.showCreateUser ? <CreateUser toggle={this.toggle} /> : null}
-                  {this.state.showEditUser ? 
-                    <EditUser 
+                  {this.state.showEditUser ?
+                    <EditUser
                       uid={this.state.editUserId}
-                      user={this.state.users[this.state.editUserId]} 
-                      toggle={this.toggle} 
+                      user={this.state.users[this.state.editUserId]}
+                      toggle={this.toggle}
                     />
                     : null}
-                  <Table>
+                  <Table style={{ display: 'inline-block', overflowX: 'scroll' }}>
                     <Table.Header>
                       <Table.Row>
                         <Table.HeaderCell>Rank</Table.HeaderCell>
@@ -418,7 +435,7 @@ export default class AccountManagement extends Component {
                         <Table.HeaderCell>Admin</Table.HeaderCell>
                         <Table.HeaderCell>Notifications</Table.HeaderCell>
                         <Table.HeaderCell>Account active?</Table.HeaderCell>
-                        <Table.HeaderCell></Table.HeaderCell>
+                        <Table.HeaderCell />
                       </Table.Row>
                     </Table.Header>
                     <Table.Body>
@@ -431,6 +448,6 @@ export default class AccountManagement extends Component {
           </Grid.Row>
         </Grid>
       </Layout>
-    )
+    );
   }
 }
