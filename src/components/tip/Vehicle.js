@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Form, Grid, Segment, Button } from 'semantic-ui-react';
-import { vehicleMakeOptions, vehicleColorOptions } from '../helpers/formOptions';
+import { vehicleMakeOptions, vehicleColorOptions } from '../../helpers/formOptions';
 
 const VehicleInput = props => (
   <Grid stackable columns={2}>

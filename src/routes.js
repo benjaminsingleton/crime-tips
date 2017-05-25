@@ -1,15 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Route, BrowserRouter, Redirect, Switch } from 'react-router-dom';
-import Incident from './components/tip/Incident';
-import Suspect from './components/tip/Suspect';
-import Vehicle from './components/tip/Vehicle';
-import Drugs from './components/tip/Drugs';
-import Media from './components/tip/Media';
-import Final from './components/tip/Final';
-import Success from './components/tip/Success';
+import Layout from './components/Layout';
+import About from './views/About';
+import FAQ from './views/FAQ';
+import TipContainer from './components/tip/TipContainer';
 import Login from './views/Login';
-import Home from './views/Home';
 import Dashboard from './views/Dashboard';
 import UserSettings from './views/UserSettings';
 import AccountManagement from './views/AccountManagement';
@@ -33,7 +29,10 @@ PrivateRoute.propTypes = {
   location: PropTypes.shape({
     state: PropTypes.string,
   }),
-  component: PropTypes.func.isRequired,
+  component: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.object,
+  ]).isRequired,
   authed: PropTypes.bool.isRequired,
 };
 
@@ -56,7 +55,10 @@ PublicRoute.propTypes = {
   location: PropTypes.shape({
     state: PropTypes.object,
   }),
-  component: PropTypes.func.isRequired,
+  component: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.object,
+  ]).isRequired,
   authed: PropTypes.bool.isRequired,
 };
 
@@ -94,27 +96,27 @@ export default class App extends Component {
     return (
       <BrowserRouter>
         <div style={style}>
-          <Switch>
-            <Route path="/" exact component={Layout}>
-              <Route path="/report_a_tip" exact component={Incident} />
-              <Route path="/suspect" exact component={Suspect} />
-              <Route path="/vehicle" exact component={Vehicle} />
-              <Route path="/drugs" exact component={Drugs} />
-              <Route path="/media" exact component={Media} />
-              <Route path="/final" exact component={Final} />
-              <Route path="/success" exact component={Success} />
-              <Route path="/about" exact component={About} />
-              <Route path="/faq" exact component={FAQ} />
-              <PublicRoute authed={this.state.authed} path="/login" component={Login} />
-              <PublicRoute authed={this.state.authed} path="/forgot_password" component={ForgotPassword} />
-              <PrivateRoute authed={this.state.authed} path="/dashboard" component={Dashboard} />
-              <PrivateRoute authed={this.state.authed} path="/settings" component={UserSettings} />
-              <PrivateRoute authed={this.state.authed} path="/account_management" component={AccountManagement} />
-              <PrivateRoute authed={this.state.authed} path="/tip/:tipId" component={Dashboard} />
-              <PrivateRoute authed={this.state.authed} path="/logout" component={LoggedOut} />
+          <Layout>
+            <Switch>
+              <Route exact path="/" component={TipContainer} />
+              <Route exact path="/suspect" component={TipContainer} />
+              <Route exact path="/vehicle" component={TipContainer} />
+              <Route exact path="/drugs" component={TipContainer} />
+              <Route exact path="/media" component={TipContainer} />
+              <Route exact path="/final" component={TipContainer} />
+              <Route exact path="/submitted" component={TipContainer} />
+              <Route exact path="/about" component={About} />
+              <Route exact path="/faq" component={FAQ} />
+              <PublicRoute exact authed={this.state.authed} path="/login" component={Login} />
+              <PublicRoute exact authed={this.state.authed} path="/forgot_password" component={ForgotPassword} />
+              <PrivateRoute exact authed={this.state.authed} path="/dashboard" component={Dashboard} />
+              <PrivateRoute exact authed={this.state.authed} path="/settings" component={UserSettings} />
+              <PrivateRoute exact authed={this.state.authed} path="/account_management" component={AccountManagement} />
+              <PrivateRoute exact authed={this.state.authed} path="/tip/:tipId" component={Dashboard} />
+              <PrivateRoute exact authed={this.state.authed} path="/logout" component={LoggedOut} />
               <Route component={NoMatch} />
-            </Route>
-          </Switch>
+            </Switch>
+          </Layout>
         </div>
       </BrowserRouter>
     );

@@ -1,98 +1,199 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Card, Button, Container, Breadcrumb, Icon } from 'semantic-ui-react';
+import _ from 'underscore';
 
-const FormContainer = props => (
-  <Card centered fluid style={{ marginBottom: '14px' }}>
-    <Card.Content header={props.title} meta={props.lang.cardSubtitle} />
-    <Card.Content>
-      <Container textAlign="center">
-        <Breadcrumb>
-          <Breadcrumb.Section active={props.activeModule === 'incident'}>
-            <Icon disabled={props.activeModule !== 'incident'} name="marker" />{props.lang.incident}
-          </Breadcrumb.Section>
-          <Breadcrumb.Divider icon="right arrow" />
-          {props.showFormModule.suspect === true &&
-            <Breadcrumb.Section active={props.activeModule === 'suspect'}>
-              <Icon disabled={props.activeModule !== 'suspect'} name="user" />{props.lang.suspect}
-            </Breadcrumb.Section>
-          }
-          {props.showFormModule.suspect === true && <Breadcrumb.Divider icon="right arrow" />}
-          {props.showFormModule.vehicle === true &&
-            <Breadcrumb.Section active={props.activeModule === 'vehicle'}>
-              <Icon disabled={props.activeModule !== 'vehicle'} name="car" />{props.lang.vehicle}
-            </Breadcrumb.Section>
-          }
-          {props.showFormModule.vehicle === true && <Breadcrumb.Divider icon="right arrow" />}
-          {props.showFormModule.drugs === true &&
-            <Breadcrumb.Section active={props.activeModule === 'drugs'}>
-              <Icon disabled={props.activeModule !== 'drugs'} name="medkit" />{props.lang.drugs}
-            </Breadcrumb.Section>
-          }
-          {props.showFormModule.drugs === true && <Breadcrumb.Divider icon="right arrow" />}
-          {props.showFormModule.media === true &&
-            <Breadcrumb.Section active={props.activeModule === 'media'}>
-              <Icon disabled={props.activeModule !== 'media'} name="cloud upload" />{props.lang.mediaBreadcrumb}
-            </Breadcrumb.Section>
-          }
-          {props.showFormModule.media === true && <Breadcrumb.Divider icon="right arrow" />}
-          <Breadcrumb.Section active={props.activeModule === 'final'}>
-            <Icon disabled={props.activeModule !== 'final'} name="check" />{props.lang.final}
-          </Breadcrumb.Section>
-        </Breadcrumb>
-      </Container>
-    </Card.Content>
-    <Card.Content>
-      {props.children}
-    </Card.Content>
-    <Card.Content>
-      {props.previousButton &&
-        <Button
-          content={props.lang.previous}
-          onClick={() => props.changeFormWizardIndex('previous')}
-        />
+export default class FormContainer extends Component {
+  state = {
+    formModules: ['incident', 'suspect', 'vehicle', 'drugs', 'media', 'final', 'submitted'],
+    moduleIndex: 0,
+    showModule: {
+      incident: true,
+      suspect: true,
+      vehicle: false,
+      drugs: false,
+      media: false,
+      final: true,
+      submitted: true,
+    },
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // compare old tip to new tip, if any of the changes are to the following fields,
+    // then make appropriate changes
+    const updatedTip = _.omit(nextProps.tip, (v, k) => this.props.tip[k] === v);
+    console.log(updatedTip)
+
+    const updatedTipKey = Object.keys(updatedTip);
+    const moduleFields = ['crimeType', 'numberOfSuspect', 'numberOfVehicles', 'tipsterHasMedia'];
+    if (moduleFields.indexOf(updatedTipKey) > -1) {
+      this.changeFormModules(updatedTipKey, updatedTip[updatedTipKey]);
+    }
+  }
+
+  changeFormModules(name, value) {
+    const showModule = { ...this.state.showModule };
+    if (name === 'crimeType') {
+      if (value === 'Drugs' && showModule.drugs === false) {
+        showModule.drugs = true;
+      } else if (value !== 'Drugs' && showModule.drugs === true) {
+        showModule.drugs = false;
       }
-      {props.nextButton &&
-        <Button
-          content={props.lang.next}
-          color="violet"
-          onClick={() => props.changeFormWizardIndex('next')}
-        />
+    } else if (name === 'numberOfSuspects') {
+      if (value === 0 && showModule.suspect === true) {
+        showModule.suspect = false;
+      } else if (value > 0 && showModule.suspect === false) {
+        showModule.suspect = true;
       }
-      {props.showSubmit &&
-        <Button
-          content={props.lang.submit}
-          color="violet"
-          onClick={e => props.createTip(e)}
-        />
+    } else if (name === 'numberOfVehicles') {
+      if (value === 0 && showModule.vehicle === true) {
+        showModule.vehicle = false;
+      } else if (value > 0 && showModule.vehicle === false) {
+        showModule.vehicle = true;
       }
-    </Card.Content>
-  </Card>
-);
+    } else if (name === 'tipsterHasMedia') {
+      showModule.media = !showModule.media;
+    }
+
+    this.setState({ showModule });
+  }
+
+  setNewModuleIndex = (direction) => {
+    const { moduleIndex } = this.state;
+    let changeIndex = true;
+    let i = 1;
+    let newModuleIndex;
+    do {
+      if (direction === 'next') {
+        newModuleIndex = moduleIndex + i;
+      } else {
+        newModuleIndex = moduleIndex - i;
+      }
+
+      const newModule = this.state.formModules[newModuleIndex];
+      if (this.state.showModule[newModule] === false) {
+        i += 1;
+      } else {
+        changeIndex = false;
+      }
+    }
+    while (changeIndex);
+    return newModuleIndex;
+  }
+
+  navigateTo = (newModuleIndex) => {
+    const formModule = this.state.formModules[newModuleIndex];
+    if (formModule === 'incident') {
+      this.props.history.push('/');
+    } else {
+      this.props.history.push(`/${formModule}`);
+    }
+  }
+
+  changeFormModule = (direction) => {
+    let newModuleIndex;
+
+    if (direction === 'next') {
+      // if ((this.state.moduleIndex === 0) && !this.props.validateIncidentModule()) {
+      //   return;
+      // }
+      newModuleIndex = this.setNewModuleIndex(direction);
+    } else if (direction === 'previous') {
+      newModuleIndex = this.setNewModuleIndex(direction);
+    }
+    this.setState({ moduleIndex: newModuleIndex });
+    this.navigateTo(newModuleIndex);
+  }
+
+  render() {
+    const { currentRoute, lang } = this.props;
+    const { suspect, vehicle, drugs, media } = this.state.showModule;
+    const showPreviousButton = (['/', '/submitted'].indexOf(currentRoute) === -1);
+    const showNextButton = (['/final', '/submitted'].indexOf(currentRoute) === -1);
+    const showSubmitButton = (currentRoute === '/final');
+    return (
+      <Card centered fluid style={{ marginBottom: '14px' }}>
+        <Card.Content header="Submit A Tip" meta={lang.cardSubtitle} />
+        <Card.Content>
+          <Container textAlign="center">
+            <Breadcrumb>
+              <Breadcrumb.Section active={currentRoute === '/'}>
+                <Icon disabled={currentRoute !== '/'} name="marker" />{lang.incident}
+              </Breadcrumb.Section>
+              <Breadcrumb.Divider icon="right arrow" />
+              {suspect === true &&
+                <Breadcrumb.Section active={currentRoute === '/suspect'}>
+                  <Icon disabled={currentRoute !== '/suspect'} name="user" />{lang.suspect}
+                </Breadcrumb.Section>
+              }
+              {suspect === true && <Breadcrumb.Divider icon="right arrow" />}
+              {vehicle === true &&
+                <Breadcrumb.Section active={currentRoute === 'vehicle'}>
+                  <Icon disabled={currentRoute !== 'vehicle'} name="car" />{lang.vehicle}
+                </Breadcrumb.Section>
+              }
+              {vehicle === true && <Breadcrumb.Divider icon="right arrow" />}
+              {drugs === true &&
+                <Breadcrumb.Section active={currentRoute === 'drugs'}>
+                  <Icon disabled={currentRoute !== 'drugs'} name="medkit" />{lang.drugs}
+                </Breadcrumb.Section>
+              }
+              {drugs === true && <Breadcrumb.Divider icon="right arrow" />}
+              {media === true &&
+                <Breadcrumb.Section active={currentRoute === 'media'}>
+                  <Icon disabled={currentRoute !== 'media'} name="cloud upload" />{lang.mediaBreadcrumb}
+                </Breadcrumb.Section>
+              }
+              {media === true && <Breadcrumb.Divider icon="right arrow" />}
+              <Breadcrumb.Section active={currentRoute === 'final'}>
+                <Icon disabled={currentRoute !== 'final'} name="check" />{lang.final}
+              </Breadcrumb.Section>
+            </Breadcrumb>
+          </Container>
+        </Card.Content>
+        <Card.Content>
+          {this.props.children}
+        </Card.Content>
+        <Card.Content>
+          {showPreviousButton &&
+            <Button
+              content={lang.previous}
+              onClick={() => this.changeFormModule('previous')}
+            />
+          }
+          {showNextButton &&
+            <Button
+              content={lang.next}
+              color="violet"
+              onClick={() => this.changeFormModule('next')}
+            />
+          }
+          {showSubmitButton &&
+            <Button
+              content={lang.submit}
+              color="violet"
+              onClick={e => this.props.submitTip(e)}
+            />
+          }
+        </Card.Content>
+      </Card>
+    );
+  }
+}
 
 FormContainer.propTypes = {
-  activeModule: PropTypes.string.isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired,
   lang: PropTypes.object.isRequired,
-  title: PropTypes.string.isRequired,
-  changeFormWizardIndex: PropTypes.func.isRequired,
-  createTip: PropTypes.func,
-  showFormModule: PropTypes.shape({
+  showModule: PropTypes.shape({
     suspect: PropTypes.bool,
     vehicle: PropTypes.bool,
     drugs: PropTypes.bool,
     media: PropTypes.bool,
   }).isRequired,
+  submitTip: PropTypes.func.isRequired,
+  currentRoute: PropTypes.string.isRequired,
+  validateIncidentModule: PropTypes.func.isRequired,
   children: PropTypes.node.isRequired,
-  previousButton: PropTypes.bool,
-  nextButton: PropTypes.bool,
-  showSubmit: PropTypes.bool,
 };
-
-FormContainer.defaultProps = {
-  previousButton: false,
-  nextButton: false,
-  showSubmit: false,
-  createTip: null,
-};
-
-export default FormContainer;

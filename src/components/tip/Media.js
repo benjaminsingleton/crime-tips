@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Form, Input, Button, Segment, Progress } from 'semantic-ui-react';
-import { firebaseApp } from '../helpers/firebase';
+import { firebaseApp } from '../../helpers/firebase';
 
 export default class Media extends Component {
   state = {

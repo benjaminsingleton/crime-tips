@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Form, Grid, Segment, Button } from 'semantic-ui-react';
-import { genderOptions, raceOptions, heightOptions, stateOptions } from '../helpers/formOptions';
+import { genderOptions, raceOptions, heightOptions, stateOptions } from '../../helpers/formOptions';
 
 const SuspectInput = props => (
   <Grid stackable columns={2}>
@@ -19,7 +19,7 @@ const SuspectInput = props => (
           name={`suspect${props.suspectNumber}FullName`}
           value={props.tip[`suspect${props.suspectNumber}FullName`]}
           placeholder={props.lang.suspectFullName.placeholder}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
       <Grid.Column>
@@ -28,7 +28,7 @@ const SuspectInput = props => (
           name={`suspect${props.suspectNumber}Nickname`}
           value={props.tip[`suspect${props.suspectNumber}Nickname`]}
           placeholder={props.lang.suspectNickname.placeholder}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
     </Grid.Row>
@@ -39,7 +39,7 @@ const SuspectInput = props => (
           name={`suspect${props.suspectNumber}DateOfBirth`}
           value={props.tip[`suspect${props.suspectNumber}DateOfBirth`]}
           placeholder={props.lang.suspectDateOfBirth.placeholder}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
       <Grid.Column>
@@ -48,7 +48,7 @@ const SuspectInput = props => (
           name={`suspect${props.suspectNumber}Age`}
           value={props.tip[`suspect${props.suspectNumber}Age`]}
           placeholder={props.lang.suspectAge.placeholder}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
     </Grid.Row>
@@ -60,7 +60,7 @@ const SuspectInput = props => (
           value={props.tip[`suspect${props.suspectNumber}Gender`]}
           options={genderOptions}
           placeholder={props.lang.suspectGender.placeholder}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
       <Grid.Column>
@@ -70,7 +70,7 @@ const SuspectInput = props => (
           value={props.tip[`suspect${props.suspectNumber}Race`]}
           options={raceOptions}
           placeholder={props.lang.suspectRace.placeholder}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
     </Grid.Row>
@@ -82,7 +82,7 @@ const SuspectInput = props => (
           value={props.tip[`suspect${props.suspectNumber}Height`]}
           options={heightOptions}
           placeholder={props.lang.suspectHeight.placeholder}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
       <Grid.Column>
@@ -91,7 +91,7 @@ const SuspectInput = props => (
           name={`suspect${props.suspectNumber}Weight`}
           value={props.tip[`suspect${props.suspectNumber}Weight`]}
           placeholder={props.lang.suspectWeight.placeholder}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
     </Grid.Row>
@@ -102,7 +102,7 @@ const SuspectInput = props => (
           name={`suspect${props.suspectNumber}Address`}
           value={props.tip[`suspect${props.suspectNumber}Address`]}
           placeholder={props.lang.suspectAddress.placeholder}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
     </Grid.Row>
@@ -113,7 +113,7 @@ const SuspectInput = props => (
           name={`suspect${props.suspectNumber}City`}
           value={props.tip[`suspect${props.suspectNumber}City`]}
           placeholder={props.lang.suspectCity.placeholder}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
       <Grid.Column>
@@ -123,7 +123,7 @@ const SuspectInput = props => (
           value={props.tip[`suspect${props.suspectNumber}State`]}
           options={stateOptions}
           placeholder={props.lang.suspectState.placeholder}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
     </Grid.Row>
@@ -134,7 +134,7 @@ const SuspectInput = props => (
           name={`suspect${props.suspectNumber}Phone`}
           value={props.tip[`suspect${props.suspectNumber}Phone`]}
           placeholder={props.lang.suspectPhone.placeholder}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
     </Grid.Row>
@@ -145,7 +145,7 @@ const SuspectInput = props => (
           name={`suspect${props.suspectNumber}Markings`}
           value={props.tip[`suspect${props.suspectNumber}Markings`]}
           placeholder={props.lang.suspectMarkings.placeholder}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
       <Grid.Column>
@@ -154,7 +154,7 @@ const SuspectInput = props => (
           name={`suspect${props.suspectNumber}Gang`}
           value={props.tip[`suspect${props.suspectNumber}Gang`]}
           placeholder={props.lang.suspectGang.placeholder}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
     </Grid.Row>
@@ -165,7 +165,7 @@ const SuspectInput = props => (
           name={`suspect${props.suspectNumber}SocialMedia`}
           value={props.tip[`suspect${props.suspectNumber}SocialMedia`]}
           placeholder={props.lang.suspectSocialMedia.placeholder}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
     </Grid.Row>
@@ -176,7 +176,7 @@ const SuspectInput = props => (
           name={`suspect${props.suspectNumber}Weapon`}
           value={props.tip[`suspect${props.suspectNumber}Weapon`]}
           placeholder={props.lang.suspectWeapon.placeholder}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
     </Grid.Row>
@@ -187,7 +187,7 @@ const SuspectInput = props => (
           name={`suspect${props.suspectNumber}Employer`}
           value={props.tip[`suspect${props.suspectNumber}Employer`]}
           placeholder={props.lang.suspectEmployer.placeholder}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
     </Grid.Row>
@@ -198,7 +198,7 @@ const SuspectInput = props => (
           name={`suspect${props.suspectNumber}Comments`}
           value={props.tip[`suspect${props.suspectNumber}Comments`]}
           placeholder={props.lang.suspectComments.placeholder}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
     </Grid.Row>
@@ -228,7 +228,7 @@ SuspectInput.propTypes = {
   numberOfSuspects: PropTypes.number.isRequired,
   tip: PropTypes.object.isRequired,
   lang: PropTypes.object.isRequired,
-  handleInputChange: PropTypes.func.isRequired,
+  handleChange: PropTypes.func.isRequired,
   addRemoveSuspectVehicle: PropTypes.func.isRequired,
 };
 

@@ -4,7 +4,7 @@ import { Form, Grid } from 'semantic-ui-react';
 import {
   tipsterAwareOfCrimeMethodOptions,
   websiteDiscoveryMethodOptions,
-} from '../helpers/formOptions';
+} from '../../helpers/formOptions';
 
 const Final = props => (
   <Form>

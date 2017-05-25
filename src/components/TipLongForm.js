@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Card, Button } from 'semantic-ui-react';
-import TipFormIntro from '../components/TipFormIntro';
-import TipFormSuspect from '../components/TipFormSuspect';
-import TipFormVehicle from '../components/TipFormVehicle';
-import TipFormDrugs from '../components/TipFormDrugs';
-import TipFormMedia from '../components/TipFormMedia';
-import TipFormConclusion from '../components/TipFormConclusion';
+import Incident from '../components/tip/Incident';
+import Suspect from '../components/tip/Suspect';
+import Vehicle from '../components/tip/Vehicle';
+import Drugs from '../components/tip/Drugs';
+import Media from '../components/tip/Media';
+import Final from '../components/tip/Final';
 import { firebaseApp } from '../helpers/firebase';
 import { language } from '../helpers/languages';
 
@@ -56,7 +56,7 @@ export default class TipLongForm extends Component {
         <Card fluid style={style.card}>
           <Card.Content header="1. Incident" style={style.header} />
           <Card.Content>
-            <TipFormIntro
+            <Incident
               tip={this.state.tip}
               handleInputChange={this.handleInputChange}
               handleCheckChange={this.handleCheckChange}
@@ -69,7 +69,7 @@ export default class TipLongForm extends Component {
         <Card fluid style={style.card}>
           <Card.Content header="2. Suspect" style={style.header} />
           <Card.Content>
-            <TipFormSuspect
+            <Suspect
               tip={this.state.tip}
               handleInputChange={this.handleInputChange}
               lang={lang}
@@ -79,7 +79,7 @@ export default class TipLongForm extends Component {
         <Card fluid style={style.card}>
           <Card.Content header="3. Vehicle" style={style.header} />
           <Card.Content>
-            <TipFormVehicle
+            <Vehicle
               tip={this.state.tip}
               handleInputChange={this.handleInputChange}
               lang={lang}
@@ -89,7 +89,7 @@ export default class TipLongForm extends Component {
         <Card fluid style={style.card}>
           <Card.Content title="4. Drugs" style={style.header} />
           <Card.Content>
-            <TipFormDrugs
+            <Drugs
               tip={this.state.tip}
               handleInputChange={this.handleInputChange}
               lang={lang}
@@ -99,13 +99,13 @@ export default class TipLongForm extends Component {
         <Card fluid style={style.card}>
           <Card.Content title="5. Media" style={style.header} />
           <Card.Content>
-            <TipFormMedia tip={this.state.tip} />
+            <Media tip={this.state.tip} />
           </Card.Content>
         </Card>
         <Card fluid style={style.card}>
           <Card.Content header="6. Final" style={style.header} />
           <Card.Content>
-            <TipFormConclusion
+            <Final
               tip={this.state.tip}
               handleInputChange={this.handleInputChange}
               lang={lang}

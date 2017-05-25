@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'semantic-ui-react';
-import { drugTypeOptions, drugSaleMethodOptions } from '../helpers/formOptions';
+import { drugTypeOptions, drugSaleMethodOptions } from '../../helpers/formOptions';
 
 const Drugs = props => (
   <Form>

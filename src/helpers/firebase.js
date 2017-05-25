@@ -12,7 +12,16 @@ const firebaseApp = firebase.initializeApp(config);
 export function incrementUnreadAbandonedTipsCount() {
   firebaseApp.database().ref('metrics/unreadAbandonedTips')
     .transaction(currentValue => currentValue + 1);
-  return null;
+}
+
+export function reduceUnreadAbandonedTipsCount() {
+  firebaseApp.database().ref('metrics/unreadAbandonedTips')
+    .transaction(currentValue => currentValue - 1);
+}
+
+export function incrementUnreadTipsCount() {
+  firebaseApp.database().ref('metrics/unreadTips')
+    .transaction(currentValue => currentValue + 1);
 }
 
 
