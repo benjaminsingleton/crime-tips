@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Grid } from 'semantic-ui-react';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import _ from 'underscore';
 import FormContainer from './FormContainer';
 import Incident from './Incident';
@@ -19,9 +19,14 @@ import {
 } from '../../helpers/firebase';
 import { language } from '../../helpers/languages';
 
+function FormRoute({ component: Component, tipKey, ...rest }) {
+  return (
+    <Route {...rest} render={props => tipKey ? <Component {...props} /> : <Redirect to="/" />} />
+  );
+}
+
 export default class TipContainer extends Component {
   state = {
-    tipKey: null,
     tip: {
       timestampStart: Date.now(),
       tipType: 'web',
@@ -152,7 +157,6 @@ export default class TipContainer extends Component {
       lang,
       tip: this.state.tip,
       handleChange: this.handleChange,
-      tipKey: this.state.tipKey,
     };
     return (
       <Grid centered container columns={1}>
@@ -169,14 +173,20 @@ export default class TipContainer extends Component {
               <Route exact path="/" render={() => (
                 <Incident {...sharedProps} error={this.state.error} />
               )}/>
-              <Route exact path="/suspect" render={() => (
-                <Suspect {...sharedProps} addRemoveSuspectVehicle={this.addRemoveSuspectVehicle} />
-              )}/>
-              <Route exact path="/vehicle" render={() => <Vehicle {...sharedProps} />} />
-              <Route exact path="/drugs" render={() => <Drugs {...sharedProps} />} />
-              <Route exact path="/media" render={() => <Media {...sharedProps} />} />
-              <Route exact path="/final" render={() => <Final {...sharedProps} />} />
-              <Route exact path="/submitted" render={() => <Submitted {...sharedProps} />} />
+              <FormRoute exact path="/suspect" 
+                {...sharedProps} 
+                error={this.state.error} 
+                component={Suspect} 
+              />
+              <FormRoute exact path="/vehicle" 
+                {...sharedProps} 
+                addRemoveSuspectVehicle={this.addRemoveSuspectVehicle}
+                component={Vehicle} 
+              />
+              <FormRoute exact path="/drugs" {...sharedProps} component={Drugs} />
+              <FormRoute exact path="/media" {...sharedProps} component={Media} />
+              <FormRoute exact path="/final" {...sharedProps} component={Final} />
+              <FormRoute exact path="/submitted" {...sharedProps} component={Submitted} />
             </Switch>
           </FormContainer>
         </Grid.Column>

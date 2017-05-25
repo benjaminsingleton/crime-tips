@@ -19,12 +19,8 @@ export default class FormContainer extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // compare old tip to new tip, if any of the changes are to the following fields,
-    // then make appropriate changes
     const updatedTip = _.omit(nextProps.tip, (v, k) => this.props.tip[k] === v);
-    console.log(updatedTip)
-
-    const updatedTipKey = Object.keys(updatedTip);
+    const updatedTipKey = Object.keys(updatedTip)[0];
     const moduleFields = ['crimeType', 'numberOfSuspect', 'numberOfVehicles', 'tipsterHasMedia'];
     if (moduleFields.indexOf(updatedTipKey) > -1) {
       this.changeFormModules(updatedTipKey, updatedTip[updatedTipKey]);
@@ -128,24 +124,24 @@ export default class FormContainer extends Component {
               }
               {suspect === true && <Breadcrumb.Divider icon="right arrow" />}
               {vehicle === true &&
-                <Breadcrumb.Section active={currentRoute === 'vehicle'}>
+                <Breadcrumb.Section active={currentRoute === '/vehicle'}>
                   <Icon disabled={currentRoute !== 'vehicle'} name="car" />{lang.vehicle}
                 </Breadcrumb.Section>
               }
               {vehicle === true && <Breadcrumb.Divider icon="right arrow" />}
               {drugs === true &&
-                <Breadcrumb.Section active={currentRoute === 'drugs'}>
+                <Breadcrumb.Section active={currentRoute === '/drugs'}>
                   <Icon disabled={currentRoute !== 'drugs'} name="medkit" />{lang.drugs}
                 </Breadcrumb.Section>
               }
               {drugs === true && <Breadcrumb.Divider icon="right arrow" />}
               {media === true &&
-                <Breadcrumb.Section active={currentRoute === 'media'}>
+                <Breadcrumb.Section active={currentRoute === '/media'}>
                   <Icon disabled={currentRoute !== 'media'} name="cloud upload" />{lang.mediaBreadcrumb}
                 </Breadcrumb.Section>
               }
               {media === true && <Breadcrumb.Divider icon="right arrow" />}
-              <Breadcrumb.Section active={currentRoute === 'final'}>
+              <Breadcrumb.Section active={currentRoute === '/final'}>
                 <Icon disabled={currentRoute !== 'final'} name="check" />{lang.final}
               </Breadcrumb.Section>
             </Breadcrumb>
@@ -186,12 +182,6 @@ FormContainer.propTypes = {
     push: PropTypes.func,
   }).isRequired,
   lang: PropTypes.object.isRequired,
-  showModule: PropTypes.shape({
-    suspect: PropTypes.bool,
-    vehicle: PropTypes.bool,
-    drugs: PropTypes.bool,
-    media: PropTypes.bool,
-  }).isRequired,
   submitTip: PropTypes.func.isRequired,
   currentRoute: PropTypes.string.isRequired,
   validateIncidentModule: PropTypes.func.isRequired,

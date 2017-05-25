@@ -20,7 +20,7 @@ const VehicleInput = props => (
           value={props.tip[`vehicle${props.vehicleNumber}Make`]}
           placeholder={props.lang.vehicleMake.placeholder}
           options={vehicleMakeOptions}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
       <Grid.Column>
@@ -29,7 +29,7 @@ const VehicleInput = props => (
           name={`vehicle${props.vehicleNumber}Model`}
           value={props.tip[`vehicle${props.vehicleNumber}Model`]}
           placeholder={props.lang.vehicleModel.placeholder}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
     </Grid.Row>
@@ -41,7 +41,7 @@ const VehicleInput = props => (
           value={props.tip[`vehicle${props.vehicleNumber}Color`]}
           placeholder={props.lang.vehicleColor.placeholder}
           options={vehicleColorOptions}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
       <Grid.Column>
@@ -50,7 +50,7 @@ const VehicleInput = props => (
           name={`vehicle${props.vehicleNumber}Plate`}
           value={props.tip[`vehicle${props.vehicleNumber}Plate`]}
           placeholder={props.lang.vehiclePlate.placeholder}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
     </Grid.Row>
@@ -61,7 +61,7 @@ const VehicleInput = props => (
           name={`vehicle${props.vehicleNumber}Location`}
           value={props.tip[`vehicle${props.vehicleNumber}Location`]}
           placeholder={props.lang.vehicleLocation.placeholder}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
     </Grid.Row>
@@ -72,7 +72,7 @@ const VehicleInput = props => (
           name={`vehicle${props.vehicleNumber}Markings`}
           value={props.tip[`vehicle${props.vehicleNumber}Markings`]}
           placeholder={props.lang.vehicleMarkings.placeholder}
-          onChange={props.handleInputChange}
+          onChange={props.handleChange}
         />
       </Grid.Column>
     </Grid.Row>
@@ -102,7 +102,7 @@ VehicleInput.propTypes = {
   numberOfVehicles: PropTypes.number.isRequired,
   tip: PropTypes.object.isRequired,
   lang: PropTypes.object.isRequired,
-  handleInputChange: PropTypes.func.isRequired,
+  handleChange: PropTypes.func.isRequired,
   addRemoveSuspectVehicle: PropTypes.func.isRequired,
 };
 

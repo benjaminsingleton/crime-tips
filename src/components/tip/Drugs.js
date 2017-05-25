@@ -11,7 +11,7 @@ const Drugs = props => (
       value={props.tip.drugType}
       options={drugTypeOptions}
       placeholder={props.lang.drugType.placeholder}
-      onChange={props.handleInputChange}
+      onChange={props.handleChange}
     />
     <Form.Select
       label={props.lang.drugSaleMethod.label}
@@ -19,27 +19,27 @@ const Drugs = props => (
       value={props.tip.drugSaleMethod}
       options={drugSaleMethodOptions}
       placeholder={props.lang.drugSaleMethod.placeholder}
-      onChange={props.handleInputChange}
+      onChange={props.handleChange}
     />
     <Form.Input
       label={props.lang.drugSaleTime.label}
       name="drugSaleTime"
       value={props.tip.drugSaleTime}
       placeholder={props.lang.drugSaleTime.placeholder}
-      onChange={props.handleInputChange}
+      onChange={props.handleChange}
     />
     <Form.Input
       label={props.lang.drugSalePhoneNumber.label}
       name="drugSalePhoneNumber"
       value={props.tip.drugSalePhoneNumber}
       placeholder={props.lang.drugSalePhoneNumber.placeholder}
-      onChange={props.handleInputChange}
+      onChange={props.handleChange}
     />
   </Form>
 );
 
 Drugs.propTypes = {
-  handleInputChange: PropTypes.func.isRequired,
+  handleChange: PropTypes.func.isRequired,
   lang: PropTypes.object.isRequired,
   tip: PropTypes.object.isRequired,
 };
