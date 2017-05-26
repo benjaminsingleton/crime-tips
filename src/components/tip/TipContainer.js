@@ -172,16 +172,17 @@ export default class TipContainer extends Component {
             <Switch>
               <Route exact path="/" render={() => (
                 <Incident {...sharedProps} error={this.state.error} />
-              )}/>
-              <FormRoute exact path="/suspect" 
-                {...sharedProps} 
-                error={this.state.error} 
-                component={Suspect} 
+              )} 
               />
-              <FormRoute exact path="/vehicle" 
-                {...sharedProps} 
+              <FormRoute exact path="/suspect"
+                {...sharedProps}
+                error={this.state.error}
+                component={Suspect}
+              />
+              <FormRoute exact path="/vehicle"
+                {...sharedProps}
                 addRemoveSuspectVehicle={this.addRemoveSuspectVehicle}
-                component={Vehicle} 
+                component={Vehicle}
               />
               <FormRoute exact path="/drugs" {...sharedProps} component={Drugs} />
               <FormRoute exact path="/media" {...sharedProps} component={Media} />

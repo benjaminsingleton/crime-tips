@@ -27,6 +27,29 @@ export default class FormContainer extends Component {
     }
   }
 
+  setNewModuleIndex = (direction) => {
+    const { moduleIndex } = this.state;
+    let changeIndex = true;
+    let i = 1;
+    let newModuleIndex;
+    do {
+      if (direction === 'next') {
+        newModuleIndex = moduleIndex + i;
+      } else {
+        newModuleIndex = moduleIndex - i;
+      }
+
+      const newModule = this.state.formModules[newModuleIndex];
+      if (this.state.showModule[newModule] === false) {
+        i += 1;
+      } else {
+        changeIndex = false;
+      }
+    }
+    while (changeIndex);
+    return newModuleIndex;
+  }
+
   changeFormModules(name, value) {
     const showModule = { ...this.state.showModule };
     if (name === 'crimeType') {
@@ -52,29 +75,6 @@ export default class FormContainer extends Component {
     }
 
     this.setState({ showModule });
-  }
-
-  setNewModuleIndex = (direction) => {
-    const { moduleIndex } = this.state;
-    let changeIndex = true;
-    let i = 1;
-    let newModuleIndex;
-    do {
-      if (direction === 'next') {
-        newModuleIndex = moduleIndex + i;
-      } else {
-        newModuleIndex = moduleIndex - i;
-      }
-
-      const newModule = this.state.formModules[newModuleIndex];
-      if (this.state.showModule[newModule] === false) {
-        i += 1;
-      } else {
-        changeIndex = false;
-      }
-    }
-    while (changeIndex);
-    return newModuleIndex;
   }
 
   navigateTo = (newModuleIndex) => {
@@ -118,29 +118,37 @@ export default class FormContainer extends Component {
               </Breadcrumb.Section>
               <Breadcrumb.Divider icon="right arrow" />
               {suspect === true &&
-                <Breadcrumb.Section active={currentRoute === '/suspect'}>
-                  <Icon disabled={currentRoute !== '/suspect'} name="user" />{lang.suspect}
-                </Breadcrumb.Section>
+                <span>
+                  <Breadcrumb.Section active={currentRoute === '/suspect'}>
+                    <Icon disabled={currentRoute !== '/suspect'} name="user" />{lang.suspect}
+                  </Breadcrumb.Section>
+                  <Breadcrumb.Divider icon="right arrow" />
+                </span>
               }
-              {suspect === true && <Breadcrumb.Divider icon="right arrow" />}
               {vehicle === true &&
-                <Breadcrumb.Section active={currentRoute === '/vehicle'}>
-                  <Icon disabled={currentRoute !== 'vehicle'} name="car" />{lang.vehicle}
-                </Breadcrumb.Section>
+                <span>
+                  <Breadcrumb.Section active={currentRoute === '/vehicle'}>
+                    <Icon disabled={currentRoute !== 'vehicle'} name="car" />{lang.vehicle}
+                  </Breadcrumb.Section>
+                  <Breadcrumb.Divider icon="right arrow" />
+                </span>
               }
-              {vehicle === true && <Breadcrumb.Divider icon="right arrow" />}
               {drugs === true &&
-                <Breadcrumb.Section active={currentRoute === '/drugs'}>
-                  <Icon disabled={currentRoute !== 'drugs'} name="medkit" />{lang.drugs}
-                </Breadcrumb.Section>
+                <span>
+                  <Breadcrumb.Section active={currentRoute === '/drugs'}>
+                    <Icon disabled={currentRoute !== 'drugs'} name="medkit" />{lang.drugs}
+                  </Breadcrumb.Section>
+                  <Breadcrumb.Divider icon="right arrow" />
+                </span>
               }
-              {drugs === true && <Breadcrumb.Divider icon="right arrow" />}
               {media === true &&
-                <Breadcrumb.Section active={currentRoute === '/media'}>
-                  <Icon disabled={currentRoute !== 'media'} name="cloud upload" />{lang.mediaBreadcrumb}
-                </Breadcrumb.Section>
+                <span>
+                  <Breadcrumb.Section active={currentRoute === '/media'}>
+                    <Icon disabled={currentRoute !== 'media'} name="cloud upload" />{lang.mediaBreadcrumb}
+                  </Breadcrumb.Section>
+                  <Breadcrumb.Divider icon="right arrow" />
+                </span>
               }
-              {media === true && <Breadcrumb.Divider icon="right arrow" />}
               <Breadcrumb.Section active={currentRoute === '/final'}>
                 <Icon disabled={currentRoute !== 'final'} name="check" />{lang.final}
               </Breadcrumb.Section>
@@ -181,9 +189,9 @@ FormContainer.propTypes = {
   history: PropTypes.shape({
     push: PropTypes.func,
   }).isRequired,
+  tip: PropTypes.object.isRequired,
   lang: PropTypes.object.isRequired,
   submitTip: PropTypes.func.isRequired,
   currentRoute: PropTypes.string.isRequired,
-  validateIncidentModule: PropTypes.func.isRequired,
   children: PropTypes.node.isRequired,
 };
