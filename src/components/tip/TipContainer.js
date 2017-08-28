@@ -156,6 +156,7 @@ export default class TipContainer extends Component {
     const sharedProps = {
       lang,
       tip: this.state.tip,
+      tipKey: this.state.tipKey,
       handleChange: this.handleChange,
     };
     return (
@@ -164,6 +165,7 @@ export default class TipContainer extends Component {
           <FormContainer
             lang={lang}
             tip={this.state.tip}
+            tipKey={this.state.tipKey}
             submitTip={this.submitTip}
             currentRoute={this.props.match.path}
             history={this.props.history}
