@@ -1,0 +1,13 @@
+# Optional overlay: build the app image from local source instead of pulling GHCR.
+# Use for air-gapped hosts, audits, or when no release image is available yet.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml \
+#     -f docker-compose.build.yml up -d --build
+#
+# Or: CRIME_TIPS_BUILD=1 ./scripts/update.sh
+
+services:
+  app:
+    build: .
+    image: ${CRIME_TIPS_IMAGE:-crime-tips:local}
+    pull_policy: never

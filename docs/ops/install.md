@@ -17,7 +17,7 @@ sudo mkdir -p /opt/crime-tips
 sudo chown "$USER":"$USER" /opt/crime-tips
 cd /opt/crime-tips
 git clone https://github.com/benjaminsingleton/crime-tips.git .
-# Prefer a release tag in production when available
+git checkout vX.Y.Z   # pin Compose/scripts to a release tag when available
 
 cp .env.example .env
 ./scripts/gen-secrets.sh
@@ -30,13 +30,17 @@ Edit `.env`:
 | `DOMAIN` | Public hostname, e.g. `tips.example.gov` |
 | `PUBLIC_ORIGIN` | `https://tips.example.gov` |
 | `ADMIN_EMAIL` | Initial admin mailbox |
+| `CRIME_TIPS_IMAGE` | `ghcr.io/benjaminsingleton/crime-tips:X.Y.Z` (match the release; default `:latest`) |
 | `CRIME_TIPS_ENV` | Leave unset in `.env` if using the prod overlay (overlay forces `production`) |
 
 ```bash
 chmod 600 .env
 ./scripts/preflight.sh prod
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
+
+Production pulls the published app image from GHCR (no Node build on the PD host). For air-gap or audit builds, see [update.md](./update.md) (`docker-compose.build.yml`).
 
 Open `https://$DOMAIN`. Submit a test tip, log in as the seeded admin, **change the admin password**, then remove `ADMIN_PASSWORD` from `.env` and recreate the app container so the password is not kept on disk:
 
@@ -64,4 +68,4 @@ docker compose up --build
 # http://localhost:8080 — weak example secrets allowed when CRIME_TIPS_ENV=development
 ```
 
-See also [hardening.md](./hardening.md), [tls.md](./tls.md), and [backup-restore.md](./backup-restore.md).
+See also [update.md](./update.md), [hardening.md](./hardening.md), [tls.md](./tls.md), and [backup-restore.md](./backup-restore.md).

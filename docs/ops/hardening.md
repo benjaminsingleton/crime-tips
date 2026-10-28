@@ -39,6 +39,8 @@ Production boots **refuse** weak JWT / DB / admin example secrets when `CRIME_TI
 
 ## Ops
 
+- [ ] `CRIME_TIPS_IMAGE` pinned to a release tag (not floating `:latest` long-term)
+- [ ] Update runbook followed: backup → `./scripts/update.sh vX.Y.Z` ([update.md](./update.md))
 - [ ] Backup script scheduled; off-box copy verified
 - [ ] Restore drill performed at least once on a staging clone
 - [ ] Admin accounts are named officers; unused accounts disabled

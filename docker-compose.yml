@@ -22,7 +22,11 @@ services:
       - "${POSTGRES_PORT:-5432}:5432"
 
   app:
+    # Local/dev: `docker compose up --build` builds from the Dockerfile.
+    # Production: set CRIME_TIPS_IMAGE to a GHCR tag and use the prod overlay
+    # (which disables build and pulls the published image).
     build: .
+    image: ${CRIME_TIPS_IMAGE:-crime-tips:local}
     depends_on:
       db:
         condition: service_healthy
