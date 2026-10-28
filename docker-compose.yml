@@ -1,3 +1,6 @@
+# Local / developer defaults. For production self-host, also load the overlay:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+
 services:
   db:
     image: postgres:16-alpine
@@ -14,6 +17,7 @@ services:
       retries: 10
     # Published for local tools / host-gateway fallbacks. Prefer the internal
     # hostname `db` from the app container on a normal Docker bridge.
+    # Production overlay removes this publish.
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
 
@@ -24,6 +28,8 @@ services:
         condition: service_healthy
     environment:
       PORT: 3000
+      # Keep local compose usable with example secrets; prod overlay sets production.
+      CRIME_TIPS_ENV: ${CRIME_TIPS_ENV:-development}
       DATABASE_URL: ${DATABASE_URL:-postgres://${POSTGRES_USER:-crimetips}:${POSTGRES_PASSWORD:-crimetips}@db:5432/${POSTGRES_DB:-crimetips}}
       JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-12h}
@@ -34,6 +40,7 @@ services:
       ADMIN_LAST_NAME: ${ADMIN_LAST_NAME:-Administrator}
       UPLOAD_DIR: /data/uploads
       CLIENT_DIST: /app/client/dist
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-}
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_SECURE: ${SMTP_SECURE:-false}
@@ -41,12 +48,26 @@ services:
       SMTP_PASS: ${SMTP_PASS:-}
       SMTP_FROM: ${SMTP_FROM:-noreply@crimetips.local}
       MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-26214400}
+      MAX_ATTACHMENTS_PER_TIP: ${MAX_ATTACHMENTS_PER_TIP:-10}
+      TRUST_PROXY: ${TRUST_PROXY:-false}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
       - uploads:/data/uploads
     ports:
       - "${APP_PORT:-8080}:3000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
     restart: unless-stopped
 
 volumes:

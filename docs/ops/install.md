@@ -1,0 +1,65 @@
+# Install (police department IT)
+
+Target: one Ubuntu LTS (or similar) VM with Docker Engine + Compose plugin. Time-to-first-tip goal: under one hour if you already know Docker.
+
+## 1. Prerequisites
+
+- Docker Engine + Compose plugin (`docker compose version`)
+- DNS A/AAAA for your tip hostname (for Let’s Encrypt), or plan to use agency TLS / internal CA
+- Host firewall: allow **80/443** (and SSH from jump hosts only). Do **not** expose 5432 or 3000 to the internet.
+
+Sizing (small department): 2 vCPU, 4 GiB RAM, 40+ GiB disk (uploads grow with media).
+
+## 2. Install
+
+```bash
+sudo mkdir -p /opt/crime-tips
+sudo chown "$USER":"$USER" /opt/crime-tips
+cd /opt/crime-tips
+git clone https://github.com/benjaminsingleton/crime-tips.git .
+# Prefer a release tag in production when available
+
+cp .env.example .env
+./scripts/gen-secrets.sh
+```
+
+Edit `.env`:
+
+| Variable | Set to |
+|----------|--------|
+| `DOMAIN` | Public hostname, e.g. `tips.example.gov` |
+| `PUBLIC_ORIGIN` | `https://tips.example.gov` |
+| `ADMIN_EMAIL` | Initial admin mailbox |
+| `CRIME_TIPS_ENV` | Leave unset in `.env` if using the prod overlay (overlay forces `production`) |
+
+```bash
+chmod 600 .env
+./scripts/preflight.sh prod
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+```
+
+Open `https://$DOMAIN`. Submit a test tip, log in as the seeded admin, **change the admin password**, then remove `ADMIN_PASSWORD` from `.env` and recreate the app container so the password is not kept on disk:
+
+```bash
+# after password change in the UI
+sed -i '/^ADMIN_PASSWORD=/d' .env
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d app
+```
+
+## 3. Smoke checklist
+
+1. `https://…/` loads the tip form over HTTPS
+2. Submit a tip (≥20 characters of tip text) and note the receipt id
+3. `/login` with admin credentials → dashboard shows the tip
+4. `curl -fsS https://$DOMAIN/api/health` → `{"ok":true}`
+5. Confirm host ports: only 80/443 (and SSH) are public — not 5432
+
+## 4. Local developer path (not for production)
+
+```bash
+cp .env.example .env
+docker compose up --build
+# http://localhost:8080 — weak example secrets allowed when CRIME_TIPS_ENV=development
+```
+
+See also [hardening.md](./hardening.md), [tls.md](./tls.md), and [backup-restore.md](./backup-restore.md).

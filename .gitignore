@@ -9,3 +9,4 @@ uploads/*
 !uploads/.gitkeep
 server/uploads/
 client/dist/
+backups/
