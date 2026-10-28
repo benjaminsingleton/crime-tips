@@ -27,6 +27,26 @@ function PublicRoute({ authed, children }) {
   return children;
 }
 
+function needsMfaEnroll(user) {
+  return Boolean(
+    user && !user.mfaEnabled && sessionStorage.getItem('mfaEnrollmentRequired') === '1',
+  );
+}
+
+const OFFICER_PATHS = ['/dashboard', '/tip/', '/settings', '/account_management', '/logout'];
+
+function AppShell({ children }) {
+  const location = useLocation();
+  const isOfficer = OFFICER_PATHS.some(
+    (p) => location.pathname === p || location.pathname.startsWith(p),
+  );
+  return (
+    <div className={isOfficer ? 'app-shell app-shell--officer' : 'app-shell'}>
+      {children}
+    </div>
+  );
+}
+
 export default function App() {
   const [authed, setAuthed] = useState(null);
   const [user, setUser] = useState(null);
@@ -57,7 +77,6 @@ export default function App() {
     setUser(nextUser);
     setAuthed(true);
     if (opts.mfaEnrollmentRequired) {
-      // Soft cue: settings will show mandatory enroll banner when MFA_REQUIRED.
       sessionStorage.setItem('mfaEnrollmentRequired', '1');
     } else {
       sessionStorage.removeItem('mfaEnrollmentRequired');
@@ -75,20 +94,12 @@ export default function App() {
   };
 
   if (authed === null) {
-    return <div style={{ padding: 40, color: '#fff' }}>Loading…</div>;
+    return <div className="loading-screen">Loading…</div>;
   }
-
-  const style = {
-    background: '#2196F3',
-    margin: '0px',
-    boxSizing: 'border-box',
-    minHeight: '100vh',
-    borderBottom: 'solid 20px #1976d2',
-  };
 
   return (
     <BrowserRouter>
-      <div style={style}>
+      <AppShell>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/suspect" element={<Home />} />
@@ -119,7 +130,7 @@ export default function App() {
             path="/dashboard"
             element={(
               <PrivateRoute authed={authed}>
-                {user && !user.mfaEnabled && sessionStorage.getItem('mfaEnrollmentRequired') === '1' ? (
+                {needsMfaEnroll(user) ? (
                   <Navigate to="/settings" replace />
                 ) : (
                   <Dashboard user={user} onLogout={onLogout} />
@@ -131,7 +142,7 @@ export default function App() {
             path="/tip/:tipId"
             element={(
               <PrivateRoute authed={authed}>
-                {user && !user.mfaEnabled && sessionStorage.getItem('mfaEnrollmentRequired') === '1' ? (
+                {needsMfaEnroll(user) ? (
                   <Navigate to="/settings" replace />
                 ) : (
                   <Dashboard user={user} onLogout={onLogout} />
@@ -151,7 +162,7 @@ export default function App() {
             path="/account_management"
             element={(
               <PrivateRoute authed={authed}>
-                {user && !user.mfaEnabled && sessionStorage.getItem('mfaEnrollmentRequired') === '1' ? (
+                {needsMfaEnroll(user) ? (
                   <Navigate to="/settings" replace />
                 ) : (
                   <AccountManagement user={user} onLogout={onLogout} />
@@ -169,7 +180,7 @@ export default function App() {
           />
           <Route path="*" element={<NoMatch />} />
         </Routes>
-      </div>
+      </AppShell>
     </BrowserRouter>
   );
 }

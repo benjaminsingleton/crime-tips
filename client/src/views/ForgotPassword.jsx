@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Grid, Card, Form, Message } from 'semantic-ui-react';
 import Layout from '../components/Layout';
+import { Panel, TextInput, Button, Alert } from '../components/ui';
 
 export default class ForgotPassword extends Component {
   state = {
@@ -12,42 +12,41 @@ export default class ForgotPassword extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    // Password reset email is not wired in the Postgres MVP; show guidance.
     this.setState({ submitted: true });
   };
 
   render() {
     return (
       <Layout>
-        <Grid centered container columns={1}>
-          <Grid.Column mobile={16} tablet={8} computer={8} largeScreen={8}>
-            <Card centered fluid>
-              <Card.Content header="Forgot Password" />
-              <Card.Content>
-                <p>
-                  Enter your email address. An administrator can reset your password from Account
-                  Management, or set <code>SMTP_*</code> env vars for email reset in a future
-                  release.
-                </p>
-                <Form success={this.state.submitted} onSubmit={this.handleSubmit}>
-                  <Form.Input
-                    name="email"
-                    type="email"
-                    placeholder="Email"
-                    value={this.state.email}
-                    onChange={this.handleInputChange}
-                  />
-                  <Message
-                    success
-                    header="Request recorded"
-                    content="Ask your department admin to reset your password if you cannot sign in."
-                  />
-                  <Form.Button>Reset Password</Form.Button>
-                </Form>
-              </Card.Content>
-            </Card>
-          </Grid.Column>
-        </Grid>
+        <div className="auth-panel">
+          <Panel title="Forgot password" meta="Account recovery">
+            <p style={{ color: 'var(--ct-muted)', marginTop: 0 }}>
+              Enter your email address. An administrator can reset your password from Account
+              Management, or set <code>SMTP_*</code> env vars for email reset in a future release.
+            </p>
+            <form onSubmit={this.handleSubmit}>
+              <TextInput
+                name="email"
+                type="email"
+                placeholder="Email"
+                value={this.state.email}
+                onChange={this.handleInputChange}
+              />
+              {this.state.submitted && (
+                <Alert
+                  tone="success"
+                  title="Request recorded"
+                  content="Ask your department admin to reset your password if you cannot sign in."
+                />
+              )}
+              <div style={{ marginTop: '1rem' }}>
+                <Button type="submit" variant="primary" block>
+                  Reset password
+                </Button>
+              </div>
+            </form>
+          </Panel>
+        </div>
       </Layout>
     );
   }

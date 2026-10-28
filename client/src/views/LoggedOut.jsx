@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { Card } from 'semantic-ui-react';
 import Layout from '../components/Layout';
+import { Panel } from '../components/ui';
 
 export default function LoggedOut({ onLogout }) {
   useEffect(() => {
@@ -11,14 +11,13 @@ export default function LoggedOut({ onLogout }) {
 
   return (
     <Layout>
-      <Card>
-        <Card.Content header="Signed out" />
-        <Card.Content>
-          <div>
-            Click <Link to="/login">here</Link> to login again.
-          </div>
-        </Card.Content>
-      </Card>
+      <div className="auth-panel">
+        <Panel title="Signed out">
+          <p>
+            Click <Link to="/login">here</Link> to sign in again.
+          </p>
+        </Panel>
+      </div>
     </Layout>
   );
 }

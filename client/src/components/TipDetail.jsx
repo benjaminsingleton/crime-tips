@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Card, Form, Button, Confirm } from 'semantic-ui-react';
 import moment from 'moment';
 import { tipTimeFormatLong } from '../helpers/helpers';
 import { api } from '../api';
+import { Panel, Button, TextArea, ConfirmDialog } from './ui';
 
 export default class TipDetail extends Component {
   state = {
@@ -61,36 +61,27 @@ export default class TipDetail extends Component {
     const notDeletedUserNoteKeys = Object.keys(userNotes).filter(
       (key) => !userNotes[key].deleted,
     );
-    const style = {
-      card: { margin: '10px' },
-      header: { backgroundColor: '#E0E0E0' },
-      actions: { textAlign: 'right' },
-    };
     return notDeletedUserNoteKeys.map((key) => (
-      <Card fluid style={style.card} key={key}>
-        <Card.Content
-          header={`${userNotes[key].authorName || 'Officer'}, ${moment(
+      <div className="note-card" key={key}>
+        <div className="note-card__header">
+          {`${userNotes[key].authorName || 'Officer'}, ${moment(
             new Date(userNotes[key].timestamp),
           ).format('MMMM Do YYYY, h:mm a')}`}
-          style={style.header}
-        />
-        <Card.Content>
-          <p>{userNotes[key].note}</p>
-        </Card.Content>
+        </div>
+        <div className="note-card__body">
+          <p style={{ margin: 0 }}>{userNotes[key].note}</p>
+        </div>
         {userNotes[key].uid === this.props.user?.id ? (
-          <Card.Content style={style.actions}>
+          <div className="note-card__actions">
             <Button
+              size="sm"
+              variant="danger-outline"
               content="Delete"
               onClick={() => this.setState({ open: true, noteToDelete: key })}
             />
-            <Confirm
-              open={this.state.open && this.state.noteToDelete === key}
-              onCancel={() => this.setState({ open: false, noteToDelete: null })}
-              onConfirm={() => this.deleteUserNote(key)}
-            />
-          </Card.Content>
+          </div>
         ) : null}
-      </Card>
+      </div>
     ));
   };
 
@@ -98,100 +89,63 @@ export default class TipDetail extends Component {
     const tip = this.state.tip || {};
     const userNotes = tip.userNotes ? this.displayUserNotes(tip.userNotes) : null;
     const attachments = tip.attachments || {};
-    const style = {
-      card: { margin: '10px' },
-      header: { backgroundColor: '#E0E0E0' },
-    };
+
     return (
       <div>
-        <Card fluid>
-          <Card.Content>
-            <h2>Tip Detail</h2>
-            <p>Crime Type: {tip.crimeType}</p>
-            <p>Date Time: {tipTimeFormatLong(tip.dateTime || tip.timestampSubmit)}</p>
-          </Card.Content>
-          <Card fluid style={style.card}>
-            <Card.Content header="1. Incident" style={style.header} />
-            <Card.Content>
-              <p>
-                What kind of crime was committed? <b>{tip.crimeType}</b>
-              </p>
-              <p>
-                Please tell us the information you wanted to share. <b>{tip.tipText}</b>
-              </p>
-              <p>
-                Where did the crime take place? <b>{tip.crimeLocation}</b>
-              </p>
-              <p>
-                When did the crime occur? <b>{tip.crimeDate}</b>
-              </p>
-              <p>
-                How many suspects were involved? <b>{tip.numberOfSuspects}</b>
-              </p>
-              <p>
-                How many vehicles were involved? <b>{tip.numberOfVehicles}</b>
-              </p>
-              <p>
-                I have media to upload. <b>{String(tip.tipsterHasMedia)}</b>
-              </p>
-            </Card.Content>
-          </Card>
-          <Card fluid style={style.card}>
-            <Card.Content header="2. Suspect(s)" style={style.header} />
-            <Card.Content>
-              <p>
-                Full name: <b>{tip.suspectFullName}</b>
-              </p>
-              <p>
-                Nickname / alias: <b>{tip.suspectNickname}</b>
-              </p>
-              <p>
-                Gender: <b>{tip.suspectGender}</b>
-              </p>
-              <p>
-                Race: <b>{tip.suspectRace}</b>
-              </p>
-              <p>
-                Comments: <b>{tip.suspectComments}</b>
-              </p>
-            </Card.Content>
-          </Card>
-          <Card fluid style={style.card}>
-            <Card.Content header="3. Vehicle(s)" style={style.header} />
-            <Card.Content>
-              <p>
-                Make: <b>{tip.suspectVehicleMake}</b>
-              </p>
-              <p>
-                Model: <b>{tip.suspectVehicleModel}</b>
-              </p>
-              <p>
-                Color: <b>{tip.suspectVehicleColor}</b>
-              </p>
-              <p>
-                Plate: <b>{tip.suspectVehiclePlateNumber}</b>
-              </p>
-            </Card.Content>
-          </Card>
-          <Card fluid style={style.card}>
-            <Card.Content header="4. Drugs" style={style.header} />
-            <Card.Content>
-              <p>
-                Drug types: <b>{tip.drugTypes}</b>
-              </p>
-              <p>
-                Sale method: <b>{tip.drugSaleMethod}</b>
-              </p>
-            </Card.Content>
-          </Card>
-          <Card fluid style={style.card}>
-            <Card.Content header="5. Media" style={style.header} />
-            <Card.Content>
+        <Panel
+          title="Tip detail"
+          meta={`Crime type: ${tip.crimeType || '—'} · ${tipTimeFormatLong(tip.dateTime || tip.timestampSubmit) || ''}`}
+        >
+          <div className="subpanel">
+            <div className="subpanel__header">1. Incident</div>
+            <div className="subpanel__body">
+              <p className="detail-row">What kind of crime was committed? <b>{tip.crimeType}</b></p>
+              <p className="detail-row">Please tell us the information you wanted to share. <b>{tip.tipText}</b></p>
+              <p className="detail-row">Where did the crime take place? <b>{tip.crimeLocation}</b></p>
+              <p className="detail-row">When did the crime occur? <b>{tip.crimeDate}</b></p>
+              <p className="detail-row">How many suspects were involved? <b>{tip.numberOfSuspects}</b></p>
+              <p className="detail-row">How many vehicles were involved? <b>{tip.numberOfVehicles}</b></p>
+              <p className="detail-row">I have media to upload. <b>{String(tip.tipsterHasMedia)}</b></p>
+            </div>
+          </div>
+
+          <div className="subpanel">
+            <div className="subpanel__header">2. Suspect(s)</div>
+            <div className="subpanel__body">
+              <p className="detail-row">Full name: <b>{tip.suspectFullName}</b></p>
+              <p className="detail-row">Nickname / alias: <b>{tip.suspectNickname}</b></p>
+              <p className="detail-row">Gender: <b>{tip.suspectGender}</b></p>
+              <p className="detail-row">Race: <b>{tip.suspectRace}</b></p>
+              <p className="detail-row">Comments: <b>{tip.suspectComments}</b></p>
+            </div>
+          </div>
+
+          <div className="subpanel">
+            <div className="subpanel__header">3. Vehicle(s)</div>
+            <div className="subpanel__body">
+              <p className="detail-row">Make: <b>{tip.suspectVehicleMake}</b></p>
+              <p className="detail-row">Model: <b>{tip.suspectVehicleModel}</b></p>
+              <p className="detail-row">Color: <b>{tip.suspectVehicleColor}</b></p>
+              <p className="detail-row">Plate: <b>{tip.suspectVehiclePlateNumber}</b></p>
+            </div>
+          </div>
+
+          <div className="subpanel">
+            <div className="subpanel__header">4. Drugs</div>
+            <div className="subpanel__body">
+              <p className="detail-row">Drug types: <b>{tip.drugTypes}</b></p>
+              <p className="detail-row">Sale method: <b>{tip.drugSaleMethod}</b></p>
+            </div>
+          </div>
+
+          <div className="subpanel">
+            <div className="subpanel__header">5. Media</div>
+            <div className="subpanel__body">
               {Object.keys(attachments).length === 0 ? (
-                <p>No attachments.</p>
+                <p className="detail-row">No attachments.</p>
               ) : (
                 Object.keys(attachments).map((id) => (
-                  <p key={id}>
+                  <p className="detail-row" key={id}>
                     <a
                       href={`/api/tips/${this.props.tipDetailKey}/attachments/${id}/download`}
                       onClick={(e) => {
@@ -214,40 +168,47 @@ export default class TipDetail extends Component {
                   </p>
                 ))
               )}
-            </Card.Content>
-          </Card>
-          <Card fluid style={style.card}>
-            <Card.Content header="6. Final" style={style.header} />
-            <Card.Content>
-              <p>
-                How are you aware of this crime? <b>{tip.tipsterAwareOfCrimeMethod}</b>
+            </div>
+          </div>
+
+          <div className="subpanel">
+            <div className="subpanel__header">6. Final</div>
+            <div className="subpanel__body">
+              <p className="detail-row">How are you aware of this crime? <b>{tip.tipsterAwareOfCrimeMethod}</b></p>
+              <p className="detail-row">
+                Website discovery:{' '}
+                <b>{tip.tipsterWebsiteDiscoveryMethod || tip.websiteDiscoveryMethod}</b>
               </p>
-              <p>
-                Website discovery: <b>{tip.tipsterWebsiteDiscoveryMethod || tip.websiteDiscoveryMethod}</b>
-              </p>
-              <p>
-                Wants contact: <b>{String(tip.tipsterWantsToBeContacted)}</b>
-              </p>
-              <p>
-                Contact details: <b>{tip.tipsterContactDetails}</b>
-              </p>
-            </Card.Content>
-          </Card>
-          <Card fluid style={style.card}>
-            <Card.Content header="Officer Notes" style={style.header} />
-            <Card.Content>
+              <p className="detail-row">Wants contact: <b>{String(tip.tipsterWantsToBeContacted)}</b></p>
+              <p className="detail-row">Contact details: <b>{tip.tipsterContactDetails}</b></p>
+            </div>
+          </div>
+
+          <div className="subpanel">
+            <div className="subpanel__header">Officer notes</div>
+            <div className="subpanel__body">
               {userNotes}
-              <Form onSubmit={this.createUserNote}>
-                <Form.TextArea
+              <form onSubmit={this.createUserNote}>
+                <TextArea
                   value={this.state.userNote}
-                  onChange={this.handleTextChange}
+                  onChange={(e) => this.handleTextChange(e)}
                   placeholder="Add a note"
                 />
-                <Button content="Add note" color="violet" />
-              </Form>
-            </Card.Content>
-          </Card>
-        </Card>
+                <div style={{ marginTop: '0.75rem' }}>
+                  <Button type="submit" variant="primary" content="Add note" />
+                </div>
+              </form>
+            </div>
+          </div>
+        </Panel>
+
+        <ConfirmDialog
+          open={this.state.open}
+          title="Delete note"
+          content="Delete this note? This cannot be undone."
+          onCancel={() => this.setState({ open: false, noteToDelete: null })}
+          onConfirm={() => this.deleteUserNote(this.state.noteToDelete)}
+        />
       </div>
     );
   }

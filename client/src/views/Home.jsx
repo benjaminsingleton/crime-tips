@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Grid } from 'semantic-ui-react';
 import Layout from '../components/Layout';
 import TipFormContainer from '../components/TipFormContainer';
 import TipFormIntro from '../components/TipFormIntro';
@@ -412,13 +411,23 @@ class HomeInner extends Component {
       displayComponent = this.displayFormModule(this.state.moduleIndex);
     }
 
+    const showHero =
+      this.state.moduleIndex !== 'about' && this.state.moduleIndex !== 'faq';
+
     return (
       <Layout>
-        <Grid centered container columns={1}>
-          <Grid.Column mobile={16} tablet={12} computer={10} largeScreen={10}>
-            {displayComponent}
-          </Grid.Column>
-        </Grid>
+        {showHero && (
+          <header className="public-hero">
+            <h1 className="public-hero__brand">
+              Gotham <span>Crime Tips</span>
+            </h1>
+            <p className="public-hero__lead">
+              Share information with police confidentially. Your tip helps keep the community safe.
+            </p>
+            <hr className="public-hero__rule" />
+          </header>
+        )}
+        {displayComponent}
       </Layout>
     );
   }

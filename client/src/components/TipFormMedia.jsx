@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Form, Input, Button, Segment, Progress } from 'semantic-ui-react';
+import { Button, Alert } from './ui';
 import { api } from '../api';
 
 export default class TipFormMedia extends Component {
@@ -65,60 +65,63 @@ export default class TipFormMedia extends Component {
     const { attachments } = this.props.tip;
     const uploadedFiles = attachments
       ? Object.keys(attachments).map((key) => (
-          <Segment key={key}>
-            <p>
-              {attachments[key].filename}
-              <Button
-                basic
-                compact
-                icon="delete"
-                color="red"
-                floated="right"
-                onClick={() => this.delete(key)}
-              />
-            </p>
-          </Segment>
+          <div className="file-row" key={key}>
+            <span>{attachments[key].filename}</span>
+            <Button
+              type="button"
+              size="sm"
+              variant="danger-outline"
+              content="Remove"
+              onClick={() => this.delete(key)}
+            />
+          </div>
         ))
       : null;
 
     return (
       <div>
         {(attachments || this.state.uploadPercent > 0 || this.state.error) && (
-          <Segment padded basic>
+          <div style={{ marginBottom: '1rem' }}>
             {this.state.error && (
-              <p>
-                <b>An error occurred. Please try again.</b>
-                {` (${this.state.error})`}
-              </p>
+              <Alert
+                tone="error"
+                title="Upload failed"
+                content={`${this.state.error}`}
+              />
             )}
             {this.state.uploadPercent > 0 && this.state.uploadPercent < 100 && (
-              <p>
-                <b>Uploading ...</b>
-              </p>
+              <p><strong>Uploading…</strong> {this.state.filename}</p>
             )}
             {this.state.uploadPercent > 0 && (
-              <Progress percent={this.state.uploadPercent} indicating autoSuccess />
+              <div className="progress" role="progressbar" aria-valuenow={this.state.uploadPercent}>
+                <div className="progress__bar" style={{ width: `${this.state.uploadPercent}%` }} />
+              </div>
             )}
             {uploadedFiles}
-          </Segment>
+          </div>
         )}
-        <Form>
-          <Form.Field>
-            <label>{this.props.lang.media.label}</label>
-            <div className="ui file input action">
-              <Input type="text" value={this.state.filename} readOnly />
-              <input
-                type="file"
-                ref={(input) => {
-                  this.fileInput = input;
-                }}
-                style={{ display: 'none' }}
-                onChange={(e) => this.uploadFile(e)}
-              />
-              <Button content="Upload" icon="cloud upload" onClick={(e) => this.click(e)} />
-            </div>
-          </Form.Field>
-        </Form>
+        <div className="field">
+          <label className="field__label">{this.props.lang.media.label}</label>
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <input
+              className="input"
+              type="text"
+              value={this.state.filename}
+              readOnly
+              placeholder="No file selected"
+              style={{ flex: 1, minWidth: '12rem' }}
+            />
+            <input
+              type="file"
+              ref={(input) => {
+                this.fileInput = input;
+              }}
+              style={{ display: 'none' }}
+              onChange={(e) => this.uploadFile(e)}
+            />
+            <Button type="button" variant="primary" content="Upload" onClick={(e) => this.click(e)} />
+          </div>
+        </div>
       </div>
     );
   }

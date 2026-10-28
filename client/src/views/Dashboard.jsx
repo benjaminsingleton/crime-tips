@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { Grid } from 'semantic-ui-react';
 import Layout from '../components/Layout';
 import DashboardMetrics from '../components/DashboardMetrics';
 import DashboardLeftPanel from '../components/DashboardLeftPanel';
@@ -71,21 +70,15 @@ class DashboardInner extends Component {
 
   render() {
     return (
-      <Layout user={this.props.user} onLogout={this.props.onLogout}>
+      <Layout user={this.props.user} onLogout={this.props.onLogout} variant="officer">
         <DashboardMetrics />
-        <Grid columns={4}>
-          <Grid.Row>
-            <Grid.Column mobile={16} tablet={16} computer={6} largeScreen={4}>
-              <DashboardLeftPanel
-                filterTips={this.filterTips}
-                changePanel={this.changePanel}
-              />
-            </Grid.Column>
-            <Grid.Column mobile={16} tablet={16} computer={10} largeScreen={12}>
-              {this.renderDashboardRightPanel()}
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
+        <div className="dash-layout">
+          <DashboardLeftPanel
+            filterTips={this.filterTips}
+            changePanel={this.changePanel}
+          />
+          <div>{this.renderDashboardRightPanel()}</div>
+        </div>
       </Layout>
     );
   }

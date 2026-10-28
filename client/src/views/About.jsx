@@ -1,14 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Card } from 'semantic-ui-react';
+import { Panel } from '../components/ui';
 
 const About = ({ lang }) => (
-  <Card centered fluid style={{ marginBottom: '14px' }}>
-    <Card.Content header={lang.about} meta={lang.aboutSubtitle} />
-    <Card.Content>
-      <p>{lang.aboutContent}</p>
-    </Card.Content>
-  </Card>
+  <Panel title={lang.about} meta={lang.aboutSubtitle}>
+    <p>{lang.aboutContent}</p>
+  </Panel>
 );
 
 About.propTypes = {
@@ -16,4 +13,3 @@ About.propTypes = {
 };
 
 export default About;
-

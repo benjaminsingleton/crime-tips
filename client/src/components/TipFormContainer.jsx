@@ -1,74 +1,63 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Card, Button, Container, Breadcrumb, Icon } from 'semantic-ui-react';
+import { Button, Panel } from './ui';
 
-const TipFormContainer = props => (
-  <Card centered fluid style={{ marginBottom: '14px' }}>
-    <Card.Content header={props.title} meta={props.lang.cardSubtitle} />
-    <Card.Content>
-      <Container textAlign="center">
-        <Breadcrumb>
-          <Breadcrumb.Section active={props.activeModule === 'intro'}>
-            <Icon disabled={props.activeModule !== 'intro'} name="marker" />{props.lang.incident}
-          </Breadcrumb.Section>
-          <Breadcrumb.Divider icon="right arrow" />
-          {props.showFormModule.suspect === true &&
-            <Breadcrumb.Section active={props.activeModule === 'suspect'}>
-              <Icon disabled={props.activeModule !== 'suspect'} name="user" />{props.lang.suspect}
-            </Breadcrumb.Section>
-          }
-          {props.showFormModule.suspect === true && <Breadcrumb.Divider icon="right arrow" />}
-          {props.showFormModule.vehicle === true &&
-            <Breadcrumb.Section active={props.activeModule === 'vehicle'}>
-              <Icon disabled={props.activeModule !== 'vehicle'} name="car" />{props.lang.vehicle}
-            </Breadcrumb.Section>
-          }
-          {props.showFormModule.vehicle === true && <Breadcrumb.Divider icon="right arrow" />}
-          {props.showFormModule.drugs === true &&
-            <Breadcrumb.Section active={props.activeModule === 'drugs'}>
-              <Icon disabled={props.activeModule !== 'drugs'} name="medkit" />{props.lang.drugs}
-            </Breadcrumb.Section>
-          }
-          {props.showFormModule.drugs === true && <Breadcrumb.Divider icon="right arrow" />}
-          {props.showFormModule.media === true &&
-            <Breadcrumb.Section active={props.activeModule === 'media'}>
-              <Icon disabled={props.activeModule !== 'media'} name="cloud upload" />{props.lang.mediaBreadcrumb}
-            </Breadcrumb.Section>
-          }
-          {props.showFormModule.media === true && <Breadcrumb.Divider icon="right arrow" />}
-          <Breadcrumb.Section active={props.activeModule === 'final'}>
-            <Icon disabled={props.activeModule !== 'final'} name="check" />{props.lang.final}
-          </Breadcrumb.Section>
-        </Breadcrumb>
-      </Container>
-    </Card.Content>
-    <Card.Content>
-      {props.children}
-    </Card.Content>
-    <Card.Content>
-      {props.previousButton &&
+const TipFormContainer = (props) => {
+  const steps = [
+    { key: 'intro', label: props.lang.incident, show: true },
+    { key: 'suspect', label: props.lang.suspect, show: props.showFormModule.suspect === true },
+    { key: 'vehicle', label: props.lang.vehicle, show: props.showFormModule.vehicle === true },
+    { key: 'drugs', label: props.lang.drugs, show: props.showFormModule.drugs === true },
+    { key: 'media', label: props.lang.mediaBreadcrumb, show: props.showFormModule.media === true },
+    { key: 'final', label: props.lang.final, show: true },
+  ].filter((s) => s.show);
+
+  const hasFooter = props.previousButton || props.nextButton || props.showSubmit;
+  const footer = hasFooter ? (
+    <>
+      {props.previousButton && (
         <Button
+          variant="secondary"
           content={props.lang.previous}
           onClick={() => props.changeFormWizardIndex('previous')}
         />
-      }
-      {props.nextButton &&
+      )}
+      {props.nextButton && (
         <Button
+          variant="primary"
           content={props.lang.next}
-          color="violet"
           onClick={() => props.changeFormWizardIndex('next')}
         />
-      }
-      {props.showSubmit &&
+      )}
+      {props.showSubmit && (
         <Button
+          variant="primary"
           content={props.lang.submit}
-          color="violet"
-          onClick={e => props.createTip(e)}
+          onClick={(e) => props.createTip(e)}
         />
-      }
-    </Card.Content>
-  </Card>
-);
+      )}
+    </>
+  ) : null;
+
+  return (
+    <Panel title={props.title} meta={props.lang.cardSubtitle} footer={footer}>
+      {props.activeModule !== 'success' && (
+        <ol className="wizard-steps" aria-label="Tip form steps">
+          {steps.map((step) => (
+            <li
+              key={step.key}
+              className={props.activeModule === step.key ? 'is-active' : undefined}
+            >
+              <span className="step-dot" aria-hidden="true" />
+              {step.label}
+            </li>
+          ))}
+        </ol>
+      )}
+      {props.children}
+    </Panel>
+  );
+};
 
 TipFormContainer.propTypes = {
   activeModule: PropTypes.string,
@@ -90,7 +79,18 @@ TipFormContainer.propTypes = {
 
 TipFormContainer.defaultProps = {
   activeModule: 'intro',
-  lang: { cardSubtitle: '', incident: '', suspect: '', vehicle: '', drugs: '', mediaBreadcrumb: '', final: '', previous: 'Previous', next: 'Next', submit: 'Submit' },
+  lang: {
+    cardSubtitle: '',
+    incident: '',
+    suspect: '',
+    vehicle: '',
+    drugs: '',
+    mediaBreadcrumb: '',
+    final: '',
+    previous: 'Previous',
+    next: 'Next',
+    submit: 'Submit',
+  },
   title: '',
   changeFormWizardIndex: () => {},
   showFormModule: {},

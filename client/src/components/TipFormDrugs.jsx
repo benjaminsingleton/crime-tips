@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Form } from 'semantic-ui-react';
+import { TextInput, Select } from './ui';
 import { drugTypeOptions, drugSaleMethodOptions } from '../helpers/formOptions';
 
-const TipFormDrugs = props => (
-  <Form>
-    <Form.Select
+const TipFormDrugs = (props) => (
+  <div className="form-grid">
+    <Select
       label={props.lang.drugType.label}
       name="drugType"
       value={props.tip.drugType}
@@ -13,7 +13,7 @@ const TipFormDrugs = props => (
       placeholder={props.lang.drugType.placeholder}
       onChange={props.handleInputChange}
     />
-    <Form.Select
+    <Select
       label={props.lang.drugSaleMethod.label}
       name="drugSaleMethod"
       value={props.tip.drugSaleMethod}
@@ -21,21 +21,21 @@ const TipFormDrugs = props => (
       placeholder={props.lang.drugSaleMethod.placeholder}
       onChange={props.handleInputChange}
     />
-    <Form.Input
+    <TextInput
       label={props.lang.drugSaleTime.label}
       name="drugSaleTime"
       value={props.tip.drugSaleTime}
       placeholder={props.lang.drugSaleTime.placeholder}
       onChange={props.handleInputChange}
     />
-    <Form.Input
+    <TextInput
       label={props.lang.drugSalePhoneNumber.label}
       name="drugSalePhoneNumber"
       value={props.tip.drugSalePhoneNumber}
       placeholder={props.lang.drugSalePhoneNumber.placeholder}
       onChange={props.handleInputChange}
     />
-  </Form>
+  </div>
 );
 
 TipFormDrugs.propTypes = {
