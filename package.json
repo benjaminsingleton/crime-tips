@@ -1,33 +1,16 @@
 {
   "name": "crime-tips",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
-  "devDependencies": {
-    "babel-eslint": "^7.2.3",
-    "eslint": "^3.19.0",
-    "eslint-config-airbnb": "^15.0.1",
-    "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-jsx-a11y": "^4.0.0",
-    "eslint-plugin-react": "^7.0.1",
-    "react-scripts": "0.9.3"
-  },
-  "dependencies": {
-    "firebase": "^3.7.4",
-    "moment": "^2.17.1",
-    "prop-types": "^15.5.8",
-    "react": "^15.5.4",
-    "react-dom": "^15.5.4",
-    "react-router-dom": "^4.1.1",
-    "semantic-ui-css": "^2.2.10",
-    "semantic-ui-react": "^0.68.3",
-    "underscore": "^1.8.3"
+  "description": "Crime tip intake — Postgres + Docker",
+  "engines": {
+    "node": ">=20"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject",
-    "deploy": "firebase deploy --except functions",
-    "deploy-functions": "firebase deploy --only functions"
+    "dev:server": "npm --prefix server start",
+    "dev:client": "npm --prefix client run dev",
+    "build:client": "npm --prefix client run build",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down"
   }
 }

@@ -1,0 +1,54 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-crimetips}
+      POSTGRES_USER: ${POSTGRES_USER:-crimetips}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-crimetips}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-crimetips} -d ${POSTGRES_DB:-crimetips}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # Published for local tools / host-gateway fallbacks. Prefer the internal
+    # hostname `db` from the app container on a normal Docker bridge.
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PORT: 3000
+      DATABASE_URL: ${DATABASE_URL:-postgres://${POSTGRES_USER:-crimetips}:${POSTGRES_PASSWORD:-crimetips}@db:5432/${POSTGRES_DB:-crimetips}}
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-12h}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-changeme}
+      ADMIN_RANK: ${ADMIN_RANK:-Admin}
+      ADMIN_FIRST_NAME: ${ADMIN_FIRST_NAME:-System}
+      ADMIN_LAST_NAME: ${ADMIN_LAST_NAME:-Administrator}
+      UPLOAD_DIR: /data/uploads
+      CLIENT_DIST: /app/client/dist
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-noreply@crimetips.local}
+      MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-26214400}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - uploads:/data/uploads
+    ports:
+      - "${APP_PORT:-8080}:3000"
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  uploads:

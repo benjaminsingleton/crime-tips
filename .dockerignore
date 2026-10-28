@@ -1,0 +1,14 @@
+**/node_modules
+**/dist
+**/build
+.git
+.env
+uploads
+*.log
+functions
+src
+public
+firebase.json
+.firebaserc
+database.rules.json
+storage.rules
