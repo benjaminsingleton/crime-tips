@@ -17,6 +17,27 @@ export function signToken(user) {
   );
 }
 
+/** Short-lived token after password OK, before TOTP verify. */
+export function signMfaPendingToken(user, ttlSec) {
+  return jwt.sign(
+    {
+      sub: user.id,
+      email: user.email,
+      purpose: 'mfa',
+    },
+    JWT_SECRET(),
+    { expiresIn: ttlSec || 300 },
+  );
+}
+
+export function verifyMfaPendingToken(token) {
+  const payload = jwt.verify(token, JWT_SECRET());
+  if (payload.purpose !== 'mfa' || !payload.sub) {
+    throw new Error('Invalid MFA pending token');
+  }
+  return payload;
+}
+
 export function requireAuth(req, res, next) {
   const token = readSessionToken(req);
   if (!token) {
@@ -38,10 +59,27 @@ export function requireAdmin(req, res, next) {
   return next();
 }
 
+/**
+ * When MFA_REQUIRED=true, block authenticated API use until the officer enrolls TOTP.
+ * Allow /api/auth/* so setup/confirm/logout/me still work.
+ */
+export function requireMfaIfEnforced(req, res, next) {
+  const v = (process.env.MFA_REQUIRED || '').toLowerCase();
+  const enforced = v === 'true' || v === '1' || v === 'yes';
+  if (!enforced) return next();
+  if (!req.dbUser) return next();
+  if (req.dbUser.mfa_enabled) return next();
+  return res.status(403).json({
+    error: 'Multi-factor authentication enrollment required',
+    mfaEnrollmentRequired: true,
+  });
+}
+
 export async function loadUser(req, res, next) {
   if (!req.user?.sub) return next();
   const { rows } = await query(
-    `SELECT id, email, rank, first_name, last_name, admin, notifications, account_active
+    `SELECT id, email, rank, first_name, last_name, admin, notifications, account_active,
+            mfa_enabled
      FROM users WHERE id = $1`,
     [req.user.sub],
   );
@@ -62,5 +100,6 @@ export function publicUser(row) {
     admin: row.admin,
     notifications: row.notifications,
     accountActive: row.account_active,
+    mfaEnabled: Boolean(row.mfa_enabled),
   };
 }

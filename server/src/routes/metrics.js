@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { query } from '../db.js';
-import { requireAuth, loadUser } from '../middleware/auth.js';
+import { requireAuth, loadUser, requireMfaIfEnforced } from '../middleware/auth.js';
 
 const router = Router();
 
-router.get('/', requireAuth, loadUser, async (_req, res) => {
+router.get('/', requireAuth, loadUser, requireMfaIfEnforced, async (_req, res) => {
   const unreadTips = await query(
     `SELECT COUNT(*)::int AS count FROM tips WHERE submitted = TRUE AND read = FALSE AND archived = FALSE`,
   );

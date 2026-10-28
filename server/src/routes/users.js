@@ -5,6 +5,7 @@ import {
   requireAuth,
   requireAdmin,
   loadUser,
+  requireMfaIfEnforced,
   publicUser,
 } from '../middleware/auth.js';
 
@@ -12,9 +13,11 @@ const router = Router();
 
 router.use(requireAuth, loadUser);
 
-router.get('/', requireAdmin, async (_req, res) => {
+// Admin account ops require MFA when MFA_REQUIRED=true; self settings stay available for enroll.
+router.get('/', requireMfaIfEnforced, requireAdmin, async (_req, res) => {
   const { rows } = await query(
-    `SELECT id, email, rank, first_name, last_name, admin, notifications, account_active, created_at
+    `SELECT id, email, rank, first_name, last_name, admin, notifications, account_active,
+            mfa_enabled, created_at
      FROM users ORDER BY last_name, first_name`,
   );
   const users = {};
@@ -24,7 +27,7 @@ router.get('/', requireAdmin, async (_req, res) => {
   res.json({ users });
 });
 
-router.post('/', requireAdmin, async (req, res) => {
+router.post('/', requireMfaIfEnforced, requireAdmin, async (req, res) => {
   const {
     email,
     password,
@@ -50,7 +53,7 @@ router.post('/', requireAdmin, async (req, res) => {
   const { rows } = await query(
     `INSERT INTO users (email, password_hash, rank, first_name, last_name, admin, notifications, account_active)
      VALUES ($1, $2, $3, $4, $5, $6, TRUE, TRUE)
-     RETURNING id, email, rank, first_name, last_name, admin, notifications, account_active`,
+     RETURNING id, email, rank, first_name, last_name, admin, notifications, account_active, mfa_enabled`,
     [email, hash, rank, firstName, lastName, Boolean(admin)],
   );
 
@@ -97,7 +100,7 @@ router.patch('/:id', async (req, res) => {
          rank = $1, first_name = $2, last_name = $3, email = $4,
          notifications = $5, account_active = $6, admin = $7, updated_at = NOW()
        WHERE id = $8
-       RETURNING id, email, rank, first_name, last_name, admin, notifications, account_active`,
+       RETURNING id, email, rank, first_name, last_name, admin, notifications, account_active, mfa_enabled`,
       [
         next.rank,
         next.firstName,

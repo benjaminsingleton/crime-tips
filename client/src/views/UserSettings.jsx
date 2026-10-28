@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Grid, Card, Form, Radio, Divider, Message } from 'semantic-ui-react';
+import { Grid, Card, Form, Radio, Divider, Message, Button } from 'semantic-ui-react';
 import Layout from '../components/Layout';
 import { api } from '../api';
 import { relativeTime } from '../helpers/helpers';
@@ -9,6 +9,7 @@ export default class UserSettings extends Component {
   state = {
     userDetails: this.props.user || {},
     userActivity: {},
+    mfaRequired: false,
     newPassword: '',
     newPasswordRepeat: '',
     passwordMsgStatus: null,
@@ -17,6 +18,13 @@ export default class UserSettings extends Component {
     newEmailRepeat: '',
     emailMsgStatus: null,
     emailMsg: '',
+    mfaSetup: null,
+    mfaCode: '',
+    mfaDisablePassword: '',
+    mfaDisableCode: '',
+    mfaMsgStatus: null,
+    mfaMsg: '',
+    backupCodes: null,
   };
 
   componentDidMount() {
@@ -25,9 +33,17 @@ export default class UserSettings extends Component {
 
   refresh = async () => {
     try {
-      const { user } = await api.me();
+      const me = await api.me();
+      const { user } = me;
       const { activity } = await api.userActivity(user.id);
-      this.setState({ userDetails: user, userActivity: activity || {} });
+      this.setState({
+        userDetails: user,
+        userActivity: activity || {},
+        mfaRequired: Boolean(me.mfaRequired),
+      });
+      if (user.mfaEnabled) {
+        sessionStorage.removeItem('mfaEnrollmentRequired');
+      }
       if (this.props.setUser) this.props.setUser(user);
     } catch (err) {
       console.error(err);
@@ -110,6 +126,164 @@ export default class UserSettings extends Component {
     }
   };
 
+  startMfaSetup = async () => {
+    try {
+      const setup = await api.mfaSetup();
+      this.setState({
+        mfaSetup: setup,
+        mfaCode: '',
+        backupCodes: null,
+        mfaMsgStatus: null,
+        mfaMsg: '',
+      });
+    } catch (error) {
+      this.setState({ mfaMsgStatus: 'error', mfaMsg: error.message });
+    }
+  };
+
+  confirmMfa = async (e) => {
+    e.preventDefault();
+    try {
+      const result = await api.mfaConfirm(this.state.mfaCode);
+      this.setState({
+        mfaSetup: null,
+        mfaCode: '',
+        backupCodes: result.backupCodes || [],
+        userDetails: result.user,
+        mfaMsgStatus: 'success',
+        mfaMsg: 'Two-factor authentication is enabled. Save your backup codes now.',
+      });
+      sessionStorage.removeItem('mfaEnrollmentRequired');
+      if (this.props.setUser) this.props.setUser(result.user);
+      this.refresh();
+    } catch (error) {
+      this.setState({ mfaMsgStatus: 'error', mfaMsg: error.message });
+    }
+  };
+
+  disableMfa = async (e) => {
+    e.preventDefault();
+    try {
+      const { user } = await api.mfaDisable(
+        this.state.mfaDisablePassword,
+        this.state.mfaDisableCode,
+      );
+      this.setState({
+        userDetails: user,
+        mfaDisablePassword: '',
+        mfaDisableCode: '',
+        backupCodes: null,
+        mfaMsgStatus: 'success',
+        mfaMsg: 'Two-factor authentication has been disabled.',
+      });
+      if (this.props.setUser) this.props.setUser(user);
+    } catch (error) {
+      this.setState({ mfaMsgStatus: 'error', mfaMsg: error.message });
+    }
+  };
+
+  renderMfaSection() {
+    const { userDetails, mfaSetup, mfaRequired, backupCodes } = this.state;
+    const enrollmentForced =
+      mfaRequired &&
+      !userDetails.mfaEnabled &&
+      sessionStorage.getItem('mfaEnrollmentRequired') === '1';
+
+    return (
+      <>
+        <h4>Two-factor authentication (TOTP)</h4>
+        {enrollmentForced && (
+          <Message
+            warning
+            header="MFA enrollment required"
+            content="This deployment sets MFA_REQUIRED=true. Enroll an authenticator app before using the dashboard."
+          />
+        )}
+        <p>
+          Status:{' '}
+          <strong>{userDetails.mfaEnabled ? 'Enabled' : 'Not enabled'}</strong>
+          {mfaRequired ? ' (required for all officers)' : ''}
+        </p>
+        {backupCodes && backupCodes.length > 0 && (
+          <Message info>
+            <Message.Header>Backup codes (save these; shown once)</Message.Header>
+            <pre style={{ whiteSpace: 'pre-wrap' }}>{backupCodes.join('\n')}</pre>
+          </Message>
+        )}
+        {!userDetails.mfaEnabled && !mfaSetup && (
+          <Button type="button" primary onClick={this.startMfaSetup}>
+            Set up authenticator
+          </Button>
+        )}
+        {mfaSetup && (
+          <Form
+            success={this.state.mfaMsgStatus === 'success'}
+            error={this.state.mfaMsgStatus === 'error'}
+            onSubmit={this.confirmMfa}
+          >
+            <p>Scan this QR code with Google Authenticator, Authy, or a similar app:</p>
+            <img
+              src={mfaSetup.qrDataUrl}
+              alt="MFA QR code"
+              width={200}
+              height={200}
+              style={{ display: 'block', marginBottom: 12 }}
+            />
+            <p>
+              Or enter this secret manually:{' '}
+              <code style={{ wordBreak: 'break-all' }}>{mfaSetup.secret}</code>
+            </p>
+            <Form.Input
+              label="Enter the 6-digit code to confirm"
+              name="mfaCode"
+              value={this.state.mfaCode}
+              onChange={this.handleInputChange}
+              autoComplete="one-time-code"
+            />
+            <Message success content={this.state.mfaMsg} />
+            <Message error content={this.state.mfaMsg} />
+            <Form.Button primary>Enable MFA</Form.Button>
+          </Form>
+        )}
+        {userDetails.mfaEnabled && !mfaRequired && (
+          <Form
+            success={this.state.mfaMsgStatus === 'success'}
+            error={this.state.mfaMsgStatus === 'error'}
+            onSubmit={this.disableMfa}
+          >
+            <p>To disable MFA, confirm your password and a current authenticator (or backup) code.</p>
+            <Form.Input
+              label="Current password"
+              name="mfaDisablePassword"
+              type="password"
+              value={this.state.mfaDisablePassword}
+              onChange={this.handleInputChange}
+            />
+            <Form.Input
+              label="Authentication code"
+              name="mfaDisableCode"
+              value={this.state.mfaDisableCode}
+              onChange={this.handleInputChange}
+            />
+            <Message success content={this.state.mfaMsg} />
+            <Message error content={this.state.mfaMsg} />
+            <Form.Button negative>Disable MFA</Form.Button>
+          </Form>
+        )}
+        {userDetails.mfaEnabled && mfaRequired && (
+          <Message info content="MFA cannot be disabled while MFA_REQUIRED is set on the server." />
+        )}
+        {!mfaSetup && this.state.mfaMsgStatus && !userDetails.mfaEnabled && (
+          <Message
+            success={this.state.mfaMsgStatus === 'success'}
+            error={this.state.mfaMsgStatus === 'error'}
+            content={this.state.mfaMsg}
+          />
+        )}
+      </>
+    );
+  }
+
   render() {
     const activityKeys = Object.keys(this.state.userActivity || {});
     return (
@@ -135,6 +309,8 @@ export default class UserSettings extends Component {
                     />
                   </Form.Field>
                 </Form>
+                <Divider />
+                {this.renderMfaSection()}
                 <Divider />
                 <Form
                   success={this.state.passwordMsgStatus === 'success'}

@@ -52,6 +52,7 @@ Ops runbooks:
 - [Update](docs/ops/update.md)
 - [TLS](docs/ops/tls.md)
 - [Hardening checklist](docs/ops/hardening.md)
+- [Officer MFA (TOTP)](docs/ops/auth-mfa.md)
 - [Backup & restore](docs/ops/backup-restore.md)
 
 Helpers: `scripts/gen-secrets.sh`, `scripts/preflight.sh`, `scripts/backup.sh`, `scripts/restore.sh`, `scripts/update.sh`.
@@ -81,11 +82,13 @@ See `.env.example`. Important variables:
 | `DOMAIN` | Hostname for Caddy / Let’s Encrypt |
 | `UPLOAD_DIR` | Tip file storage (volume in Compose) |
 | `SMTP_*` | Optional new-tip email; otherwise the API logs a stub |
+| `MFA_REQUIRED` | `true` to require TOTP enrollment for all officers (optional) |
+| `MFA_ISSUER` | Authenticator app label (default `Crime Tips`) |
 
 ## Architecture
 
 - `client/` — Vite React app (tip wizard + officer UI)
-- `server/` — Express API, httpOnly session cookies + bcrypt, draft tip edit tokens, Postgres schema in `server/sql/schema.sql`
+- `server/` — Express API, httpOnly session cookies + bcrypt, optional TOTP MFA, draft tip edit tokens, Postgres schema in `server/sql/schema.sql`
 - `docker-compose.yml` — developer stack (`db` + `app`; `docker compose up --build`)
 - `docker-compose.prod.yml` — production overlay (Caddy, no Postgres publish, pull GHCR image)
 - `docker-compose.build.yml` — optional: build app from source instead of pulling

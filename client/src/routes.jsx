@@ -53,9 +53,15 @@ export default function App() {
     };
   }, []);
 
-  const onLogin = (nextUser) => {
+  const onLogin = (nextUser, opts = {}) => {
     setUser(nextUser);
     setAuthed(true);
+    if (opts.mfaEnrollmentRequired) {
+      // Soft cue: settings will show mandatory enroll banner when MFA_REQUIRED.
+      sessionStorage.setItem('mfaEnrollmentRequired', '1');
+    } else {
+      sessionStorage.removeItem('mfaEnrollmentRequired');
+    }
   };
 
   const onLogout = async () => {
@@ -113,7 +119,11 @@ export default function App() {
             path="/dashboard"
             element={(
               <PrivateRoute authed={authed}>
-                <Dashboard user={user} onLogout={onLogout} />
+                {user && !user.mfaEnabled && sessionStorage.getItem('mfaEnrollmentRequired') === '1' ? (
+                  <Navigate to="/settings" replace />
+                ) : (
+                  <Dashboard user={user} onLogout={onLogout} />
+                )}
               </PrivateRoute>
             )}
           />
@@ -121,7 +131,11 @@ export default function App() {
             path="/tip/:tipId"
             element={(
               <PrivateRoute authed={authed}>
-                <Dashboard user={user} onLogout={onLogout} />
+                {user && !user.mfaEnabled && sessionStorage.getItem('mfaEnrollmentRequired') === '1' ? (
+                  <Navigate to="/settings" replace />
+                ) : (
+                  <Dashboard user={user} onLogout={onLogout} />
+                )}
               </PrivateRoute>
             )}
           />
@@ -137,7 +151,11 @@ export default function App() {
             path="/account_management"
             element={(
               <PrivateRoute authed={authed}>
-                <AccountManagement user={user} onLogout={onLogout} />
+                {user && !user.mfaEnabled && sessionStorage.getItem('mfaEnrollmentRequired') === '1' ? (
+                  <Navigate to="/settings" replace />
+                ) : (
+                  <AccountManagement user={user} onLogout={onLogout} />
+                )}
               </PrivateRoute>
             )}
           />

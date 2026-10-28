@@ -39,6 +39,16 @@ export const api = {
   health: () => request('/health'),
   login: (email, password) =>
     request('/auth/login', { method: 'POST', body: { email, password } }),
+  verifyMfa: (mfaToken, code) =>
+    request('/auth/mfa/verify', { method: 'POST', body: { mfaToken, code } }),
+  mfaStatus: () => request('/auth/mfa/status'),
+  mfaSetup: () => request('/auth/mfa/setup', { method: 'POST' }),
+  mfaConfirm: (code) =>
+    request('/auth/mfa/confirm', { method: 'POST', body: { code } }),
+  mfaDisable: (password, code) =>
+    request('/auth/mfa/disable', { method: 'POST', body: { password, code } }),
+  mfaAdminReset: (userId) =>
+    request(`/auth/mfa/admin-reset/${userId}`, { method: 'POST' }),
   me: () => request('/auth/me'),
   logout: () => request('/auth/logout', { method: 'POST' }),
 

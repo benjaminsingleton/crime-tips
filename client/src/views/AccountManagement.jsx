@@ -227,6 +227,29 @@ class EditUser extends Component {
     }
   };
 
+  resetMfa = async (e) => {
+    e.preventDefault();
+    if (
+      !window.confirm(
+        'Clear MFA for this officer? They will enroll again at next login if MFA is required.',
+      )
+    ) {
+      return;
+    }
+    try {
+      await api.mfaAdminReset(this.props.uid);
+      this.setState({
+        error: false,
+        success: true,
+        header: 'Success!',
+        message: 'MFA cleared for this account.',
+      });
+      this.props.onSaved();
+    } catch (error) {
+      this.setState({ error: true, success: false, header: 'Error!', message: error.message });
+    }
+  };
+
   saveChanges = async (e) => {
     e.preventDefault();
     if (!this.state.rank || !this.state.firstName || !this.state.lastName || !this.state.email) {
@@ -304,6 +327,14 @@ class EditUser extends Component {
                   onChange={this.handleInputChange}
                 />
                 <Form.Button size="small" content="Reset Password" onClick={this.resetPassword} />
+                {this.props.user.mfaEnabled ? (
+                  <Form.Button
+                    size="small"
+                    content="Reset MFA"
+                    type="button"
+                    onClick={this.resetMfa}
+                  />
+                ) : null}
               </Grid.Column>
               <Grid.Column>
                 <Form.Checkbox
@@ -321,6 +352,9 @@ class EditUser extends Component {
                   checked={this.state.accountActive}
                   onChange={() => this.toggleBool('accountActive')}
                 />
+                <p style={{ marginTop: 8 }}>
+                  MFA: {this.props.user.mfaEnabled ? 'Enabled' : 'Off'}
+                </p>
               </Grid.Column>
               <Grid.Column />
             </Grid.Row>
@@ -396,6 +430,7 @@ export default class AccountManagement extends Component {
         <Table.Cell>{user.admin ? 'True' : 'False'}</Table.Cell>
         <Table.Cell>{user.notifications ? 'True' : 'False'}</Table.Cell>
         <Table.Cell>{user.accountActive ? 'True' : 'False'}</Table.Cell>
+        <Table.Cell>{user.mfaEnabled ? 'On' : 'Off'}</Table.Cell>
         <Table.Cell>
           <Button content="Edit" onClick={() => this.editUser(userId)} />
         </Table.Cell>
@@ -435,6 +470,7 @@ export default class AccountManagement extends Component {
                         <Table.HeaderCell>Admin</Table.HeaderCell>
                         <Table.HeaderCell>Notifications</Table.HeaderCell>
                         <Table.HeaderCell>Account active?</Table.HeaderCell>
+                        <Table.HeaderCell>MFA</Table.HeaderCell>
                         <Table.HeaderCell />
                       </Table.Row>
                     </Table.Header>
