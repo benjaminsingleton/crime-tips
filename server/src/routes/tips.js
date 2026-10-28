@@ -5,6 +5,11 @@ import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { query, tipToJson } from '../db.js';
 import { requireAuth, loadUser } from '../middleware/auth.js';
+import { tipUploadLimiter, tipWriteLimiter } from '../middleware/rateLimit.js';
+import {
+  isAllowedAttachmentMime,
+  maxAttachmentsPerTip,
+} from '../security/uploads.js';
 import { notifyNewTip } from '../services/email.js';
 
 const router = Router();
@@ -27,6 +32,12 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   limits: { fileSize: Number(process.env.MAX_UPLOAD_BYTES || 25 * 1024 * 1024) },
+  fileFilter: (_req, file, cb) => {
+    if (!isAllowedAttachmentMime(file.mimetype)) {
+      return cb(new Error('File type not allowed'));
+    }
+    return cb(null, true);
+  },
 });
 
 async function getAttachments(tipId) {
@@ -100,7 +111,7 @@ function stripServerFields(body = {}) {
 }
 
 // Public: create draft tip (abandoned flow)
-router.post('/', async (req, res) => {
+router.post('/', tipWriteLimiter, async (req, res) => {
   const body = stripServerFields(req.body || {});
   const submitted = Boolean(req.body?.submitted);
   const timestampStart = body.timestampStart || Date.now();
@@ -124,7 +135,7 @@ router.post('/', async (req, res) => {
 });
 
 // Public: update unsubmitted tip payload
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', tipWriteLimiter, async (req, res) => {
   const { rows } = await query(`SELECT * FROM tips WHERE id = $1`, [req.params.id]);
   if (!rows[0]) return res.status(404).json({ error: 'Tip not found' });
   if (rows[0].submitted) {
@@ -144,7 +155,7 @@ router.patch('/:id', async (req, res) => {
 });
 
 // Public: submit tip
-router.post('/:id/submit', async (req, res) => {
+router.post('/:id/submit', tipWriteLimiter, async (req, res) => {
   const { rows } = await query(`SELECT * FROM tips WHERE id = $1`, [req.params.id]);
   if (!rows[0]) return res.status(404).json({ error: 'Tip not found' });
   if (rows[0].submitted) return res.status(400).json({ error: 'Already submitted' });
@@ -173,13 +184,37 @@ router.post('/:id/submit', async (req, res) => {
 });
 
 // Public: upload attachment to draft tip
-router.post('/:id/attachments', upload.single('file'), async (req, res) => {
+router.post('/:id/attachments', tipUploadLimiter, (req, res, next) => {
+  upload.single('file')(req, res, (err) => {
+    if (err) {
+      const message = err.message || 'Upload failed';
+      const status = err.code === 'LIMIT_FILE_SIZE' ? 413 : 400;
+      return res.status(status).json({ error: message });
+    }
+    return next();
+  });
+}, async (req, res) => {
   const { rows } = await query(`SELECT * FROM tips WHERE id = $1`, [req.params.id]);
   if (!rows[0]) return res.status(404).json({ error: 'Tip not found' });
   if (rows[0].submitted) {
     return res.status(403).json({ error: 'Cannot attach to submitted tip' });
   }
   if (!req.file) return res.status(400).json({ error: 'file required' });
+
+  const countRes = await query(
+    `SELECT COUNT(*)::int AS count FROM tip_attachments WHERE tip_id = $1`,
+    [req.params.id],
+  );
+  if (countRes.rows[0].count >= maxAttachmentsPerTip()) {
+    try {
+      fs.unlinkSync(req.file.path);
+    } catch {
+      /* ignore */
+    }
+    return res.status(400).json({
+      error: `Maximum of ${maxAttachmentsPerTip()} attachments per tip`,
+    });
+  }
 
   const inserted = await query(
     `INSERT INTO tip_attachments (tip_id, filename, stored_name, mime_type, size_bytes)

@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { query } from '../db.js';
+import { resolveJwtSecret } from '../security/secrets.js';
 
-const JWT_SECRET = () => process.env.JWT_SECRET || 'dev-insecure-secret-change-me';
+const JWT_SECRET = () => resolveJwtSecret();
 
 export function signToken(user) {
   return jwt.sign(

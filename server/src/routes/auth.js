@@ -7,10 +7,11 @@ import {
   loadUser,
   publicUser,
 } from '../middleware/auth.js';
+import { loginLimiter } from '../middleware/rateLimit.js';
 
 const router = Router();
 
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
   const { email, password } = req.body || {};
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password required' });
