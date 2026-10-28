@@ -25,6 +25,12 @@ Production boots **refuse** weak JWT / DB / admin example secrets when `CRIME_TI
 - [ ] HSTS enabled once HTTPS is stable (Caddyfile default)
 - [ ] App Helmet headers present (CSP, frame denial, etc.)
 
+## Auth and tip privacy
+
+- [ ] Officer session uses httpOnly cookie (not JWT in `localStorage`); Secure cookie over HTTPS
+- [ ] `PUBLIC_ORIGIN` matches the browser origin when API is cross-origin (CORS + `credentials`)
+- [ ] Unsubmitted tip PATCH / upload / delete require the draft **edit token** (UUID alone is not enough)
+
 ## Abuse controls
 
 - [ ] Login rate limit active (`POST /api/auth/login`)
@@ -39,5 +45,5 @@ Production boots **refuse** weak JWT / DB / admin example secrets when `CRIME_TI
 
 ## Incident starters
 
-- Suspected session theft: rotate `JWT_SECRET` and restart `app` (invalidates tokens)
+- Suspected session theft: rotate `JWT_SECRET` and restart `app` (invalidates session cookies)
 - Suspected DB exposure: rotate `POSTGRES_PASSWORD`, update `DATABASE_URL`, restart stack, preserve logs

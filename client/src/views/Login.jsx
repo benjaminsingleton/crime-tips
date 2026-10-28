@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Grid, Card, Form, Message } from 'semantic-ui-react';
 import Layout from '../components/Layout';
-import { api, setToken } from '../api';
+import { api } from '../api';
 
 export default class Login extends Component {
   state = {
@@ -17,8 +17,7 @@ export default class Login extends Component {
   handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { token, user } = await api.login(this.state.email, this.state.password);
-      setToken(token);
+      const { user } = await api.login(this.state.email, this.state.password);
       this.props.onLogin(user);
     } catch {
       this.setState({ error: true });

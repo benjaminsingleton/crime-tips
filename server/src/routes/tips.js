@@ -10,6 +10,12 @@ import {
   isAllowedAttachmentMime,
   maxAttachmentsPerTip,
 } from '../security/uploads.js';
+import {
+  extractEditToken,
+  generateEditToken,
+  hashEditToken,
+  verifyEditToken,
+} from '../security/editToken.js';
 import { notifyNewTip } from '../services/email.js';
 
 const router = Router();
@@ -107,7 +113,21 @@ function stripServerFields(body = {}) {
   delete copy.userNotes;
   delete copy.createdAt;
   delete copy.updatedAt;
+  delete copy.editToken;
+  delete copy.edit_token;
+  delete copy.edit_token_hash;
   return copy;
+}
+
+function requireDraftCapability(req, tipRow) {
+  if (!tipRow || tipRow.submitted) {
+    return { ok: false, status: 403, error: 'Submitted tips cannot be modified publicly' };
+  }
+  const token = extractEditToken(req);
+  if (!verifyEditToken(token, tipRow.edit_token_hash)) {
+    return { ok: false, status: 403, error: 'Valid edit token required' };
+  }
+  return { ok: true };
 }
 
 // Public: create draft tip (abandoned flow)
@@ -117,11 +137,17 @@ router.post('/', tipWriteLimiter, async (req, res) => {
   const timestampStart = body.timestampStart || Date.now();
   const timestampSubmit = submitted ? (body.timestampSubmit || Date.now()) : null;
 
+  const editToken = submitted ? null : generateEditToken();
+  const editTokenHash = editToken ? hashEditToken(editToken) : null;
+
   const { rows } = await query(
-    `INSERT INTO tips (payload, submitted, read, archived, important, timestamp_start, timestamp_submit)
-     VALUES ($1::jsonb, $2, FALSE, FALSE, FALSE, $3, $4)
+    `INSERT INTO tips (
+       payload, submitted, read, archived, important,
+       timestamp_start, timestamp_submit, edit_token_hash
+     )
+     VALUES ($1::jsonb, $2, FALSE, FALSE, FALSE, $3, $4, $5)
      RETURNING *`,
-    [JSON.stringify(body), submitted, timestampStart, timestampSubmit],
+    [JSON.stringify(body), submitted, timestampStart, timestampSubmit, editTokenHash],
   );
 
   const tip = tipToJson(rows[0]);
@@ -131,16 +157,18 @@ router.post('/', tipWriteLimiter, async (req, res) => {
     notifyNewTip(tip.id).catch((err) => console.error('notify failed', err));
   }
 
-  res.status(201).json({ tip });
+  const payload = { tip };
+  if (editToken) payload.editToken = editToken;
+  res.status(201).json(payload);
 });
 
 // Public: update unsubmitted tip payload
 router.patch('/:id', tipWriteLimiter, async (req, res) => {
   const { rows } = await query(`SELECT * FROM tips WHERE id = $1`, [req.params.id]);
   if (!rows[0]) return res.status(404).json({ error: 'Tip not found' });
-  if (rows[0].submitted) {
-    return res.status(403).json({ error: 'Submitted tips cannot be updated publicly' });
-  }
+
+  const gate = requireDraftCapability(req, rows[0]);
+  if (!gate.ok) return res.status(gate.status).json({ error: gate.error });
 
   const incoming = stripServerFields(req.body || {});
   const payload = { ...(rows[0].payload || {}), ...incoming };
@@ -160,6 +188,9 @@ router.post('/:id/submit', tipWriteLimiter, async (req, res) => {
   if (!rows[0]) return res.status(404).json({ error: 'Tip not found' });
   if (rows[0].submitted) return res.status(400).json({ error: 'Already submitted' });
 
+  const gate = requireDraftCapability(req, rows[0]);
+  if (!gate.ok) return res.status(gate.status).json({ error: gate.error });
+
   const incoming = stripServerFields(req.body || {});
   const payload = {
     ...(rows[0].payload || {}),
@@ -171,7 +202,7 @@ router.post('/:id/submit', tipWriteLimiter, async (req, res) => {
   const updated = await query(
     `UPDATE tips
      SET payload = $1::jsonb, submitted = TRUE, read = FALSE, archived = FALSE, important = FALSE,
-         timestamp_submit = $2, updated_at = NOW()
+         timestamp_submit = $2, edit_token_hash = NULL, updated_at = NOW()
      WHERE id = $3
      RETURNING *`,
     [JSON.stringify(payload), timestampSubmit, req.params.id],
@@ -196,9 +227,10 @@ router.post('/:id/attachments', tipUploadLimiter, (req, res, next) => {
 }, async (req, res) => {
   const { rows } = await query(`SELECT * FROM tips WHERE id = $1`, [req.params.id]);
   if (!rows[0]) return res.status(404).json({ error: 'Tip not found' });
-  if (rows[0].submitted) {
-    return res.status(403).json({ error: 'Cannot attach to submitted tip' });
-  }
+
+  const gate = requireDraftCapability(req, rows[0]);
+  if (!gate.ok) return res.status(gate.status).json({ error: gate.error });
+
   if (!req.file) return res.status(400).json({ error: 'file required' });
 
   const countRes = await query(
@@ -241,15 +273,20 @@ router.post('/:id/attachments', tipUploadLimiter, (req, res, next) => {
   });
 });
 
-// Public: list attachments for draft (or officer for any)
+// Public draft (edit token) or officer (session): list attachments
 router.get('/:id/attachments', async (req, res) => {
   const { rows } = await query(`SELECT * FROM tips WHERE id = $1`, [req.params.id]);
   if (!rows[0]) return res.status(404).json({ error: 'Tip not found' });
 
-  const authHeader = req.headers.authorization || '';
-  if (rows[0].submitted && !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Authentication required' });
+  if (rows[0].submitted) {
+    return requireAuth(req, res, async () => {
+      const attachments = await getAttachments(req.params.id);
+      return res.json({ attachments });
+    });
   }
+
+  const gate = requireDraftCapability(req, rows[0]);
+  if (!gate.ok) return res.status(gate.status).json({ error: gate.error });
 
   const attachments = await getAttachments(req.params.id);
   return res.json({ attachments });
@@ -258,9 +295,9 @@ router.get('/:id/attachments', async (req, res) => {
 router.delete('/:id/attachments/:attachmentId', async (req, res) => {
   const tipRes = await query(`SELECT * FROM tips WHERE id = $1`, [req.params.id]);
   if (!tipRes.rows[0]) return res.status(404).json({ error: 'Tip not found' });
-  if (tipRes.rows[0].submitted) {
-    return res.status(403).json({ error: 'Cannot delete attachment on submitted tip' });
-  }
+
+  const gate = requireDraftCapability(req, tipRes.rows[0]);
+  if (!gate.ok) return res.status(gate.status).json({ error: gate.error });
 
   const att = await query(
     `SELECT * FROM tip_attachments WHERE id = $1 AND tip_id = $2`,

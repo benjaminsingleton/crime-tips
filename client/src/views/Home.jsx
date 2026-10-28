@@ -28,6 +28,7 @@ class HomeInner extends Component {
         tipText: '',
       },
       tipKey: null,
+      editToken: null,
       moduleIndex: 0,
       formModules: ['intro', 'suspect', 'vehicle', 'drugs', 'media', 'final', 'success'],
       showFormModule: {
@@ -98,8 +99,11 @@ class HomeInner extends Component {
 
   createDraftTip = async () => {
     try {
-      const { tip } = await api.createTip({ ...this.state.tip, submitted: false });
-      this.setState({ tipKey: tip.id });
+      const { tip, editToken } = await api.createTip({
+        ...this.state.tip,
+        submitted: false,
+      });
+      this.setState({ tipKey: tip.id, editToken: editToken || null });
     } catch (err) {
       console.error(err);
       this.draftCreated = false;
@@ -107,11 +111,11 @@ class HomeInner extends Component {
   };
 
   updateTip = async (tipNow, tipPrev) => {
-    if (!this.state.tipKey) return;
+    if (!this.state.tipKey || !this.state.editToken) return;
     const updated = omitUnchanged(tipNow, tipPrev);
     if (Object.keys(updated).length === 0) return;
     try {
-      await api.updateTip(this.state.tipKey, updated);
+      await api.updateTip(this.state.tipKey, updated, this.state.editToken);
     } catch (err) {
       console.error(err);
     }
@@ -171,9 +175,9 @@ class HomeInner extends Component {
         const created = await api.createTip({ ...tip, submitted: true });
         tipKey = created.tip.id;
       } else {
-        await api.submitTip(tipKey, tip);
+        await api.submitTip(tipKey, tip, this.state.editToken);
       }
-      this.setState({ tipKey, tip, moduleIndex: 6 });
+      this.setState({ tipKey, tip, editToken: null, moduleIndex: 6 });
       this.props.navigate('/success');
     } catch (err) {
       console.error(err);
@@ -338,6 +342,7 @@ class HomeInner extends Component {
             <TipFormMedia
               tip={this.state.tip}
               tipKey={this.state.tipKey}
+              editToken={this.state.editToken}
               lang={lang}
               onAttachmentsChange={this.onAttachmentsChange}
             />

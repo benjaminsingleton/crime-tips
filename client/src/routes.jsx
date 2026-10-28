@@ -8,7 +8,7 @@ import AccountManagement from './views/AccountManagement';
 import LoggedOut from './views/LoggedOut';
 import ForgotPassword from './views/ForgotPassword';
 import NoMatch from './views/NoMatch';
-import { api, clearToken, getToken } from './api';
+import { api } from './api';
 
 function PrivateRoute({ authed, children }) {
   const location = useLocation();
@@ -34,13 +34,6 @@ export default function App() {
   useEffect(() => {
     let cancelled = false;
     async function boot() {
-      if (!getToken()) {
-        if (!cancelled) {
-          setAuthed(false);
-          setUser(null);
-        }
-        return;
-      }
       try {
         const { user: me } = await api.me();
         if (!cancelled) {
@@ -48,7 +41,6 @@ export default function App() {
           setAuthed(true);
         }
       } catch {
-        clearToken();
         if (!cancelled) {
           setUser(null);
           setAuthed(false);
@@ -72,7 +64,6 @@ export default function App() {
     } catch {
       /* ignore */
     }
-    clearToken();
     setUser(null);
     setAuthed(false);
   };

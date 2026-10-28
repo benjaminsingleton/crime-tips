@@ -1,33 +1,21 @@
-const TOKEN_KEY = 'crime_tips_token';
-
-export function getToken() {
-  return localStorage.getItem(TOKEN_KEY);
-}
-
-export function setToken(token) {
-  if (token) localStorage.setItem(TOKEN_KEY, token);
-  else localStorage.removeItem(TOKEN_KEY);
-}
-
-export function clearToken() {
-  localStorage.removeItem(TOKEN_KEY);
-}
-
 async function request(path, options = {}) {
-  const headers = { ...(options.headers || {}) };
-  if (!(options.body instanceof FormData)) {
+  const { editToken, headers: optionHeaders, body, ...rest } = options;
+  const headers = { ...(optionHeaders || {}) };
+  if (!(body instanceof FormData)) {
     headers['Content-Type'] = headers['Content-Type'] || 'application/json';
   }
-  const token = getToken();
-  if (token) headers.Authorization = `Bearer ${token}`;
+  if (editToken) {
+    headers['X-Tip-Edit-Token'] = editToken;
+  }
 
   const res = await fetch(`/api${path}`, {
-    ...options,
+    ...rest,
+    credentials: 'include',
     headers,
     body:
-      options.body && !(options.body instanceof FormData) && typeof options.body !== 'string'
-        ? JSON.stringify(options.body)
-        : options.body,
+      body && !(body instanceof FormData) && typeof body !== 'string'
+        ? JSON.stringify(body)
+        : body,
   });
 
   const text = await res.text();
@@ -55,20 +43,21 @@ export const api = {
   logout: () => request('/auth/logout', { method: 'POST' }),
 
   createTip: (payload) => request('/tips', { method: 'POST', body: payload }),
-  updateTip: (id, payload) => request(`/tips/${id}`, { method: 'PATCH', body: payload }),
-  submitTip: (id, payload) =>
-    request(`/tips/${id}/submit`, { method: 'POST', body: payload || {} }),
+  updateTip: (id, payload, editToken) =>
+    request(`/tips/${id}`, { method: 'PATCH', body: payload, editToken }),
+  submitTip: (id, payload, editToken) =>
+    request(`/tips/${id}/submit`, { method: 'POST', body: payload || {}, editToken }),
   listTips: (criteria, value) =>
     request(`/tips?criteria=${encodeURIComponent(criteria)}&value=${encodeURIComponent(value)}`),
   getTip: (id) => request(`/tips/${id}`),
   updateTipFlags: (id, flags) =>
     request(`/tips/${id}/flags`, { method: 'PATCH', body: flags }),
-  uploadAttachment: (id, file, onProgress) =>
+  uploadAttachment: (id, file, onProgress, editToken) =>
     new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.open('POST', `/api/tips/${id}/attachments`);
-      const token = getToken();
-      if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+      xhr.withCredentials = true;
+      if (editToken) xhr.setRequestHeader('X-Tip-Edit-Token', editToken);
       xhr.upload.onprogress = (e) => {
         if (e.lengthComputable && onProgress) {
           onProgress((e.loaded / e.total) * 100);
@@ -88,9 +77,29 @@ export const api = {
       form.append('file', file);
       xhr.send(form);
     }),
-  deleteAttachment: (tipId, attachmentId) =>
-    request(`/tips/${tipId}/attachments/${attachmentId}`, { method: 'DELETE' }),
-  listAttachments: (tipId) => request(`/tips/${tipId}/attachments`),
+  deleteAttachment: (tipId, attachmentId, editToken) =>
+    request(`/tips/${tipId}/attachments/${attachmentId}`, {
+      method: 'DELETE',
+      editToken,
+    }),
+  listAttachments: (tipId, editToken) =>
+    request(`/tips/${tipId}/attachments`, { editToken }),
+  downloadAttachment: async (tipId, attachmentId) => {
+    const res = await fetch(`/api/tips/${tipId}/attachments/${attachmentId}/download`, {
+      credentials: 'include',
+    });
+    if (!res.ok) {
+      let message = 'Download failed';
+      try {
+        const data = await res.json();
+        message = data.error || message;
+      } catch {
+        /* ignore */
+      }
+      throw new Error(message);
+    }
+    return res.blob();
+  },
   addNote: (tipId, note) =>
     request(`/tips/${tipId}/notes`, { method: 'POST', body: { note } }),
   deleteNote: (tipId, noteId) =>

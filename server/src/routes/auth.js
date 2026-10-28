@@ -8,6 +8,7 @@ import {
   publicUser,
 } from '../middleware/auth.js';
 import { loginLimiter } from '../middleware/rateLimit.js';
+import { setSessionCookie, clearSessionCookie } from '../middleware/cookies.js';
 
 const router = Router();
 
@@ -32,14 +33,16 @@ router.post('/login', loginLimiter, async (req, res) => {
   }
 
   const token = signToken(user);
-  return res.json({ token, user: publicUser(user) });
+  setSessionCookie(res, req, token);
+  return res.json({ user: publicUser(user) });
 });
 
 router.get('/me', requireAuth, loadUser, (req, res) => {
   res.json({ user: publicUser(req.dbUser) });
 });
 
-router.post('/logout', (_req, res) => {
+router.post('/logout', (req, res) => {
+  clearSessionCookie(res, req);
   res.json({ ok: true });
 });
 

@@ -17,9 +17,16 @@ export default class TipFormMedia extends Component {
 
   delete = async (attachmentId) => {
     try {
-      await api.deleteAttachment(this.props.tipKey, attachmentId);
+      await api.deleteAttachment(
+        this.props.tipKey,
+        attachmentId,
+        this.props.editToken,
+      );
       if (this.props.onAttachmentsChange) {
-        const { attachments } = await api.listAttachments(this.props.tipKey);
+        const { attachments } = await api.listAttachments(
+          this.props.tipKey,
+          this.props.editToken,
+        );
         this.props.onAttachmentsChange(attachments);
       }
       this.setState({ error: null });
@@ -33,11 +40,19 @@ export default class TipFormMedia extends Component {
     if (!file) return;
     this.setState({ filename: file.name, error: null });
     try {
-      await api.uploadAttachment(this.props.tipKey, file, (uploadPercent) => {
-        this.setState({ uploadPercent });
-      });
+      await api.uploadAttachment(
+        this.props.tipKey,
+        file,
+        (uploadPercent) => {
+          this.setState({ uploadPercent });
+        },
+        this.props.editToken,
+      );
       if (this.props.onAttachmentsChange) {
-        const { attachments } = await api.listAttachments(this.props.tipKey);
+        const { attachments } = await api.listAttachments(
+          this.props.tipKey,
+          this.props.editToken,
+        );
         this.props.onAttachmentsChange(attachments);
       }
       this.setState({ filename: '', uploadPercent: 0 });
@@ -112,10 +127,12 @@ export default class TipFormMedia extends Component {
 TipFormMedia.propTypes = {
   tip: PropTypes.object.isRequired,
   tipKey: PropTypes.string.isRequired,
+  editToken: PropTypes.string,
   lang: PropTypes.object.isRequired,
   onAttachmentsChange: PropTypes.func,
 };
 
 TipFormMedia.defaultProps = {
+  editToken: null,
   onAttachmentsChange: null,
 };
