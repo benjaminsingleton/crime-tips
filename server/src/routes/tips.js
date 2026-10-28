@@ -4,7 +4,9 @@ import path from 'path';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { query, tipToJson } from '../db.js';
-import { requireAuth, loadUser } from '../middleware/auth.js';
+import { requireAuth, loadUser, requireMfaIfEnforced } from '../middleware/auth.js';
+
+const officerAuth = [requireAuth, loadUser, requireMfaIfEnforced];
 import { tipUploadLimiter, tipWriteLimiter } from '../middleware/rateLimit.js';
 import {
   isAllowedAttachmentMime,
@@ -316,7 +318,7 @@ router.delete('/:id/attachments/:attachmentId', async (req, res) => {
 });
 
 // Officer: list tips
-router.get('/', requireAuth, loadUser, async (req, res) => {
+router.get('/', ...officerAuth, async (req, res) => {
   const criteria = req.query.criteria || 'archived';
   const rawValue = req.query.value;
   let value = rawValue === 'true' ? true : rawValue === 'false' ? false : rawValue;
@@ -351,7 +353,7 @@ router.get('/', requireAuth, loadUser, async (req, res) => {
   return res.json({ tips });
 });
 
-router.get('/:id', requireAuth, loadUser, async (req, res) => {
+router.get('/:id', ...officerAuth, async (req, res) => {
   const tip = await loadTip(req.params.id, { withExtras: true });
   if (!tip || !tip.submitted) {
     // officers can still see submitted only for mailbox; allow any for admin debugging of drafts? Prefer submitted only.
@@ -360,7 +362,7 @@ router.get('/:id', requireAuth, loadUser, async (req, res) => {
   return res.json({ tip });
 });
 
-router.patch('/:id/flags', requireAuth, loadUser, async (req, res) => {
+router.patch('/:id/flags', ...officerAuth, async (req, res) => {
   const { read, archived, important } = req.body || {};
   const existing = await query(`SELECT * FROM tips WHERE id = $1`, [req.params.id]);
   if (!existing.rows[0]) return res.status(404).json({ error: 'Tip not found' });
@@ -391,7 +393,7 @@ router.patch('/:id/flags', requireAuth, loadUser, async (req, res) => {
   return res.json({ tip: tipToJson(updated.rows[0]) });
 });
 
-router.post('/:id/notes', requireAuth, loadUser, async (req, res) => {
+router.post('/:id/notes', ...officerAuth, async (req, res) => {
   const note = (req.body?.note || '').trim();
   if (!note) return res.status(400).json({ error: 'note required' });
 
@@ -415,7 +417,7 @@ router.post('/:id/notes', requireAuth, loadUser, async (req, res) => {
   });
 });
 
-router.delete('/:id/notes/:noteId', requireAuth, loadUser, async (req, res) => {
+router.delete('/:id/notes/:noteId', ...officerAuth, async (req, res) => {
   const { rows } = await query(
     `SELECT * FROM tip_notes WHERE id = $1 AND tip_id = $2`,
     [req.params.noteId, req.params.id],
@@ -433,7 +435,7 @@ router.delete('/:id/notes/:noteId', requireAuth, loadUser, async (req, res) => {
 });
 
 // Officer download
-router.get('/:id/attachments/:attachmentId/download', requireAuth, loadUser, async (req, res) => {
+router.get('/:id/attachments/:attachmentId/download', ...officerAuth, async (req, res) => {
   const att = await query(
     `SELECT * FROM tip_attachments WHERE id = $1 AND tip_id = $2`,
     [req.params.attachmentId, req.params.id],

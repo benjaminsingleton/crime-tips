@@ -10,9 +10,17 @@ CREATE TABLE IF NOT EXISTS users (
   admin BOOLEAN NOT NULL DEFAULT FALSE,
   notifications BOOLEAN NOT NULL DEFAULT TRUE,
   account_active BOOLEAN NOT NULL DEFAULT TRUE,
+  mfa_enabled BOOLEAN NOT NULL DEFAULT FALSE,
+  mfa_secret_enc TEXT,
+  mfa_backup_hashes JSONB NOT NULL DEFAULT '[]'::jsonb,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Additive for DBs created before officer TOTP MFA
+ALTER TABLE users ADD COLUMN IF NOT EXISTS mfa_enabled BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS mfa_secret_enc TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS mfa_backup_hashes JSONB NOT NULL DEFAULT '[]'::jsonb;
 
 CREATE TABLE IF NOT EXISTS tips (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

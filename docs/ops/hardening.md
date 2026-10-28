@@ -30,6 +30,8 @@ Production boots **refuse** weak JWT / DB / admin example secrets when `CRIME_TI
 - [ ] Officer session uses httpOnly cookie (not JWT in `localStorage`); Secure cookie over HTTPS
 - [ ] `PUBLIC_ORIGIN` matches the browser origin when API is cross-origin (CORS + `credentials`)
 - [ ] Unsubmitted tip PATCH / upload / delete require the draft **edit token** (UUID alone is not enough)
+- [ ] Officers enrolled in TOTP MFA (or `MFA_REQUIRED=true`); see [auth-mfa.md](./auth-mfa.md)
+- [ ] Seeded admin MFA enrolled; backup codes stored in the agency password manager
 
 ## Abuse controls
 

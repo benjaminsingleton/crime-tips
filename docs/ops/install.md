@@ -60,6 +60,8 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d app
 
 Officer auth uses a Secure (on HTTPS), httpOnly, SameSite session cookie. Set `PUBLIC_ORIGIN` to your HTTPS origin so CORS allows credentialed browser calls if the API is ever served cross-origin. Draft tip edits require an unguessable edit token returned only on draft create (held in the tip wizard, not the receipt id alone).
 
+Optional officer **TOTP MFA**: enroll under My Settings, or set `MFA_REQUIRED=true` to require it for all officers. See [auth-mfa.md](./auth-mfa.md). Agency OIDC/SAML SSO is a documented follow-up (not in this release).
+
 ## 4. Local developer path (not for production)
 
 ```bash
