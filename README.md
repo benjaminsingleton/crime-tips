@@ -23,30 +23,38 @@ Example secrets are allowed when `CRIME_TIPS_ENV=development` (Compose default).
 
 ## Production self-host (Safe Compose)
 
-Police-department path: TLS via Caddy, Postgres not published, strong secrets required at boot, rate limits + Helmet + CORS.
+Police-department path: TLS via Caddy, Postgres not published, strong secrets required at boot, rate limits + Helmet + CORS. Production **pulls a version-pinned image from GHCR** (no build on the PD host).
 
 ```bash
 cp .env.example .env
 ./scripts/gen-secrets.sh
 # set DOMAIN=tips.example.gov and PUBLIC_ORIGIN=https://tips.example.gov
+# pin a release, e.g. CRIME_TIPS_IMAGE=ghcr.io/benjaminsingleton/crime-tips:1.0.0
 chmod 600 .env
 ./scripts/preflight.sh prod
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
 
 | Mode | Command | Public ports |
 |------|---------|--------------|
 | **Dev** | `docker compose up --build` | App `8080`, Postgres `5432` |
-| **Prod** | `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build` | Caddy `80`/`443` only |
+| **Prod** | `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d` (pull GHCR image) | Caddy `80`/`443` only |
+| **Prod from source** | add `-f docker-compose.build.yml` and `--build` | same |
+
+**Image:** `ghcr.io/benjaminsingleton/crime-tips` — tags `:X.Y.Z` / `:X.Y` / `:latest` from GitHub release tags `vX.Y.Z`; `:master` and `:sha-…` from main-branch CI.
+
+Update: `./scripts/backup.sh && ./scripts/update.sh vX.Y.Z` — see [Update](docs/ops/update.md).
 
 Ops runbooks:
 
 - [Install](docs/ops/install.md)
+- [Update](docs/ops/update.md)
 - [TLS](docs/ops/tls.md)
 - [Hardening checklist](docs/ops/hardening.md)
 - [Backup & restore](docs/ops/backup-restore.md)
 
-Helpers: `scripts/gen-secrets.sh`, `scripts/preflight.sh`, `scripts/backup.sh`, `scripts/restore.sh`.
+Helpers: `scripts/gen-secrets.sh`, `scripts/preflight.sh`, `scripts/backup.sh`, `scripts/restore.sh`, `scripts/update.sh`.
 
 ## Local development (without full Compose)
 
@@ -78,8 +86,9 @@ See `.env.example`. Important variables:
 
 - `client/` — Vite React app (tip wizard + officer UI)
 - `server/` — Express API, httpOnly session cookies + bcrypt, draft tip edit tokens, Postgres schema in `server/sql/schema.sql`
-- `docker-compose.yml` — developer stack (`db` + `app`)
-- `docker-compose.prod.yml` — production overlay (Caddy, no Postgres publish, prod env)
+- `docker-compose.yml` — developer stack (`db` + `app`; `docker compose up --build`)
+- `docker-compose.prod.yml` — production overlay (Caddy, no Postgres publish, pull GHCR image)
+- `docker-compose.build.yml` — optional: build app from source instead of pulling
 
 ## License
 

@@ -1,0 +1,78 @@
+# Build and push the Crime Tips app image to GitHub Container Registry (GHCR).
+#
+# Tags published:
+#   - git tag vX.Y.Z  →  :X.Y.Z  :X.Y  :latest  (release pins for PD IT)
+#   - push to master  →  :master  :sha-<short>   (optional pre-release / CI)
+#   - workflow_dispatch → same as branch/tag that triggered it
+#
+# Image: ghcr.io/<owner>/<repo>  (e.g. ghcr.io/benjaminsingleton/crime-tips)
+
+name: Publish container image
+
+on:
+  push:
+    branches: [master]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: publish-image-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          # Lowercase required by GHCR / OCI registries
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/v') }}
+            type=ref,event=branch
+            type=sha,prefix=sha-,format=short
+          labels: |
+            org.opencontainers.image.title=Crime Tips
+            org.opencontainers.image.description=Anonymous crime-tip intake (API + static UI)
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Summarize tags
+        run: |
+          echo "### Published image" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "${{ steps.meta.outputs.tags }}" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Pin production with \`CRIME_TIPS_IMAGE=ghcr.io/${{ github.repository }}:<version>\`." >> "$GITHUB_STEP_SUMMARY"
