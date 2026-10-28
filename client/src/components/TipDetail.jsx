@@ -196,12 +196,8 @@ export default class TipDetail extends Component {
                       href={`/api/tips/${this.props.tipDetailKey}/attachments/${id}/download`}
                       onClick={(e) => {
                         e.preventDefault();
-                        const token = localStorage.getItem('crime_tips_token');
-                        fetch(
-                          `/api/tips/${this.props.tipDetailKey}/attachments/${id}/download`,
-                          { headers: { Authorization: `Bearer ${token}` } },
-                        )
-                          .then((r) => r.blob())
+                        api
+                          .downloadAttachment(this.props.tipDetailKey, id)
                           .then((blob) => {
                             const url = URL.createObjectURL(blob);
                             const a = document.createElement('a');
@@ -209,7 +205,8 @@ export default class TipDetail extends Component {
                             a.download = attachments[id].filename;
                             a.click();
                             URL.revokeObjectURL(url);
-                          });
+                          })
+                          .catch((err) => console.error(err));
                       }}
                     >
                       {attachments[id].filename}

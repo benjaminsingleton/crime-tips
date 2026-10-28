@@ -23,9 +23,13 @@ CREATE TABLE IF NOT EXISTS tips (
   important BOOLEAN NOT NULL DEFAULT FALSE,
   timestamp_start BIGINT,
   timestamp_submit BIGINT,
+  edit_token_hash TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Additive for DBs created before edit tokens existed
+ALTER TABLE tips ADD COLUMN IF NOT EXISTS edit_token_hash TEXT;
 
 CREATE INDEX IF NOT EXISTS tips_submitted_idx ON tips (submitted);
 CREATE INDEX IF NOT EXISTS tips_archived_idx ON tips (archived);

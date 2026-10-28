@@ -65,10 +65,11 @@ See `.env.example`. Important variables:
 | Variable | Purpose |
 |----------|---------|
 | `CRIME_TIPS_ENV` | `development` (local) or `production` (secret refusal + prod CORS) |
-| `JWT_SECRET` | Signs officer session tokens (≥32 chars in prod) |
+| `JWT_SECRET` | Signs officer session cookies (≥32 chars in prod) |
+| `COOKIE_SECURE` / `COOKIE_SAMESITE` | Session cookie flags (Secure defaults on in prod/HTTPS; SameSite defaults to `lax`) |
 | `ADMIN_*` | Seeded on first boot when `users` is empty |
 | `DATABASE_URL` | Postgres connection string |
-| `PUBLIC_ORIGIN` | Allowed CORS origin(s); set to your HTTPS URL in prod |
+| `PUBLIC_ORIGIN` | Allowed CORS origin(s); required when the SPA and API are on different origins (`credentials: include`) |
 | `DOMAIN` | Hostname for Caddy / Let’s Encrypt |
 | `UPLOAD_DIR` | Tip file storage (volume in Compose) |
 | `SMTP_*` | Optional new-tip email; otherwise the API logs a stub |
@@ -76,7 +77,7 @@ See `.env.example`. Important variables:
 ## Architecture
 
 - `client/` — Vite React app (tip wizard + officer UI)
-- `server/` — Express API, JWT/bcrypt auth, Postgres schema in `server/sql/schema.sql`
+- `server/` — Express API, httpOnly session cookies + bcrypt, draft tip edit tokens, Postgres schema in `server/sql/schema.sql`
 - `docker-compose.yml` — developer stack (`db` + `app`)
 - `docker-compose.prod.yml` — production overlay (Caddy, no Postgres publish, prod env)
 

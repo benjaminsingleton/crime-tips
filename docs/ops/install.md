@@ -50,9 +50,11 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d app
 
 1. `https://…/` loads the tip form over HTTPS
 2. Submit a tip (≥20 characters of tip text) and note the receipt id
-3. `/login` with admin credentials → dashboard shows the tip
+3. `/login` with admin credentials → dashboard shows the tip (session is an httpOnly cookie; DevTools → Application → Cookies)
 4. `curl -fsS https://$DOMAIN/api/health` → `{"ok":true}`
 5. Confirm host ports: only 80/443 (and SSH) are public — not 5432
+
+Officer auth uses a Secure (on HTTPS), httpOnly, SameSite session cookie. Set `PUBLIC_ORIGIN` to your HTTPS origin so CORS allows credentialed browser calls if the API is ever served cross-origin. Draft tip edits require an unguessable edit token returned only on draft create (held in the tip wizard, not the receipt id alone).
 
 ## 4. Local developer path (not for production)
 

@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { query } from '../db.js';
 import { resolveJwtSecret } from '../security/secrets.js';
+import { readSessionToken } from './cookies.js';
 
 const JWT_SECRET = () => resolveJwtSecret();
 
@@ -17,8 +18,7 @@ export function signToken(user) {
 }
 
 export function requireAuth(req, res, next) {
-  const header = req.headers.authorization || '';
-  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+  const token = readSessionToken(req);
   if (!token) {
     return res.status(401).json({ error: 'Authentication required' });
   }
