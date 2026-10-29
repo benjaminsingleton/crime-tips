@@ -8,7 +8,7 @@ Use this before putting a tip site on the public internet.
 - Agencies remain responsible for policy, accreditation, retention, and FOIA/records handling.
 - See [SECURITY.md](../../SECURITY.md) and [privacy-model.md](./privacy-model.md).
 
-**Known product limits (central):** no SAML (OIDC only, post-`v1.0.0`); no tipster email; no password-reset email; no built-in upload malware scanning (scan at gateway / future); single-node Compose (no HA); CAPTCHA/ClamAV not included.
+**Known product limits (central):** no SAML (OIDC only, `v1.1.0+`); no tipster email; no password-reset email; no built-in upload malware scanning (scan at gateway / future); single-node Compose (no HA); CAPTCHA/ClamAV not included.
 
 ## Network
 

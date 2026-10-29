@@ -39,7 +39,7 @@ Backups and restore drills, updates (pinned GHCR tags), TLS/DNS, optional IdP an
 
 ## Version note
 
-Tagged **`v1.0.0`** is the first PD package. **SMTP notifications, department branding, and OIDC SSO** landed on `master` after that tag — use the [version alignment](./install.md#version-alignment) path (next release tag, or documented `master` / `:master` pilot) so install pins match the features you expect.
+Tagged **`v1.1.0`** is the current PD package (SMTP, branding, OIDC + core). **`v1.0.0`** remains the first release without those features. Match checkout ↔ image via [version alignment](./install.md#version-alignment).
 
 ## License
 

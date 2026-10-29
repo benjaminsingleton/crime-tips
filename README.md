@@ -4,7 +4,7 @@
 
 Public tip form for your community; mailbox and case notes for sworn or civilian officers. You run it on your own VM with Docker — tip data stays in your Postgres and upload volumes.
 
-**Status:** `v1.x` self-host package. First tagged release: **`v1.0.0`**. Features added on `master` after that tag (SMTP, branding, OIDC) need a newer image — see [Version & features](#version--features).
+**Status:** `v1.x` self-host package. Current release: **`v1.1.0`** (SMTP, branding, OIDC + core package). See [Version & features](#version--features).
 
 ## Is this for us?
 
@@ -39,10 +39,10 @@ cp .env.example .env
 ./scripts/gen-secrets.sh
 # set DOMAIN=tips.example.gov and PUBLIC_ORIGIN=https://tips.example.gov
 # pin an image that matches the features you need (see Version & features)
-# e.g. CRIME_TIPS_IMAGE=ghcr.io/benjaminsingleton/crime-tips:1.0.0
+# e.g. CRIME_TIPS_IMAGE=ghcr.io/benjaminsingleton/crime-tips:1.1.0
 chmod 600 .env
 ./scripts/preflight.sh prod
-docker pull "${CRIME_TIPS_IMAGE:-ghcr.io/benjaminsingleton/crime-tips:1.0.0}"   # verify pull
+docker pull "${CRIME_TIPS_IMAGE:-ghcr.io/benjaminsingleton/crime-tips:1.1.0}"   # verify pull
 docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
@@ -61,17 +61,18 @@ Update: `./scripts/backup.sh && ./scripts/update.sh <tag>` — [docs/ops/update.
 
 ## Version & features
 
-Do **not** mix a `v1.0.0` checkout / `:1.0.0` image with docs that describe later features and expect parity.
+Do **not** mix checkout and image tags (e.g. `v1.1.0` docs with `:1.0.0`) and expect parity.
 
 | Capability | Min image / checkout | Notes |
 |------------|----------------------|--------|
 | Safe Compose, httpOnly sessions, tip intake, officer dashboard | **`v1.0.0` / `:1.0.0`** | First PD release |
 | Optional officer TOTP MFA | **`v1.0.0` / `:1.0.0`** | [auth-mfa.md](docs/ops/auth-mfa.md) |
-| SMTP new-tip officer email | **`master` / `:master`** until next release tag | [email.md](docs/ops/email.md) |
-| Department branding (`BRAND_*` / admin UI) | **`master` / `:master`** until next release tag | [branding.md](docs/ops/branding.md) |
-| Optional OIDC SSO | **`master` / `:master`** until next release tag | [auth-mfa.md](docs/ops/auth-mfa.md) |
+| SMTP new-tip officer email | **`v1.1.0` / `:1.1.0`** | [email.md](docs/ops/email.md) |
+| Department branding (`BRAND_*` / admin UI) | **`v1.1.0` / `:1.1.0`** | [branding.md](docs/ops/branding.md) |
+| Optional OIDC SSO | **`v1.1.0` / `:1.1.0`** | [auth-mfa.md](docs/ops/auth-mfa.md) |
+| PD-facing docs rewrite (privacy, SECURITY, MIT, eval) | **`v1.1.0` / `:1.1.0`** | Docs/tag package |
 
-**Pilot needing SMTP + branding + OIDC today:** check out `master`, pin `CRIME_TIPS_IMAGE=…:master` (or a `:sha-…`), and accept pre-release churn — or wait for the next GitHub Release and pin that semver. Details: [install.md § Version alignment](docs/ops/install.md#version-alignment).
+**Recommended production pin:** `v1.1.0` / `:1.1.0`. Details: [install.md § Version alignment](docs/ops/install.md#version-alignment).
 
 ## Ops index
 
@@ -109,10 +110,10 @@ See `.env.example`. Important variables:
 | `PUBLIC_ORIGIN` | Allowed CORS origin(s); required when SPA and API differ |
 | `DOMAIN` | Hostname for Caddy / Let’s Encrypt |
 | `UPLOAD_DIR` | Tip file storage (volume in Compose) |
-| `SMTP_*` | Optional new-tip email; unset `SMTP_HOST` → console stub ([email.md](docs/ops/email.md)) — needs post-`v1.0.0` image |
+| `SMTP_*` | Optional new-tip email; unset `SMTP_HOST` → console stub ([email.md](docs/ops/email.md)) — `v1.1.0+` |
 | `MFA_REQUIRED` / `MFA_ISSUER` | Optional TOTP policy |
-| `OIDC_*` | Optional agency SSO ([auth-mfa.md](docs/ops/auth-mfa.md)) — needs post-`v1.0.0` image |
-| `BRAND_*` | Department branding defaults — needs post-`v1.0.0` image |
+| `OIDC_*` | Optional agency SSO ([auth-mfa.md](docs/ops/auth-mfa.md)) — `v1.1.0+` |
+| `BRAND_*` | Department branding defaults — `v1.1.0+` |
 
 ## Architecture
 
