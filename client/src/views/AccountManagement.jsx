@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Grid, Card, Segment, Form, Button, Table, Message } from 'semantic-ui-react';
 import Layout from '../components/Layout';
 import { api } from '../api';
+import { Panel, TextInput, Checkbox, Button, Alert } from '../components/ui';
 
 class CreateUser extends Component {
   state = {
@@ -77,87 +77,64 @@ class CreateUser extends Component {
 
   render() {
     return (
-      <Segment>
-        <Form
-          success={this.state.success}
-          error={this.state.error}
-          onSubmit={(e) => this.createUser(e)}
-        >
-          <Grid stackable columns={3}>
-            <Grid.Row>
-              <Grid.Column width={16}>
-                <Message success header={this.state.header} content={this.state.message} />
-              </Grid.Column>
-            </Grid.Row>
-            <Grid.Row>
-              <Grid.Column>
-                <Form.Input
-                  label="Rank"
-                  name="rank"
-                  value={this.state.rank}
-                  onChange={this.handleInputChange}
-                />
-              </Grid.Column>
-              <Grid.Column>
-                <Form.Input
-                  label="First name"
-                  name="firstName"
-                  value={this.state.firstName}
-                  onChange={this.handleInputChange}
-                />
-              </Grid.Column>
-              <Grid.Column>
-                <Form.Input
-                  label="Last name"
-                  name="lastName"
-                  value={this.state.lastName}
-                  onChange={this.handleInputChange}
-                />
-              </Grid.Column>
-            </Grid.Row>
-            <Grid.Row>
-              <Grid.Column>
-                <Form.Input
-                  label="Email"
-                  name="email"
-                  value={this.state.email}
-                  type="email"
-                  onChange={this.handleInputChange}
-                />
-              </Grid.Column>
-              <Grid.Column>
-                <Form.Input
-                  label="Password"
-                  name="password"
-                  value={this.state.password}
-                  type="password"
-                  onChange={this.handleInputChange}
-                />
-              </Grid.Column>
-              <Grid.Column>
-                <Form.Checkbox
+      <div className="subpanel" style={{ marginBottom: '1.25rem' }}>
+        <div className="subpanel__header">Create user</div>
+        <div className="subpanel__body">
+          <form onSubmit={(e) => this.createUser(e)}>
+            {this.state.success && (
+              <Alert tone="success" title={this.state.header} content={this.state.message} />
+            )}
+            <div className="form-grid form-grid--3">
+              <TextInput
+                label="Rank"
+                name="rank"
+                value={this.state.rank}
+                onChange={this.handleInputChange}
+              />
+              <TextInput
+                label="First name"
+                name="firstName"
+                value={this.state.firstName}
+                onChange={this.handleInputChange}
+              />
+              <TextInput
+                label="Last name"
+                name="lastName"
+                value={this.state.lastName}
+                onChange={this.handleInputChange}
+              />
+              <TextInput
+                label="Email"
+                name="email"
+                value={this.state.email}
+                type="email"
+                onChange={this.handleInputChange}
+              />
+              <TextInput
+                label="Password"
+                name="password"
+                value={this.state.password}
+                type="password"
+                onChange={this.handleInputChange}
+              />
+              <div style={{ display: 'flex', alignItems: 'end', paddingBottom: '0.35rem' }}>
+                <Checkbox
                   label="Admin?"
                   name="admin"
                   checked={this.state.admin}
                   onChange={this.handleCheckChange}
                 />
-              </Grid.Column>
-            </Grid.Row>
-            <Grid.Row>
-              <Grid.Column width={16}>
-                <Message error header={this.state.header} content={this.state.message} />
-              </Grid.Column>
-            </Grid.Row>
-            <Grid.Row>
-              <Grid.Column />
-              <Grid.Column />
-              <Grid.Column textAlign="right">
-                <Form.Button content="Create User" color="violet" />
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </Form>
-      </Segment>
+              </div>
+            </div>
+            {this.state.error && (
+              <Alert tone="error" title={this.state.header} content={this.state.message} />
+            )}
+            <div className="actions-end" style={{ marginTop: '0.85rem' }}>
+              <Button type="submit" variant="primary" content="Create user" />
+            </div>
+          </form>
+        </div>
+      </div>
     );
   }
 }
@@ -281,108 +258,97 @@ class EditUser extends Component {
 
   render() {
     return (
-      <Segment>
-        <Form error={this.state.error} success={this.state.success} onSubmit={this.saveChanges}>
-          <Grid stackable columns={3}>
-            <Grid.Row>
-              <Grid.Column>
-                <Form.Input
-                  label="Rank"
-                  name="rank"
-                  value={this.state.rank}
-                  onChange={this.handleInputChange}
-                />
-              </Grid.Column>
-              <Grid.Column>
-                <Form.Input
-                  label="First name"
-                  name="firstName"
-                  value={this.state.firstName}
-                  onChange={this.handleInputChange}
-                />
-              </Grid.Column>
-              <Grid.Column>
-                <Form.Input
-                  label="Last name"
-                  name="lastName"
-                  value={this.state.lastName}
-                  onChange={this.handleInputChange}
-                />
-              </Grid.Column>
-            </Grid.Row>
-            <Grid.Row>
-              <Grid.Column>
-                <Form.Input
-                  label="Email"
-                  name="email"
-                  value={this.state.email}
-                  type="email"
-                  onChange={this.handleInputChange}
-                />
-                <Form.Input
-                  label="Set new password"
-                  name="newPassword"
-                  type="password"
-                  value={this.state.newPassword}
-                  onChange={this.handleInputChange}
-                />
-                <Form.Button size="small" content="Reset Password" onClick={this.resetPassword} />
+      <div className="subpanel" style={{ marginBottom: '1.25rem' }}>
+        <div className="subpanel__header">Edit user</div>
+        <div className="subpanel__body">
+          <form onSubmit={this.saveChanges}>
+            <div className="form-grid form-grid--3">
+              <TextInput
+                label="Rank"
+                name="rank"
+                value={this.state.rank}
+                onChange={this.handleInputChange}
+              />
+              <TextInput
+                label="First name"
+                name="firstName"
+                value={this.state.firstName}
+                onChange={this.handleInputChange}
+              />
+              <TextInput
+                label="Last name"
+                name="lastName"
+                value={this.state.lastName}
+                onChange={this.handleInputChange}
+              />
+              <TextInput
+                label="Email"
+                name="email"
+                value={this.state.email}
+                type="email"
+                onChange={this.handleInputChange}
+              />
+              <TextInput
+                label="Set new password"
+                name="newPassword"
+                type="password"
+                value={this.state.newPassword}
+                onChange={this.handleInputChange}
+              />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'end' }}>
+                <Button size="sm" variant="secondary" content="Reset password" onClick={this.resetPassword} />
                 {this.props.user.mfaEnabled ? (
-                  <Form.Button
-                    size="small"
-                    content="Reset MFA"
+                  <Button
+                    size="sm"
                     type="button"
+                    variant="secondary"
+                    content="Reset MFA"
                     onClick={this.resetMfa}
                   />
                 ) : null}
-              </Grid.Column>
-              <Grid.Column>
-                <Form.Checkbox
-                  label="Admin?"
-                  checked={this.state.admin}
-                  onChange={() => this.toggleBool('admin')}
-                />
-                <Form.Checkbox
-                  label="Notifications?"
-                  checked={this.state.notifications}
-                  onChange={() => this.toggleBool('notifications')}
-                />
-                <Form.Checkbox
-                  label="Account active?"
-                  checked={this.state.accountActive}
-                  onChange={() => this.toggleBool('accountActive')}
-                />
-                <p style={{ marginTop: 8 }}>
-                  MFA: {this.props.user.mfaEnabled ? 'Enabled' : 'Off'}
-                </p>
-              </Grid.Column>
-              <Grid.Column />
-            </Grid.Row>
-            <Grid.Row>
-              <Grid.Column width={16}>
-                <Message success header={this.state.header} content={this.state.message} />
-                <Message error header={this.state.header} content={this.state.message} />
-              </Grid.Column>
-            </Grid.Row>
-            <Grid.Row>
-              <Grid.Column />
-              <Grid.Column />
-              <Grid.Column textAlign="right">
-                <Form.Group>
-                  <Form.Button
-                    content="Cancel"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      this.props.toggle('showEditUser');
-                    }}
-                  />
-                  <Form.Button content="Save" color="violet" />
-                </Form.Group>
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </Form>
-      </Segment>
+              </div>
+            </div>
+            <div className="form-grid form-grid--3" style={{ marginTop: '0.75rem' }}>
+              <Checkbox
+                label="Admin?"
+                checked={this.state.admin}
+                onChange={() => this.toggleBool('admin')}
+              />
+              <Checkbox
+                label="Notifications?"
+                checked={this.state.notifications}
+                onChange={() => this.toggleBool('notifications')}
+              />
+              <Checkbox
+                label="Account active?"
+                checked={this.state.accountActive}
+                onChange={() => this.toggleBool('accountActive')}
+              />
+            </div>
+            <p style={{ marginTop: 8 }}>
+              MFA: {this.props.user.mfaEnabled ? 'Enabled' : 'Off'}
+            </p>
+            {this.state.success && (
+              <Alert tone="success" title={this.state.header} content={this.state.message} />
+            )}
+            {this.state.error && (
+              <Alert tone="error" title={this.state.header} content={this.state.message} />
+            )}
+            <div className="actions-end" style={{ marginTop: '0.85rem' }}>
+              <Button
+                type="button"
+                variant="secondary"
+                content="Cancel"
+                onClick={(e) => {
+                  e.preventDefault();
+                  this.props.toggle('showEditUser');
+                }}
+              />
+              <Button type="submit" variant="primary" content="Save" />
+            </div>
+          </form>
+        </div>
+      </div>
     );
   }
 }
@@ -422,19 +388,19 @@ export default class AccountManagement extends Component {
   makeUserRows = (userId) => {
     const user = this.state.users[userId];
     return (
-      <Table.Row key={userId}>
-        <Table.Cell>{user.rank}</Table.Cell>
-        <Table.Cell>{user.firstName}</Table.Cell>
-        <Table.Cell>{user.lastName}</Table.Cell>
-        <Table.Cell>{user.email}</Table.Cell>
-        <Table.Cell>{user.admin ? 'True' : 'False'}</Table.Cell>
-        <Table.Cell>{user.notifications ? 'True' : 'False'}</Table.Cell>
-        <Table.Cell>{user.accountActive ? 'True' : 'False'}</Table.Cell>
-        <Table.Cell>{user.mfaEnabled ? 'On' : 'Off'}</Table.Cell>
-        <Table.Cell>
-          <Button content="Edit" onClick={() => this.editUser(userId)} />
-        </Table.Cell>
-      </Table.Row>
+      <tr key={userId}>
+        <td>{user.rank}</td>
+        <td>{user.firstName}</td>
+        <td>{user.lastName}</td>
+        <td>{user.email}</td>
+        <td>{user.admin ? 'True' : 'False'}</td>
+        <td>{user.notifications ? 'True' : 'False'}</td>
+        <td>{user.accountActive ? 'True' : 'False'}</td>
+        <td>{user.mfaEnabled ? 'On' : 'Off'}</td>
+        <td className="cell-actions">
+          <Button size="sm" content="Edit" variant="secondary" onClick={() => this.editUser(userId)} />
+        </td>
+      </tr>
     );
   };
 
@@ -442,45 +408,38 @@ export default class AccountManagement extends Component {
     const userRows = Object.keys(this.state.users).map((userId) => this.makeUserRows(userId));
 
     return (
-      <Layout user={this.props.user} onLogout={this.props.onLogout}>
-        <Grid columns={1} centered>
-          <Grid.Row>
-            <Grid.Column mobile={16} tablet={12} computer={10} largeScreen={10}>
-              <Card fluid>
-                <Card.Content header="Account Management" />
-                <Card.Content>
-                  {this.state.showCreateUser ? (
-                    <CreateUser onCreated={this.loadUsers} />
-                  ) : null}
-                  {this.state.showEditUser && this.state.users[this.state.editUserId] ? (
-                    <EditUser
-                      uid={this.state.editUserId}
-                      user={this.state.users[this.state.editUserId]}
-                      toggle={this.toggle}
-                      onSaved={this.loadUsers}
-                    />
-                  ) : null}
-                  <Table style={{ display: 'inline-block', overflowX: 'scroll' }}>
-                    <Table.Header>
-                      <Table.Row>
-                        <Table.HeaderCell>Rank</Table.HeaderCell>
-                        <Table.HeaderCell>First name</Table.HeaderCell>
-                        <Table.HeaderCell>Last name</Table.HeaderCell>
-                        <Table.HeaderCell>Email</Table.HeaderCell>
-                        <Table.HeaderCell>Admin</Table.HeaderCell>
-                        <Table.HeaderCell>Notifications</Table.HeaderCell>
-                        <Table.HeaderCell>Account active?</Table.HeaderCell>
-                        <Table.HeaderCell>MFA</Table.HeaderCell>
-                        <Table.HeaderCell />
-                      </Table.Row>
-                    </Table.Header>
-                    <Table.Body>{userRows}</Table.Body>
-                  </Table>
-                </Card.Content>
-              </Card>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
+      <Layout user={this.props.user} onLogout={this.props.onLogout} variant="officer">
+        <div style={{ maxWidth: '56rem', margin: '1.25rem auto 0' }}>
+          <Panel title="Account management">
+            {this.state.showCreateUser ? <CreateUser onCreated={this.loadUsers} /> : null}
+            {this.state.showEditUser && this.state.users[this.state.editUserId] ? (
+              <EditUser
+                uid={this.state.editUserId}
+                user={this.state.users[this.state.editUserId]}
+                toggle={this.toggle}
+                onSaved={this.loadUsers}
+              />
+            ) : null}
+            <div className="table-wrap">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>First name</th>
+                    <th>Last name</th>
+                    <th>Email</th>
+                    <th>Admin</th>
+                    <th>Notifications</th>
+                    <th>Account active?</th>
+                    <th>MFA</th>
+                    <th />
+                  </tr>
+                </thead>
+                <tbody>{userRows}</tbody>
+              </table>
+            </div>
+          </Panel>
+        </div>
       </Layout>
     );
   }

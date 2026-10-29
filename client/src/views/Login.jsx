@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { Grid, Card, Form, Message } from 'semantic-ui-react';
 import Layout from '../components/Layout';
+import { Panel, TextInput, Button, Alert } from '../components/ui';
 import { api } from '../api';
 
 export default class Login extends Component {
@@ -60,83 +60,77 @@ export default class Login extends Component {
   };
 
   render() {
-    const style = {
-      forgotPassword: {
-        textDecoration: 'none',
-        fontSize: '12px',
-      },
-    };
     const mfaStep = Boolean(this.state.mfaToken);
     return (
       <Layout>
-        <Grid centered container columns={1}>
-          <Grid.Column mobile={16} tablet={8} computer={8} largeScreen={8}>
-            <Card centered fluid>
-              <Card.Content
-                header={mfaStep ? 'Two-factor authentication' : 'Login'}
-                meta={
-                  mfaStep
-                    ? 'Enter the 6-digit code from your authenticator app'
-                    : 'Enter your credentials below'
-                }
-              />
-              <Card.Content>
-                <Form error={this.state.error} onSubmit={this.handleSubmit}>
-                  {!mfaStep ? (
-                    <>
-                      <Form.Input
-                        label="Email"
-                        name="email"
-                        type="email"
-                        placeholder="Email"
-                        value={this.state.email}
-                        onChange={this.handleChange}
-                        autoComplete="username"
-                      />
-                      <Form.Input
-                        label="Password"
-                        name="password"
-                        type="password"
-                        placeholder="Password"
-                        value={this.state.password}
-                        onChange={this.handleChange}
-                        autoComplete="current-password"
-                      />
-                    </>
-                  ) : (
-                    <Form.Input
-                      label="Authentication code"
-                      name="mfaCode"
-                      type="text"
-                      inputMode="numeric"
-                      autoComplete="one-time-code"
-                      placeholder="123456"
-                      value={this.state.mfaCode}
-                      onChange={this.handleChange}
-                    />
-                  )}
-                  {this.state.error && (
-                    <Message
-                      error
-                      header={this.state.errorHeader}
-                      content={this.state.errorContent}
-                    />
-                  )}
-                  <Form.Button>{mfaStep ? 'Verify' : 'Submit'}</Form.Button>
-                  {mfaStep ? (
-                    <a href="#back" onClick={this.backToPassword} style={style.forgotPassword}>
-                      Back to password
-                    </a>
-                  ) : (
-                    <Link to="/forgot_password" style={style.forgotPassword}>
-                      Forgot password?
-                    </Link>
-                  )}
-                </Form>
-              </Card.Content>
-            </Card>
-          </Grid.Column>
-        </Grid>
+        <div className="auth-panel">
+          <Panel
+            title={mfaStep ? 'Two-factor authentication' : 'Officer login'}
+            meta={
+              mfaStep
+                ? 'Enter the 6-digit code from your authenticator app'
+                : 'Authorized personnel only'
+            }
+          >
+            <form onSubmit={this.handleSubmit}>
+              {!mfaStep ? (
+                <>
+                  <TextInput
+                    label="Email"
+                    name="email"
+                    type="email"
+                    placeholder="Email"
+                    value={this.state.email}
+                    onChange={this.handleChange}
+                    autoComplete="username"
+                  />
+                  <div style={{ height: '0.75rem' }} />
+                  <TextInput
+                    label="Password"
+                    name="password"
+                    type="password"
+                    placeholder="Password"
+                    value={this.state.password}
+                    onChange={this.handleChange}
+                    autoComplete="current-password"
+                  />
+                </>
+              ) : (
+                <TextInput
+                  label="Authentication code"
+                  name="mfaCode"
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  placeholder="123456"
+                  value={this.state.mfaCode}
+                  onChange={this.handleChange}
+                />
+              )}
+              {this.state.error && (
+                <Alert
+                  tone="error"
+                  title={this.state.errorHeader}
+                  content={this.state.errorContent}
+                />
+              )}
+              <div style={{ marginTop: '1rem' }}>
+                <Button type="submit" variant="primary" block>
+                  {mfaStep ? 'Verify' : 'Sign in'}
+                </Button>
+              </div>
+              {mfaStep ? (
+                <a href="#back" onClick={this.backToPassword} className="auth-link">
+                  Back to password
+                </a>
+              ) : (
+                <Link to="/forgot_password" className="auth-link">
+                  Forgot password?
+                </Link>
+              )}
+            </form>
+          </Panel>
+        </div>
       </Layout>
     );
   }

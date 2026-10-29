@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Card, Button, Input, Table, Icon, Checkbox } from 'semantic-ui-react';
 import { tipTimeFormat } from '../helpers/helpers';
 import { api } from '../api';
+import { Button, Panel } from './ui';
 
 export default class Mailbox extends Component {
   state = {
@@ -128,97 +128,95 @@ export default class Mailbox extends Component {
   renderMailboxRows = (tipKeysToDisplay) => {
     const { tips } = this.state;
     return tipKeysToDisplay.map((key) => (
-      <Table.Row key={key}>
-        <Table.Cell width={1} textAlign="center">
-          <Checkbox
+      <tr key={key} className={tips[key].read ? undefined : 'is-unread'}>
+        <td className="cell-actions" onClick={(e) => e.stopPropagation()}>
+          <input
+            type="checkbox"
             checked={this.state.selectedTipKeys.indexOf(key) !== -1}
             onChange={() => this.addSelectedItem(key)}
+            aria-label={`Select tip ${key}`}
           />
-        </Table.Cell>
-        <Table.Cell width={1}>
-          {tips[key].important ? (
-            <Icon name="star" color="yellow" onClick={() => this.markTipAs(key, 'important')} />
-          ) : (
-            <Icon name="star outline" disabled onClick={() => this.markTipAs(key, 'important')} />
-          )}
-          {tips[key].tipType === 'web' ? (
-            <Icon name="computer" disabled />
-          ) : (
-            <Icon name="phone" disabled />
-          )}
-        </Table.Cell>
-        <Table.Cell width={4} onClick={() => this.showTipDetail(key)}>
-          {tips[key].read ? tips[key].crimeType : <b>{tips[key].crimeType}</b>}
-        </Table.Cell>
-        <Table.Cell width={8} onClick={() => this.showTipDetail(key)}>
-          {tips[key].read ? tips[key].tipText : <b>{tips[key].tipText}</b>}
-        </Table.Cell>
-        <Table.Cell width={1} onClick={() => this.showTipDetail(key)}>
-          {tips[key].attachments && Object.keys(tips[key].attachments).length > 0 ? (
-            <Icon name="attach" />
-          ) : null}
-        </Table.Cell>
-        <Table.Cell width={2} textAlign="right" onClick={() => this.showTipDetail(key)}>
-          {tips[key].read ? (
-            tipTimeFormat(tips[key].timestampStart || tips[key].dateTime)
-          ) : (
-            <b>{tipTimeFormat(tips[key].timestampStart || tips[key].dateTime)}</b>
-          )}
-        </Table.Cell>
-      </Table.Row>
+        </td>
+        <td className="cell-actions" onClick={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            className={`star-btn${tips[key].important ? ' is-on' : ''}`}
+            aria-label={tips[key].important ? 'Unmark important' : 'Mark important'}
+            onClick={() => this.markTipAs(key, 'important')}
+          >
+            {tips[key].important ? '★' : '☆'}
+          </button>
+          <span style={{ marginLeft: 4, color: 'var(--ct-muted)', fontSize: '0.75rem' }}>
+            {tips[key].tipType === 'web' ? 'Web' : 'Phone'}
+          </span>
+        </td>
+        <td onClick={() => this.showTipDetail(key)}>{tips[key].crimeType}</td>
+        <td onClick={() => this.showTipDetail(key)}>{tips[key].tipText}</td>
+        <td onClick={() => this.showTipDetail(key)}>
+          {tips[key].attachments && Object.keys(tips[key].attachments).length > 0 ? 'Yes' : '—'}
+        </td>
+        <td onClick={() => this.showTipDetail(key)} style={{ textAlign: 'right' }}>
+          {tipTimeFormat(tips[key].timestampStart || tips[key].dateTime)}
+        </td>
+      </tr>
     ));
   };
 
   render() {
     const keys = this.filteredKeys();
     return (
-      <Card fluid>
-        <Card.Content>
-          <h2 style={{ float: 'left' }}>Tip Inbox</h2>
-          <form style={{ float: 'right' }}>
-            <Input
-              icon="search"
-              placeholder="Search..."
-              style={{ margin: '0 5px' }}
-              value={this.state.searchTerm}
-              onChange={(e) => this.searchTips(e.target.value)}
-            />
-          </form>
+      <Panel>
+        <div className="mailbox-toolbar">
+          <h2>Tip inbox</h2>
           <Button
-            icon="archive"
-            style={{ float: 'right', margin: '0 20px' }}
+            size="sm"
+            variant="secondary"
+            content="Archive selected"
             onClick={() => this.markSelectedTipsAs('archived')}
           />
-          <div style={{ clear: 'both' }} />
-        </Card.Content>
-        <Card.Content>
-          <Table basic="very" fixed singleLine style={{ cursor: 'pointer' }}>
-            <Table.Header>
-              <Table.Row>
-                <Table.HeaderCell width={1} />
-                <Table.HeaderCell width={1} />
-                <Table.HeaderCell width={3}>Crime Type</Table.HeaderCell>
-                <Table.HeaderCell width={8}>Tip Text</Table.HeaderCell>
-                <Table.HeaderCell width={1}>File(s)</Table.HeaderCell>
-                <Table.HeaderCell width={2} textAlign="right">
-                  Date
-                </Table.HeaderCell>
-              </Table.Row>
-            </Table.Header>
-            <Table.Body>
-              {keys.length === 0 ? null : this.renderMailboxRows(keys)}
-            </Table.Body>
-          </Table>
-          <div style={{ textAlign: 'right' }}>
-            {this.state.showPreviousButton && (
-              <Button content="Previous" onClick={() => this.changePage(-1)} />
-            )}
-            {this.state.showNextButton && (
-              <Button content="Next" onClick={() => this.changePage(1)} />
-            )}
-          </div>
-        </Card.Content>
-      </Card>
+          <input
+            className="input search-input"
+            type="search"
+            placeholder="Search…"
+            value={this.state.searchTerm}
+            onChange={(e) => this.searchTips(e.target.value)}
+            aria-label="Search tips"
+          />
+        </div>
+        <div className="table-wrap">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th aria-label="Select" />
+                <th aria-label="Flags" />
+                <th>Crime type</th>
+                <th>Tip</th>
+                <th>Files</th>
+                <th style={{ textAlign: 'right' }}>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {keys.length === 0 ? (
+                <tr>
+                  <td colSpan={6} style={{ cursor: 'default', color: 'var(--ct-muted)' }}>
+                    No tips in this folder.
+                  </td>
+                </tr>
+              ) : (
+                this.renderMailboxRows(keys)
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="pager">
+          {this.state.showPreviousButton && (
+            <Button content="Previous" variant="secondary" onClick={() => this.changePage(-1)} />
+          )}
+          {this.state.showNextButton && (
+            <Button content="Next" variant="secondary" onClick={() => this.changePage(1)} />
+          )}
+        </div>
+      </Panel>
     );
   }
 }

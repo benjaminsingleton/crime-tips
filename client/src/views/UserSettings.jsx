@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Grid, Card, Form, Radio, Divider, Message, Button } from 'semantic-ui-react';
 import Layout from '../components/Layout';
 import { api } from '../api';
 import { relativeTime } from '../helpers/helpers';
+import { Panel, TextInput, Button, Alert, Toggle } from '../components/ui';
 
 export default class UserSettings extends Component {
   state = {
@@ -191,11 +191,11 @@ export default class UserSettings extends Component {
 
     return (
       <>
-        <h4>Two-factor authentication (TOTP)</h4>
+        <h3 style={{ fontSize: '1.05rem' }}>Two-factor authentication (TOTP)</h3>
         {enrollmentForced && (
-          <Message
-            warning
-            header="MFA enrollment required"
+          <Alert
+            tone="warn"
+            title="MFA enrollment required"
             content="This deployment sets MFA_REQUIRED=true. Enroll an authenticator app before using the dashboard."
           />
         )}
@@ -205,78 +205,88 @@ export default class UserSettings extends Component {
           {mfaRequired ? ' (required for all officers)' : ''}
         </p>
         {backupCodes && backupCodes.length > 0 && (
-          <Message info>
-            <Message.Header>Backup codes (save these; shown once)</Message.Header>
-            <pre style={{ whiteSpace: 'pre-wrap' }}>{backupCodes.join('\n')}</pre>
-          </Message>
+          <Alert tone="info" title="Backup codes (save these; shown once)">
+            <pre className="backup-codes">{backupCodes.join('\n')}</pre>
+          </Alert>
         )}
         {!userDetails.mfaEnabled && !mfaSetup && (
-          <Button type="button" primary onClick={this.startMfaSetup}>
+          <Button type="button" variant="primary" onClick={this.startMfaSetup}>
             Set up authenticator
           </Button>
         )}
         {mfaSetup && (
-          <Form
-            success={this.state.mfaMsgStatus === 'success'}
-            error={this.state.mfaMsgStatus === 'error'}
-            onSubmit={this.confirmMfa}
-          >
+          <form onSubmit={this.confirmMfa}>
             <p>Scan this QR code with Google Authenticator, Authy, or a similar app:</p>
             <img
+              className="mfa-qr"
               src={mfaSetup.qrDataUrl}
               alt="MFA QR code"
               width={200}
               height={200}
-              style={{ display: 'block', marginBottom: 12 }}
             />
             <p>
               Or enter this secret manually:{' '}
               <code style={{ wordBreak: 'break-all' }}>{mfaSetup.secret}</code>
             </p>
-            <Form.Input
+            <TextInput
               label="Enter the 6-digit code to confirm"
               name="mfaCode"
               value={this.state.mfaCode}
               onChange={this.handleInputChange}
               autoComplete="one-time-code"
             />
-            <Message success content={this.state.mfaMsg} />
-            <Message error content={this.state.mfaMsg} />
-            <Form.Button primary>Enable MFA</Form.Button>
-          </Form>
+            {this.state.mfaMsgStatus === 'success' && (
+              <Alert tone="success" content={this.state.mfaMsg} />
+            )}
+            {this.state.mfaMsgStatus === 'error' && (
+              <Alert tone="error" content={this.state.mfaMsg} />
+            )}
+            <div style={{ marginTop: '0.75rem' }}>
+              <Button type="submit" variant="primary">
+                Enable MFA
+              </Button>
+            </div>
+          </form>
         )}
         {userDetails.mfaEnabled && !mfaRequired && (
-          <Form
-            success={this.state.mfaMsgStatus === 'success'}
-            error={this.state.mfaMsgStatus === 'error'}
-            onSubmit={this.disableMfa}
-          >
+          <form onSubmit={this.disableMfa}>
             <p>To disable MFA, confirm your password and a current authenticator (or backup) code.</p>
-            <Form.Input
+            <TextInput
               label="Current password"
               name="mfaDisablePassword"
               type="password"
               value={this.state.mfaDisablePassword}
               onChange={this.handleInputChange}
             />
-            <Form.Input
+            <div style={{ height: '0.65rem' }} />
+            <TextInput
               label="Authentication code"
               name="mfaDisableCode"
               value={this.state.mfaDisableCode}
               onChange={this.handleInputChange}
             />
-            <Message success content={this.state.mfaMsg} />
-            <Message error content={this.state.mfaMsg} />
-            <Form.Button negative>Disable MFA</Form.Button>
-          </Form>
+            {this.state.mfaMsgStatus === 'success' && (
+              <Alert tone="success" content={this.state.mfaMsg} />
+            )}
+            {this.state.mfaMsgStatus === 'error' && (
+              <Alert tone="error" content={this.state.mfaMsg} />
+            )}
+            <div style={{ marginTop: '0.75rem' }}>
+              <Button type="submit" variant="danger">
+                Disable MFA
+              </Button>
+            </div>
+          </form>
         )}
         {userDetails.mfaEnabled && mfaRequired && (
-          <Message info content="MFA cannot be disabled while MFA_REQUIRED is set on the server." />
+          <Alert
+            tone="info"
+            content="MFA cannot be disabled while MFA_REQUIRED is set on the server."
+          />
         )}
         {!mfaSetup && this.state.mfaMsgStatus && !userDetails.mfaEnabled && (
-          <Message
-            success={this.state.mfaMsgStatus === 'success'}
-            error={this.state.mfaMsgStatus === 'error'}
+          <Alert
+            tone={this.state.mfaMsgStatus === 'success' ? 'success' : 'error'}
             content={this.state.mfaMsg}
           />
         )}
@@ -287,94 +297,94 @@ export default class UserSettings extends Component {
   render() {
     const activityKeys = Object.keys(this.state.userActivity || {});
     return (
-      <Layout user={this.props.user} onLogout={this.props.onLogout}>
-        <Grid centered container columns={1}>
-          <Grid.Column mobile={16} tablet={10} computer={8}>
-            <Card fluid>
-              <Card.Content header="My Settings" />
-              <Card.Content>
-                <p>
-                  {this.state.userDetails.rank} {this.state.userDetails.firstName}{' '}
-                  {this.state.userDetails.lastName}
+      <Layout user={this.props.user} onLogout={this.props.onLogout} variant="officer">
+        <div style={{ maxWidth: '36rem', margin: '1.25rem auto 0' }}>
+          <Panel title="My settings">
+            <p style={{ marginTop: 0 }}>
+              {this.state.userDetails.rank} {this.state.userDetails.firstName}{' '}
+              {this.state.userDetails.lastName}
+            </p>
+            <p style={{ color: 'var(--ct-muted)' }}>{this.state.userDetails.email}</p>
+            <hr className="section-divider" />
+            <Toggle
+              label="Email notifications"
+              checked={!!this.state.userDetails.notifications}
+              onChange={this.onToggle}
+            />
+            <hr className="section-divider" />
+            {this.renderMfaSection()}
+            <hr className="section-divider" />
+            <form onSubmit={this.changePassword}>
+              <TextInput
+                label="New password"
+                name="newPassword"
+                type="password"
+                value={this.state.newPassword}
+                onChange={this.handleInputChange}
+              />
+              <div style={{ height: '0.65rem' }} />
+              <TextInput
+                label="Repeat password"
+                name="newPasswordRepeat"
+                type="password"
+                value={this.state.newPasswordRepeat}
+                onChange={this.handleInputChange}
+              />
+              {this.state.passwordMsgStatus === 'success' && (
+                <Alert tone="success" content={this.state.passwordMsg} />
+              )}
+              {this.state.passwordMsgStatus === 'error' && (
+                <Alert tone="error" content={this.state.passwordMsg} />
+              )}
+              <div style={{ marginTop: '0.75rem' }}>
+                <Button type="submit" variant="primary">
+                  Update password
+                </Button>
+              </div>
+            </form>
+            <hr className="section-divider" />
+            <form onSubmit={this.changeEmail}>
+              <TextInput
+                label="New email"
+                name="newEmail"
+                type="email"
+                value={this.state.newEmail}
+                onChange={this.handleInputChange}
+              />
+              <div style={{ height: '0.65rem' }} />
+              <TextInput
+                label="Repeat email"
+                name="newEmailRepeat"
+                type="email"
+                value={this.state.newEmailRepeat}
+                onChange={this.handleInputChange}
+              />
+              {this.state.emailMsgStatus === 'success' && (
+                <Alert tone="success" content={this.state.emailMsg} />
+              )}
+              {this.state.emailMsgStatus === 'error' && (
+                <Alert tone="error" content={this.state.emailMsg} />
+              )}
+              <div style={{ marginTop: '0.75rem' }}>
+                <Button type="submit" variant="primary">
+                  Update email
+                </Button>
+              </div>
+            </form>
+            <hr className="section-divider" />
+            <h3 style={{ fontSize: '1.05rem' }}>Recent activity</h3>
+            {activityKeys.length === 0 ? (
+              <p style={{ color: 'var(--ct-muted)' }}>No recent activity.</p>
+            ) : (
+              activityKeys.map((key) => (
+                <p key={key}>
+                  {this.state.userActivity[key].action} —{' '}
+                  {relativeTime(this.state.userActivity[key].timestamp)}
                 </p>
-                <p>{this.state.userDetails.email}</p>
-                <Divider />
-                <Form>
-                  <Form.Field>
-                    Email notifications:{' '}
-                    <Radio
-                      toggle
-                      checked={!!this.state.userDetails.notifications}
-                      onChange={this.onToggle}
-                    />
-                  </Form.Field>
-                </Form>
-                <Divider />
-                {this.renderMfaSection()}
-                <Divider />
-                <Form
-                  success={this.state.passwordMsgStatus === 'success'}
-                  error={this.state.passwordMsgStatus === 'error'}
-                  onSubmit={this.changePassword}
-                >
-                  <Form.Input
-                    label="New password"
-                    name="newPassword"
-                    type="password"
-                    value={this.state.newPassword}
-                    onChange={this.handleInputChange}
-                  />
-                  <Form.Input
-                    label="Repeat password"
-                    name="newPasswordRepeat"
-                    type="password"
-                    value={this.state.newPasswordRepeat}
-                    onChange={this.handleInputChange}
-                  />
-                  <Message success content={this.state.passwordMsg} />
-                  <Message error content={this.state.passwordMsg} />
-                  <Form.Button>Update password</Form.Button>
-                </Form>
-                <Divider />
-                <Form
-                  success={this.state.emailMsgStatus === 'success'}
-                  error={this.state.emailMsgStatus === 'error'}
-                  onSubmit={this.changeEmail}
-                >
-                  <Form.Input
-                    label="New email"
-                    name="newEmail"
-                    type="email"
-                    value={this.state.newEmail}
-                    onChange={this.handleInputChange}
-                  />
-                  <Form.Input
-                    label="Repeat email"
-                    name="newEmailRepeat"
-                    type="email"
-                    value={this.state.newEmailRepeat}
-                    onChange={this.handleInputChange}
-                  />
-                  <Message success content={this.state.emailMsg} />
-                  <Message error content={this.state.emailMsg} />
-                  <Form.Button>Update email</Form.Button>
-                </Form>
-                <Divider />
-                <h4>Recent activity</h4>
-                {activityKeys.length === 0 ? (
-                  <p>No recent activity.</p>
-                ) : (
-                  activityKeys.map((key) => (
-                    <p key={key}>
-                      {this.state.userActivity[key].action} —{' '}
-                      {relativeTime(this.state.userActivity[key].timestamp)}
-                    </p>
-                  ))
-                )}
-              </Card.Content>
-            </Card>
-          </Grid.Column>
-        </Grid>
+              ))
+            )}
+          </Panel>
+        </div>
       </Layout>
     );
   }

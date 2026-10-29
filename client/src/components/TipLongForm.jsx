@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Card, Form, Button, Message } from 'semantic-ui-react';
 import { api } from '../api';
+import { Panel, TextInput, TextArea, Button, Alert } from './ui';
 
 export default class TipLongForm extends Component {
   state = {
@@ -45,28 +45,28 @@ export default class TipLongForm extends Component {
 
   render() {
     return (
-      <Card fluid>
-        <Card.Content header="Submit a tip (officer)" />
-        <Card.Content>
-          <Form success={this.state.success} error={!!this.state.error} onSubmit={this.createTip}>
-            <Form.Input
-              label="Crime type"
-              name="crimeType"
-              value={this.state.tip.crimeType}
-              onChange={this.handleInputChange}
-            />
-            <Form.TextArea
-              label="Tip"
-              name="tipText"
-              value={this.state.tip.tipText}
-              onChange={this.handleInputChange}
-            />
-            <Message success content="Tip submitted." />
-            <Message error content={this.state.error} />
-            <Button content="Submit" color="violet" />
-          </Form>
-        </Card.Content>
-      </Card>
+      <Panel title="Submit a tip (officer)">
+        <form onSubmit={this.createTip}>
+          <TextInput
+            label="Crime type"
+            name="crimeType"
+            value={this.state.tip.crimeType}
+            onChange={this.handleInputChange}
+          />
+          <div style={{ height: '0.75rem' }} />
+          <TextArea
+            label="Tip"
+            name="tipText"
+            value={this.state.tip.tipText}
+            onChange={this.handleInputChange}
+          />
+          {this.state.success && <Alert tone="success" content="Tip submitted." />}
+          {this.state.error && <Alert tone="error" content={this.state.error} />}
+          <div style={{ marginTop: '1rem' }}>
+            <Button type="submit" variant="primary" content="Submit" />
+          </div>
+        </form>
+      </Panel>
     );
   }
 }

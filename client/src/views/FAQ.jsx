@@ -1,36 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Card } from 'semantic-ui-react';
+import { Panel } from '../components/ui';
 
 const FAQ = ({ lang }) => (
-  <Card centered fluid style={{ marginBottom: '14px' }}>
-    <Card.Content header={lang.faq} meta={lang.faqSubtitle} />
-    <Card.Content>
-      <p><b>{lang.faq1Question}</b></p>
-      <p>{lang.faq1Answer}</p>
-      <br />
-      <p><b>{lang.faq2Question}</b></p>
-      <p>{lang.faq2Answer}</p>
-      <br />
-      <p><b>{lang.faq3Question}</b></p>
-      <p>{lang.faq3Answer}</p>
-      <br />
-      <p><b>{lang.faq4Question}</b></p>
-      <p>{lang.faq4Answer}</p>
-      <br />
-      <p><b>{lang.faq5Question}</b></p>
-      <p>{lang.faq5Answer}</p>
-      <br />
-      <p><b>{lang.faq6Question}</b></p>
-      <p>{lang.faq6Answer}</p>
-      <br />
-      <p><b>{lang.faq7Question}</b></p>
-      <p>{lang.faq7Answer}</p>
-      <br />
-      <p><b>{lang.faq8Question}</b></p>
-      <p>{lang.faq8Answer}</p>
-    </Card.Content>
-  </Card>
+  <Panel title={lang.faq} meta={lang.faqSubtitle}>
+    {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+      <div className="faq-item" key={n}>
+        <h3>{lang[`faq${n}Question`]}</h3>
+        <p>{lang[`faq${n}Answer`]}</p>
+      </div>
+    ))}
+  </Panel>
 );
 
 FAQ.propTypes = {

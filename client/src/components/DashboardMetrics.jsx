@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Grid, Segment, Icon } from 'semantic-ui-react';
 import { api } from '../api';
 
 export default class DashboardMetrics extends Component {
@@ -31,41 +30,22 @@ export default class DashboardMetrics extends Component {
   };
 
   render() {
-    const style = {
-      metric: { fontSize: '2em', fontWeight: 'bold' },
-      label: { color: '#666' },
-    };
+    const items = [
+      { value: this.state.metrics.unreadTips, label: 'Unread tips' },
+      { value: this.state.metrics.tipsReceivedLast24Hours, label: 'Last 24 hours' },
+      { value: this.state.metrics.tipsReceivedYTD, label: 'Year to date' },
+      { value: this.state.metrics.unreadAbandonedTips, label: 'Abandoned drafts' },
+    ];
+
     return (
-      <Grid columns={4} stackable style={{ marginBottom: 10 }}>
-        <Grid.Column>
-          <Segment textAlign="center">
-            <Icon name="mail outline" size="large" />
-            <div style={style.metric}>{this.state.metrics.unreadTips}</div>
-            <div style={style.label}>Unread tips</div>
-          </Segment>
-        </Grid.Column>
-        <Grid.Column>
-          <Segment textAlign="center">
-            <Icon name="clock" size="large" />
-            <div style={style.metric}>{this.state.metrics.tipsReceivedLast24Hours}</div>
-            <div style={style.label}>Last 24 hours</div>
-          </Segment>
-        </Grid.Column>
-        <Grid.Column>
-          <Segment textAlign="center">
-            <Icon name="calendar" size="large" />
-            <div style={style.metric}>{this.state.metrics.tipsReceivedYTD}</div>
-            <div style={style.label}>Year to date</div>
-          </Segment>
-        </Grid.Column>
-        <Grid.Column>
-          <Segment textAlign="center">
-            <Icon name="wait" size="large" />
-            <div style={style.metric}>{this.state.metrics.unreadAbandonedTips}</div>
-            <div style={style.label}>Abandoned drafts</div>
-          </Segment>
-        </Grid.Column>
-      </Grid>
+      <div className="metrics">
+        {items.map((item) => (
+          <div className="metric" key={item.label}>
+            <div className="metric__value">{item.value}</div>
+            <div className="metric__label">{item.label}</div>
+          </div>
+        ))}
+      </div>
     );
   }
 }
