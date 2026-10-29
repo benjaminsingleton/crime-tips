@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link, NavLink } from 'react-router-dom';
 import { BrandMark } from './ui';
+import { useBranding } from '../branding';
 
-export default class Navigation extends Component {
+class NavigationInner extends Component {
   logout = async () => {
     if (this.props.onLogout) await this.props.onLogout();
   };
@@ -12,15 +13,16 @@ export default class Navigation extends Component {
     const user = this.props.user;
     const uid = user?.id;
     const admin = user?.admin;
+    const { name, tagline, logoUrl } = this.props.branding;
 
     return (
       <header className="site-header">
         <div className="site-header__inner">
           <Link to={uid ? '/dashboard' : '/'} className="brand">
-            <BrandMark />
+            <BrandMark logoUrl={logoUrl || undefined} alt="" />
             <span>
-              <span className="brand__name">Gotham Crime Tips</span>
-              <span className="brand__tag">Police tip line</span>
+              <span className="brand__name">{name}</span>
+              <span className="brand__tag">{tagline}</span>
             </span>
           </Link>
 
@@ -52,6 +54,14 @@ export default class Navigation extends Component {
                 className={({ isActive }) => (isActive ? 'is-active' : undefined)}
               >
                 Accounts
+              </NavLink>
+            )}
+            {admin && (
+              <NavLink
+                to="/branding"
+                className={({ isActive }) => (isActive ? 'is-active' : undefined)}
+              >
+                Branding
               </NavLink>
             )}
             {!uid && (
@@ -103,12 +113,22 @@ export default class Navigation extends Component {
   }
 }
 
-Navigation.propTypes = {
+NavigationInner.propTypes = {
   user: PropTypes.object,
   onLogout: PropTypes.func,
+  branding: PropTypes.shape({
+    name: PropTypes.string,
+    tagline: PropTypes.string,
+    logoUrl: PropTypes.string,
+  }).isRequired,
 };
 
-Navigation.defaultProps = {
+NavigationInner.defaultProps = {
   user: null,
   onLogout: null,
 };
+
+export default function Navigation(props) {
+  const branding = useBranding();
+  return <NavigationInner {...props} branding={branding} />;
+}

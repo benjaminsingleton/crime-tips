@@ -62,6 +62,8 @@ Officer auth uses a Secure (on HTTPS), httpOnly, SameSite session cookie. Set `P
 
 Optional officer **TOTP MFA**: enroll under My Settings, or set `MFA_REQUIRED=true` to require it for all officers. See [auth-mfa.md](./auth-mfa.md). Agency OIDC/SAML SSO is a documented follow-up (not in this release).
 
+**Department branding** (name, logo, navy/gold colors) without forking: set `BRAND_*` in `.env`, or sign in as admin → **Branding**. See [branding.md](./branding.md).
+
 ## 4. Local developer path (not for production)
 
 ```bash

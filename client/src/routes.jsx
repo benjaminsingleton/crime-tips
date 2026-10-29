@@ -8,7 +8,9 @@ import AccountManagement from './views/AccountManagement';
 import LoggedOut from './views/LoggedOut';
 import ForgotPassword from './views/ForgotPassword';
 import NoMatch from './views/NoMatch';
+import BrandingSettings from './views/BrandingSettings';
 import { api } from './api';
+import { BrandingProvider } from './branding';
 
 function PrivateRoute({ authed, children }) {
   const location = useLocation();
@@ -33,7 +35,14 @@ function needsMfaEnroll(user) {
   );
 }
 
-const OFFICER_PATHS = ['/dashboard', '/tip/', '/settings', '/account_management', '/logout'];
+const OFFICER_PATHS = [
+  '/dashboard',
+  '/tip/',
+  '/settings',
+  '/account_management',
+  '/branding',
+  '/logout',
+];
 
 function AppShell({ children }) {
   const location = useLocation();
@@ -98,6 +107,7 @@ export default function App() {
   }
 
   return (
+    <BrandingProvider>
     <BrowserRouter>
       <AppShell>
         <Routes>
@@ -171,6 +181,20 @@ export default function App() {
             )}
           />
           <Route
+            path="/branding"
+            element={(
+              <PrivateRoute authed={authed}>
+                {needsMfaEnroll(user) ? (
+                  <Navigate to="/settings" replace />
+                ) : user?.admin ? (
+                  <BrandingSettings user={user} onLogout={onLogout} />
+                ) : (
+                  <Navigate to="/dashboard" replace />
+                )}
+              </PrivateRoute>
+            )}
+          />
+          <Route
             path="/logout"
             element={(
               <PrivateRoute authed={authed}>
@@ -182,5 +206,6 @@ export default function App() {
         </Routes>
       </AppShell>
     </BrowserRouter>
+    </BrandingProvider>
   );
 }

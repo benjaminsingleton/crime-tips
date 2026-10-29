@@ -186,6 +186,20 @@ textarea {
   fill: var(--ct-gold-soft);
 }
 
+.brand__mark--logo {
+  border-color: rgba(184, 151, 74, 0.55);
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  padding: 2px;
+}
+
+.brand__mark--logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
 .brand__name {
   font-family: var(--ct-font-display);
   font-size: 1.15rem;
@@ -270,6 +284,71 @@ textarea {
   padding: 2.25rem 0 1.25rem;
   color: #fff;
   animation: ct-rise 0.55s ease both;
+}
+
+.public-hero__logo {
+  display: block;
+  width: auto;
+  height: 3.25rem;
+  max-width: 12rem;
+  object-fit: contain;
+  margin: 0 0 1rem;
+  animation: ct-fade-in 0.5s ease both;
+}
+
+.branding-logo-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.branding-logo-preview {
+  width: 3.5rem;
+  height: 3.5rem;
+  object-fit: contain;
+  border: 1px solid var(--ct-border);
+  border-radius: var(--ct-radius);
+  background: var(--ct-navy-900);
+  padding: 0.25rem;
+}
+
+.branding-logo-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.branding-colors {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 1rem;
+}
+
+.branding-color-input {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.branding-color-input input[type='color'] {
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid var(--ct-border);
+  border-radius: var(--ct-radius);
+  background: transparent;
+  cursor: pointer;
+}
+
+.branding-color-input .input {
+  flex: 1;
+}
+
+.muted {
+  color: var(--ct-muted);
+  font-size: 0.9rem;
 }
 
 .public-hero__brand {

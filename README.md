@@ -53,6 +53,7 @@ Ops runbooks:
 - [TLS](docs/ops/tls.md)
 - [Hardening checklist](docs/ops/hardening.md)
 - [Officer MFA (TOTP)](docs/ops/auth-mfa.md)
+- [Department branding](docs/ops/branding.md)
 - [Backup & restore](docs/ops/backup-restore.md)
 
 Helpers: `scripts/gen-secrets.sh`, `scripts/preflight.sh`, `scripts/backup.sh`, `scripts/restore.sh`, `scripts/update.sh`.
@@ -84,6 +85,8 @@ See `.env.example`. Important variables:
 | `SMTP_*` | Optional new-tip email; otherwise the API logs a stub |
 | `MFA_REQUIRED` | `true` to require TOTP enrollment for all officers (optional) |
 | `MFA_ISSUER` | Authenticator app label (default `Crime Tips`) |
+| `BRAND_NAME` / `BRAND_TAGLINE` / `BRAND_LOGO_URL` | Department branding defaults (admin UI can override) |
+| `BRAND_PRIMARY_COLOR` / `BRAND_ACCENT_COLOR` | Navy / gold hex colors for the official theme |
 
 ## Architecture
 

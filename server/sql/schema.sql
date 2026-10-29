@@ -80,3 +80,10 @@ CREATE TABLE IF NOT EXISTS activity_logs (
 
 CREATE INDEX IF NOT EXISTS activity_logs_user_id_idx ON activity_logs (user_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS activity_logs_tip_id_idx ON activity_logs (tip_id);
+
+-- Department branding (admin UI + env defaults; no fork required)
+CREATE TABLE IF NOT EXISTS app_settings (
+  key TEXT PRIMARY KEY,
+  value JSONB NOT NULL DEFAULT '{}'::jsonb,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
