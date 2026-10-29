@@ -42,14 +42,17 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 | **Prod** | `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d` (pull GHCR image) | Caddy `80`/`443` only |
 | **Prod from source** | add `-f docker-compose.build.yml` and `--build` | same |
 
-**Image:** `ghcr.io/benjaminsingleton/crime-tips` — tags `:X.Y.Z` / `:X.Y` / `:latest` from GitHub release tags `vX.Y.Z`; `:master` and `:sha-…` from main-branch CI.
+**Image:** `ghcr.io/benjaminsingleton/crime-tips` — first release **`v1.0.0`** → `:1.0.0` / `:1.0` / `:latest`; later `vX.Y.Z` tags follow the same pattern. Branch CI also publishes `:master` and `:sha-…`.
 
-Update: `./scripts/backup.sh && ./scripts/update.sh vX.Y.Z` — see [Update](docs/ops/update.md).
+**Package visibility:** GHCR packages often start private. After the release image publishes, a maintainer must set the package to **Public** so departments can pull without login — see [GHCR](docs/ops/ghcr.md).
+
+Update: `./scripts/backup.sh && ./scripts/update.sh v1.0.0` — see [Update](docs/ops/update.md). Changelog: [CHANGELOG.md](CHANGELOG.md).
 
 Ops runbooks:
 
 - [Install](docs/ops/install.md)
 - [Update](docs/ops/update.md)
+- [GHCR publish & visibility](docs/ops/ghcr.md)
 - [TLS](docs/ops/tls.md)
 - [Hardening checklist](docs/ops/hardening.md)
 - [Officer MFA (TOTP)](docs/ops/auth-mfa.md)

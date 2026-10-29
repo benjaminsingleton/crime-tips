@@ -17,7 +17,7 @@ sudo mkdir -p /opt/crime-tips
 sudo chown "$USER":"$USER" /opt/crime-tips
 cd /opt/crime-tips
 git clone https://github.com/benjaminsingleton/crime-tips.git .
-git checkout vX.Y.Z   # pin Compose/scripts to a release tag when available
+git checkout v1.0.0   # pin Compose/scripts to a release tag
 
 cp .env.example .env
 ./scripts/gen-secrets.sh
@@ -30,7 +30,7 @@ Edit `.env`:
 | `DOMAIN` | Public hostname, e.g. `tips.example.gov` |
 | `PUBLIC_ORIGIN` | `https://tips.example.gov` |
 | `ADMIN_EMAIL` | Initial admin mailbox |
-| `CRIME_TIPS_IMAGE` | `ghcr.io/benjaminsingleton/crime-tips:X.Y.Z` (match the release; default `:latest`) |
+| `CRIME_TIPS_IMAGE` | `ghcr.io/benjaminsingleton/crime-tips:1.0.0` (match the release; default `:latest`) |
 | `CRIME_TIPS_ENV` | Leave unset in `.env` if using the prod overlay (overlay forces `production`) |
 
 ```bash
