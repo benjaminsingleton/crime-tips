@@ -2,6 +2,14 @@
 
 Use this before putting a tip site on the public internet.
 
+## Claims / non-claims
+
+- This checklist is **operational hygiene** for a self-hosted tip site. It is **not** a CJIS (or other) certification, audit report, or compliance attestation.
+- Agencies remain responsible for policy, accreditation, retention, and FOIA/records handling.
+- See [SECURITY.md](../../SECURITY.md) and [privacy-model.md](./privacy-model.md).
+
+**Known product limits (central):** no SAML (OIDC only, post-`v1.0.0`); no tipster email; no password-reset email; no built-in upload malware scanning (scan at gateway / future); single-node Compose (no HA); CAPTCHA/ClamAV not included.
+
 ## Network
 
 - [ ] Production Compose overlay in use (`docker-compose.prod.yml`)
@@ -49,13 +57,18 @@ Production boots **refuse** weak JWT / DB / admin example secrets when `CRIME_TI
 
 ## Ops
 
-- [ ] `CRIME_TIPS_IMAGE` pinned to a release tag (not floating `:latest` long-term)
+- [ ] `CRIME_TIPS_IMAGE` pinned to a release tag (not floating `:latest` long-term); checkout matches features ([install.md](./install.md#version-alignment))
+- [ ] Anonymous `docker pull` of the pinned tag succeeded before go-live ([ghcr.md](./ghcr.md))
 - [ ] Update runbook followed: backup → `./scripts/update.sh vX.Y.Z` ([update.md](./update.md))
-- [ ] Backup script scheduled; off-box copy verified
+- [ ] Backup script scheduled (example cron in [backup-restore.md](./backup-restore.md)); encrypt + off-box copy verified
 - [ ] Restore drill performed at least once on a staging clone
-- [ ] Admin accounts are named officers; unused accounts disabled
+- [ ] Admin accounts are named officers; unused accounts disabled ([user-admin.md](./user-admin.md))
+- [ ] Container logs (`app`, `caddy`, `db`) shipped to agency SIEM / log retention as required
+- [ ] Monitoring probes `GET /api/health`
+- [ ] Upload malware scanning handled at gateway / AV if agency policy requires (not built into Crime Tips)
 
 ## Incident starters
 
 - Suspected session theft: rotate `JWT_SECRET` and restart `app` (invalidates session cookies)
 - Suspected DB exposure: rotate `POSTGRES_PASSWORD`, update `DATABASE_URL`, restart stack, preserve logs
+- Tipster-anonymity concern: review proxy logs and [privacy-model.md](./privacy-model.md); align public messaging
