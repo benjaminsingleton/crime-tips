@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
   mfa_enabled BOOLEAN NOT NULL DEFAULT FALSE,
   mfa_secret_enc TEXT,
   mfa_backup_hashes JSONB NOT NULL DEFAULT '[]'::jsonb,
+  oidc_sub TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -21,6 +22,10 @@ CREATE TABLE IF NOT EXISTS users (
 ALTER TABLE users ADD COLUMN IF NOT EXISTS mfa_enabled BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS mfa_secret_enc TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS mfa_backup_hashes JSONB NOT NULL DEFAULT '[]'::jsonb;
+
+-- Additive for optional agency OIDC SSO
+ALTER TABLE users ADD COLUMN IF NOT EXISTS oidc_sub TEXT;
+CREATE UNIQUE INDEX IF NOT EXISTS users_oidc_sub_uidx ON users (oidc_sub) WHERE oidc_sub IS NOT NULL;
 
 CREATE TABLE IF NOT EXISTS tips (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

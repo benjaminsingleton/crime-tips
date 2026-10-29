@@ -55,10 +55,21 @@ export default function App() {
     let cancelled = false;
     async function boot() {
       try {
-        const { user: me } = await api.me();
+        const { user: me, mfaRequired } = await api.me();
         if (!cancelled) {
           setUser(me);
           setAuthed(true);
+          // Password login and OIDC both land here via session cookie; enforce
+          // agency MFA_REQUIRED the same way for SSO callbacks.
+          if (mfaRequired && me && !me.mfaEnabled) {
+            sessionStorage.setItem('mfaEnrollmentRequired', '1');
+          }
+          if (
+            typeof window !== 'undefined' &&
+            new URLSearchParams(window.location.search).get('mfa_enroll') === '1'
+          ) {
+            sessionStorage.setItem('mfaEnrollmentRequired', '1');
+          }
         }
       } catch {
         if (!cancelled) {

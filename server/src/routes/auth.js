@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import { query } from '../db.js';
 import {
   signToken,
@@ -22,6 +23,21 @@ import {
   mfaPendingTtlSec,
   mfaRequiredGlobally,
 } from '../services/mfa.js';
+import {
+  oidcConfigured,
+  oidcAllowPassword,
+  oidcAutoProvision,
+  publicOidcStatus,
+  buildOidcAuthorization,
+  exchangeOidcCallback,
+  signOidcPending,
+  verifyOidcPending,
+  oidcPendingCookieName,
+  setOidcPendingCookie,
+  clearOidcPendingCookie,
+  callbackUrlFromRequest,
+  extractOidcIdentity,
+} from '../services/oidc.js';
 
 const router = Router();
 
@@ -31,7 +47,192 @@ async function issueSession(res, req, user) {
   return res.json({ user: publicUser(user) });
 }
 
+function loginRedirectBase(req) {
+  const origin = (process.env.PUBLIC_ORIGIN || '')
+    .split(',')[0]
+    .trim()
+    .replace(/\/$/, '');
+  if (origin) return origin;
+  const proto = (req.headers['x-forwarded-proto'] || req.protocol || 'http')
+    .toString()
+    .split(',')[0]
+    .trim();
+  const host = (req.headers['x-forwarded-host'] || req.headers.host || 'localhost')
+    .toString()
+    .split(',')[0]
+    .trim();
+  return `${proto}://${host}`;
+}
+
+function redirectOidcError(res, req, message) {
+  const url = new URL('/login', loginRedirectBase(req));
+  url.searchParams.set('oidc_error', message);
+  return res.redirect(url.toString());
+}
+
+/**
+ * Resolve local officer from IdP claims: oidc_sub → email → optional auto-provision.
+ * SSO does not prompt for local TOTP (IdP is the second factor); MFA_REQUIRED still
+ * forces enrollment for defense-in-depth on password login paths.
+ */
+async function resolveOidcUser(identity) {
+  const { sub, email, firstName, lastName } = identity;
+  if (!sub) {
+    return { error: 'Identity provider did not return a subject' };
+  }
+
+  let { rows } = await query(`SELECT * FROM users WHERE oidc_sub = $1`, [sub]);
+  if (rows[0]) {
+    if (!rows[0].account_active) {
+      return { error: 'Account is inactive' };
+    }
+    return { user: rows[0] };
+  }
+
+  if (email) {
+    ({ rows } = await query(`SELECT * FROM users WHERE LOWER(email) = LOWER($1)`, [
+      email,
+    ]));
+    if (rows[0]) {
+      if (!rows[0].account_active) {
+        return { error: 'Account is inactive' };
+      }
+      const linked = await query(
+        `UPDATE users SET oidc_sub = $1, updated_at = NOW() WHERE id = $2
+         RETURNING *`,
+        [sub, rows[0].id],
+      );
+      return { user: linked.rows[0] };
+    }
+  }
+
+  if (!oidcAutoProvision()) {
+    return {
+      error:
+        'No Crime Tips account matches this SSO identity. Ask an admin to create your officer account (same email), or enable OIDC_AUTO_PROVISION.',
+    };
+  }
+
+  if (!email) {
+    return { error: 'Identity provider did not return an email claim required for provisioning' };
+  }
+
+  const randomPassword = crypto.randomBytes(32).toString('base64url');
+  const hash = await bcrypt.hash(randomPassword, 12);
+  const created = await query(
+    `INSERT INTO users (email, password_hash, rank, first_name, last_name, admin, notifications, account_active, oidc_sub)
+     VALUES ($1, $2, $3, $4, $5, FALSE, TRUE, TRUE, $6)
+     RETURNING *`,
+    [
+      email,
+      hash,
+      process.env.OIDC_DEFAULT_RANK || 'Officer',
+      firstName || 'Officer',
+      lastName || 'User',
+      sub,
+    ],
+  );
+  return { user: created.rows[0], provisioned: true };
+}
+
+/** Public: whether SSO button should show (no secrets). */
+router.get('/oidc/status', (_req, res) => {
+  res.json(publicOidcStatus());
+});
+
+/** Begin OIDC authorization code + PKCE flow. */
+router.get('/oidc/start', loginLimiter, async (req, res) => {
+  if (!oidcConfigured()) {
+    return res.status(404).json({ error: 'OIDC SSO is not enabled' });
+  }
+  try {
+    const { redirectTo, pending } = await buildOidcAuthorization();
+    const token = signOidcPending(pending);
+    setOidcPendingCookie(res, req, token);
+    return res.redirect(redirectTo);
+  } catch (err) {
+    console.error('OIDC start failed:', err.message);
+    return redirectOidcError(
+      res,
+      req,
+      'Could not start agency SSO. Check OIDC configuration.',
+    );
+  }
+});
+
+/** OIDC redirect_uri callback — exchange code, set session cookie, go to dashboard. */
+router.get('/oidc/callback', loginLimiter, async (req, res) => {
+  if (!oidcConfigured()) {
+    return redirectOidcError(res, req, 'OIDC SSO is not enabled');
+  }
+
+  if (req.query.error) {
+    clearOidcPendingCookie(res, req);
+    const desc =
+      typeof req.query.error_description === 'string'
+        ? req.query.error_description
+        : String(req.query.error);
+    return redirectOidcError(res, req, desc);
+  }
+
+  const pendingToken = req.cookies?.[oidcPendingCookieName()];
+  if (!pendingToken) {
+    return redirectOidcError(res, req, 'SSO session expired. Try again.');
+  }
+
+  let pending;
+  try {
+    pending = verifyOidcPending(pendingToken);
+  } catch {
+    clearOidcPendingCookie(res, req);
+    return redirectOidcError(res, req, 'SSO session expired. Try again.');
+  }
+
+  try {
+    const currentUrl = callbackUrlFromRequest(req);
+    const { claims } = await exchangeOidcCallback(currentUrl, pending);
+    clearOidcPendingCookie(res, req);
+
+    const identity = extractOidcIdentity(claims);
+    const resolved = await resolveOidcUser(identity);
+    if (resolved.error) {
+      return redirectOidcError(res, req, resolved.error);
+    }
+
+    const user = resolved.user;
+    const sessionJwt = signToken(user);
+    setSessionCookie(res, req, sessionJwt);
+
+    await query(`INSERT INTO activity_logs (user_id, action) VALUES ($1, $2)`, [
+      user.id,
+      resolved.provisioned ? 'oidcProvisionLogin' : 'oidcLogin',
+    ]);
+
+    const dest = new URL('/dashboard', loginRedirectBase(req));
+    if (mfaRequiredGlobally() && !user.mfa_enabled) {
+      dest.pathname = '/settings';
+      dest.searchParams.set('mfa_enroll', '1');
+    }
+    return res.redirect(dest.toString());
+  } catch (err) {
+    console.error('OIDC callback failed:', err.message);
+    clearOidcPendingCookie(res, req);
+    return redirectOidcError(
+      res,
+      req,
+      'Agency SSO sign-in failed. Try again or use email and password.',
+    );
+  }
+});
+
 router.post('/login', loginLimiter, async (req, res) => {
+  if (!oidcAllowPassword() && oidcConfigured()) {
+    return res.status(403).json({
+      error: 'Password login is disabled. Use agency SSO.',
+      oidcRequired: true,
+    });
+  }
+
   const { email, password } = req.body || {};
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password required' });
@@ -279,6 +480,7 @@ router.get('/me', requireAuth, loadUser, (req, res) => {
   res.json({
     user: publicUser(req.dbUser),
     mfaRequired: mfaRequiredGlobally(),
+    oidc: publicOidcStatus(),
   });
 });
 
