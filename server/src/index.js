@@ -12,10 +12,12 @@ import {
   configureTrustProxy,
   globalApiLimiter,
 } from './middleware/rateLimit.js';
+import { logEmailConfig } from './services/email.js';
 import authRoutes from './routes/auth.js';
 import tipRoutes from './routes/tips.js';
 import userRoutes from './routes/users.js';
 import metricsRoutes from './routes/metrics.js';
+import brandingRoutes from './routes/branding.js';
 
 assertSafeSecretsOrExit();
 
@@ -32,10 +34,10 @@ app.use(
       directives: {
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", 'data:', 'blob:'],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+        imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
         connectSrc: ["'self'"],
-        fontSrc: ["'self'", 'data:'],
+        fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
         objectSrc: ["'none'"],
         frameAncestors: ["'none'"],
         baseUri: ["'self'"],
@@ -82,6 +84,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/tips', tipRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/metrics', metricsRoutes);
+app.use('/api/branding', brandingRoutes);
 
 const clientDist = process.env.CLIENT_DIST || path.join(__dirname, '../../client/dist');
 if (fs.existsSync(clientDist)) {
@@ -106,6 +109,7 @@ async function start() {
 
   await migrate();
   await seedAdmin();
+  logEmailConfig();
 
   app.listen(port, () => {
     console.log(`Crime Tips API listening on :${port}`);

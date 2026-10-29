@@ -42,17 +42,22 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 | **Prod** | `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d` (pull GHCR image) | Caddy `80`/`443` only |
 | **Prod from source** | add `-f docker-compose.build.yml` and `--build` | same |
 
-**Image:** `ghcr.io/benjaminsingleton/crime-tips` — tags `:X.Y.Z` / `:X.Y` / `:latest` from GitHub release tags `vX.Y.Z`; `:master` and `:sha-…` from main-branch CI.
+**Image:** `ghcr.io/benjaminsingleton/crime-tips` — first release **`v1.0.0`** → `:1.0.0` / `:1.0` / `:latest`; later `vX.Y.Z` tags follow the same pattern. Branch CI also publishes `:master` and `:sha-…`.
 
-Update: `./scripts/backup.sh && ./scripts/update.sh vX.Y.Z` — see [Update](docs/ops/update.md).
+**Package visibility:** GHCR packages often start private. After the release image publishes, a maintainer must set the package to **Public** so departments can pull without login — see [GHCR](docs/ops/ghcr.md).
+
+Update: `./scripts/backup.sh && ./scripts/update.sh v1.0.0` — see [Update](docs/ops/update.md). Changelog: [CHANGELOG.md](CHANGELOG.md).
 
 Ops runbooks:
 
 - [Install](docs/ops/install.md)
 - [Update](docs/ops/update.md)
+- [GHCR publish & visibility](docs/ops/ghcr.md)
 - [TLS](docs/ops/tls.md)
 - [Hardening checklist](docs/ops/hardening.md)
 - [Officer MFA (TOTP) + optional OIDC SSO](docs/ops/auth-mfa.md)
+- [Department branding](docs/ops/branding.md)
+- [Email notifications (SMTP)](docs/ops/email.md)
 - [Backup & restore](docs/ops/backup-restore.md)
 
 Helpers: `scripts/gen-secrets.sh`, `scripts/preflight.sh`, `scripts/backup.sh`, `scripts/restore.sh`, `scripts/update.sh`.
@@ -81,12 +86,14 @@ See `.env.example`. Important variables:
 | `PUBLIC_ORIGIN` | Allowed CORS origin(s); required when the SPA and API are on different origins (`credentials: include`) |
 | `DOMAIN` | Hostname for Caddy / Let’s Encrypt |
 | `UPLOAD_DIR` | Tip file storage (volume in Compose) |
-| `SMTP_*` | Optional new-tip email; otherwise the API logs a stub |
+| `SMTP_*` | Optional new-tip email to officers with notifications on; unset `SMTP_HOST` → console stub ([email.md](docs/ops/email.md)) |
 | `MFA_REQUIRED` | `true` to require TOTP enrollment for all officers (optional) |
 | `MFA_ISSUER` | Authenticator app label (default `Crime Tips`) |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` | Enable agency OIDC SSO when both are set (optional; see [auth-mfa.md](docs/ops/auth-mfa.md)) |
 | `OIDC_CLIENT_SECRET` | IdP client secret (most confidential clients) |
 | `OIDC_ALLOW_PASSWORD` | Keep email/password login alongside SSO (default `true`) |
+| `BRAND_NAME` / `BRAND_TAGLINE` / `BRAND_LOGO_URL` | Department branding defaults (admin UI can override) |
+| `BRAND_PRIMARY_COLOR` / `BRAND_ACCENT_COLOR` | Navy / gold hex colors for the official theme |
 
 ## Architecture
 

@@ -17,7 +17,7 @@ sudo mkdir -p /opt/crime-tips
 sudo chown "$USER":"$USER" /opt/crime-tips
 cd /opt/crime-tips
 git clone https://github.com/benjaminsingleton/crime-tips.git .
-git checkout vX.Y.Z   # pin Compose/scripts to a release tag when available
+git checkout v1.0.0   # pin Compose/scripts to a release tag
 
 cp .env.example .env
 ./scripts/gen-secrets.sh
@@ -30,8 +30,9 @@ Edit `.env`:
 | `DOMAIN` | Public hostname, e.g. `tips.example.gov` |
 | `PUBLIC_ORIGIN` | `https://tips.example.gov` |
 | `ADMIN_EMAIL` | Initial admin mailbox |
-| `CRIME_TIPS_IMAGE` | `ghcr.io/benjaminsingleton/crime-tips:X.Y.Z` (match the release; default `:latest`) |
+| `CRIME_TIPS_IMAGE` | `ghcr.io/benjaminsingleton/crime-tips:1.0.0` (match the release; default `:latest`) |
 | `CRIME_TIPS_ENV` | Leave unset in `.env` if using the prod overlay (overlay forces `production`) |
+| `SMTP_HOST` (and related `SMTP_*`) | Optional agency relay for new-tip officer email; leave empty to stub/log only — see [email.md](./email.md) |
 
 ```bash
 chmod 600 .env
@@ -62,6 +63,10 @@ Officer auth uses a Secure (on HTTPS), httpOnly, SameSite session cookie. Set `P
 
 Optional officer **TOTP MFA**: enroll under My Settings, or set `MFA_REQUIRED=true` to require it for all officers. Optional **OIDC SSO**: set `OIDC_ISSUER` + `OIDC_CLIENT_ID` (and usually `OIDC_CLIENT_SECRET`); password login stays available unless `OIDC_ALLOW_PASSWORD=false`. See [auth-mfa.md](./auth-mfa.md).
 
+Optional **new-tip email**: set `SMTP_*` to your agency relay so officers with notifications enabled get mail on submit; leave `SMTP_HOST` empty to keep stub logging. See [email.md](./email.md).
+
+**Department branding** (name, logo, navy/gold colors) without forking: set `BRAND_*` in `.env`, or sign in as admin → **Branding**. See [branding.md](./branding.md).
+
 ## 4. Local developer path (not for production)
 
 ```bash
@@ -70,4 +75,4 @@ docker compose up --build
 # http://localhost:8080 — weak example secrets allowed when CRIME_TIPS_ENV=development
 ```
 
-See also [update.md](./update.md), [hardening.md](./hardening.md), [tls.md](./tls.md), and [backup-restore.md](./backup-restore.md).
+See also [update.md](./update.md), [hardening.md](./hardening.md), [tls.md](./tls.md), [email.md](./email.md), [branding.md](./branding.md), and [backup-restore.md](./backup-restore.md).

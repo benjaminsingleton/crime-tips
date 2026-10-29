@@ -37,6 +37,16 @@ async function request(path, options = {}) {
 
 export const api = {
   health: () => request('/health'),
+  getBranding: () => request('/branding'),
+  getBrandingAdmin: () => request('/branding/admin'),
+  updateBranding: (body) => request('/branding', { method: 'PUT', body }),
+  resetBranding: () => request('/branding', { method: 'DELETE' }),
+  uploadBrandingLogo: (file) => {
+    const form = new FormData();
+    form.append('logo', file);
+    return request('/branding/logo', { method: 'POST', body: form });
+  },
+  deleteBrandingLogo: () => request('/branding/logo', { method: 'DELETE' }),
   login: (email, password) =>
     request('/auth/login', { method: 'POST', body: { email, password } }),
   verifyMfa: (mfaToken, code) =>

@@ -40,6 +40,13 @@ Production boots **refuse** weak JWT / DB / admin example secrets when `CRIME_TI
 - [ ] Tip write / upload rate limits active
 - [ ] Attachment MIME allowlist + per-tip count cap (`MAX_ATTACHMENTS_PER_TIP`)
 
+## Email (optional)
+
+- [ ] `SMTP_*` pointed at the agency authenticated relay, or intentionally left unset (stub log only) — [email.md](./email.md)
+- [ ] `SMTP_FROM` is an address the relay is allowed to send as; SPF/DKIM/DMARC reviewed with IT
+- [ ] `PUBLIC_ORIGIN` set so notification emails include a working `/tip/<id>` link
+- [ ] Test submit reaches only officers with notifications enabled
+
 ## Ops
 
 - [ ] `CRIME_TIPS_IMAGE` pinned to a release tag (not floating `:latest` long-term)

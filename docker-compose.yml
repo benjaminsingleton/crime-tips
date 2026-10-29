@@ -71,6 +71,12 @@ services:
       OIDC_AUTO_PROVISION: ${OIDC_AUTO_PROVISION:-}
       OIDC_DEFAULT_RANK: ${OIDC_DEFAULT_RANK:-}
       OIDC_ALLOW_INSECURE: ${OIDC_ALLOW_INSECURE:-}
+      # Department branding (defaults; admin UI can override without redeploy)
+      BRAND_NAME: ${BRAND_NAME:-}
+      BRAND_TAGLINE: ${BRAND_TAGLINE:-}
+      BRAND_LOGO_URL: ${BRAND_LOGO_URL:-}
+      BRAND_PRIMARY_COLOR: ${BRAND_PRIMARY_COLOR:-}
+      BRAND_ACCENT_COLOR: ${BRAND_ACCENT_COLOR:-}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
