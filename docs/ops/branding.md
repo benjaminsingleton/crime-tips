@@ -2,6 +2,8 @@
 
 Configure the public tip site and officer shell with your agency name, logo, and colors without changing application code.
 
+**Version:** Branding landed on `master` **after** `v1.0.0`. Use `:master` / a newer release tag — [install.md § Version alignment](./install.md#version-alignment).
+
 Resolution order (later wins):
 
 1. Built-in defaults (Gotham Crime Tips / navy `#102033` / gold `#b8974a`)

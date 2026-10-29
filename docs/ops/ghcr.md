@@ -14,7 +14,23 @@ CI workflow: [`.github/workflows/publish-image.yml`](../../.github/workflows/pub
 | Push to `master` | `:master`, `:sha-<short>` |
 | Manual `workflow_dispatch` | Same as the ref that ran |
 
-Police departments should pin a release tag (e.g. `:1.0.0`), not `:master`.
+Police departments should pin a **release** tag for long-term production (e.g. `:1.0.0`). Use `:master` only when intentionally piloting post-`v1.0.0` features (SMTP, branding, OIDC) before the next release — see [install.md § Version alignment](./install.md#version-alignment).
+
+## PD acceptance test (before go-live)
+
+From a machine **without** `docker login ghcr.io` (or after `docker logout ghcr.io`):
+
+```bash
+docker pull ghcr.io/benjaminsingleton/crime-tips:1.0.0
+# or your chosen pin, e.g. :master / :X.Y.Z
+```
+
+| Result | Action |
+|--------|--------|
+| Pull succeeds | OK to rely on anonymous pulls in compose |
+| `unauthorized` / `denied` | Package still private — ask a maintainer to flip visibility (below), **or** document PAT + `docker login` as agency policy |
+
+Do this **before** cutover so ACME night is not also GHCR night.
 
 ## First release / package visibility (maintainers)
 

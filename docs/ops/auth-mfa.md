@@ -2,6 +2,8 @@
 
 Local email/password login remains the default. Officers can add **TOTP** multi-factor authentication (Google Authenticator, Authy, 1Password, etc.) from **My Settings**. Large departments can also enable **OpenID Connect (OIDC)** single sign-on via environment variables without removing the password path.
 
+**Limits:** SAML is **not** implemented. Tipster (public) flows have no login. Password-reset email is **not** implemented — admins reset passwords in Account Management ([user-admin.md](./user-admin.md)). **OIDC requires a post-`v1.0.0` image** (`:master` or a newer release); TOTP MFA is in `v1.0.0`. See [install.md § Version alignment](./install.md#version-alignment).
+
 ## Enable MFA (per officer)
 
 1. Log in with email + password.

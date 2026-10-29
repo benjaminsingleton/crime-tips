@@ -2,6 +2,8 @@
 
 Keep production on a **pinned GHCR image tag**. Do not run `git pull` on `master` and rebuild casually.
 
+**Do not mix** a `master` git checkout (docs/scripts that describe SMTP, branding, OIDC) with image `:1.0.0` and expect those features. Match checkout ↔ image ↔ [CHANGELOG](../../CHANGELOG.md). Alignment table: [install.md § Version alignment](./install.md#version-alignment).
+
 ## Image name and tags
 
 | Item | Value |
@@ -9,24 +11,25 @@ Keep production on a **pinned GHCR image tag**. Do not run `git pull` on `master
 | Registry | GitHub Container Registry (GHCR) |
 | Image | `ghcr.io/benjaminsingleton/crime-tips` |
 | Release tags | Semver from Git tags `vX.Y.Z` → `:X.Y.Z`, also `:X.Y` and `:latest` |
-| Branch builds | `:master` and `:sha-<short>` (optional / pre-release; not for prod) |
+| Branch builds | `:master` and `:sha-<short>` (optional / pre-release; prefer a release tag for long-term prod) |
 
 Pin with `CRIME_TIPS_IMAGE` in `.env`, for example:
 
 ```bash
-CRIME_TIPS_IMAGE=ghcr.io/benjaminsingleton/crime-tips:1.2.3
+CRIME_TIPS_IMAGE=ghcr.io/benjaminsingleton/crime-tips:1.0.0
 ```
 
 List releases: https://github.com/benjaminsingleton/crime-tips/releases  
-Packages: https://github.com/benjaminsingleton/crime-tips/pkgs/container/crime-tips
+Packages: https://github.com/benjaminsingleton/crime-tips/pkgs/container/crime-tips  
+Read the notes for the **specific** tag you are moving to before updating.
 
 **Visibility:** GHCR packages often start **private**. Departments need either a **Public** package or `docker login ghcr.io` with `read:packages`. Maintainer steps to publish and flip visibility: [ghcr.md](./ghcr.md).
 
-If pulls fail with `unauthorized`, the package may still be private: in GitHub → Packages → crime-tips → Package settings → change visibility to **Public**, or `docker login ghcr.io` with a PAT that has `read:packages`.
+If pulls fail with `unauthorized`, the package may still be private: in GitHub → Packages → crime-tips → Package settings → change visibility to **Public**, or `docker login ghcr.io` with a PAT that has `read:packages`. See [troubleshooting.md](./troubleshooting.md).
 
 ## Before every update
 
-1. Read the release notes (schema / breaking changes).
+1. Read the release notes / [CHANGELOG.md](../../CHANGELOG.md) for that tag (schema / breaking changes).
 2. Prefer a staging clone when you have one.
 3. **Backup** Postgres + uploads: `./scripts/backup.sh` (see [backup-restore.md](./backup-restore.md)).
 
