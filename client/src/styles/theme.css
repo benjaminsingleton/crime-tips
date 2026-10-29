@@ -984,6 +984,38 @@ textarea {
   background: var(--ct-surface);
 }
 
+.auth-sso {
+  margin-bottom: 0.25rem;
+}
+
+.auth-sso .btn {
+  text-align: center;
+  text-decoration: none;
+}
+
+.auth-sso__divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.1rem 0 0.85rem;
+  color: var(--ct-muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.auth-sso__divider::before,
+.auth-sso__divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--ct-border);
+}
+
+.auth-sso__divider span {
+  flex: 0 0 auto;
+}
+
 .auth-panel {
   max-width: 26rem;
   margin: 2.5rem auto 0;

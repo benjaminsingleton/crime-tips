@@ -32,6 +32,7 @@ Production boots **refuse** weak JWT / DB / admin example secrets when `CRIME_TI
 - [ ] Unsubmitted tip PATCH / upload / delete require the draft **edit token** (UUID alone is not enough)
 - [ ] Officers enrolled in TOTP MFA (or `MFA_REQUIRED=true`); see [auth-mfa.md](./auth-mfa.md)
 - [ ] Seeded admin MFA enrolled; backup codes stored in the agency password manager
+- [ ] If using OIDC SSO: redirect URI matches IdP; `OIDC_CLIENT_SECRET` in `.env` (`chmod 600`); prefer `OIDC_AUTO_PROVISION=false` and create officers explicitly; keep a break-glass password admin unless policy forbids it
 
 ## Abuse controls
 

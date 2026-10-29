@@ -61,6 +61,7 @@ export const api = {
     request(`/auth/mfa/admin-reset/${userId}`, { method: 'POST' }),
   me: () => request('/auth/me'),
   logout: () => request('/auth/logout', { method: 'POST' }),
+  oidcStatus: () => request('/auth/oidc/status'),
 
   createTip: (payload) => request('/tips', { method: 'POST', body: payload }),
   updateTip: (id, payload, editToken) =>
