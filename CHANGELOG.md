@@ -7,7 +7,9 @@ Versioning follows [SemVer](https://semver.org/).
 
 ## [Unreleased]
 
-Features on `master` **after** the `v1.0.0` tag. They are available via image `:master` / `:sha-…` (or a forthcoming release tag). Do **not** expect them on `:1.0.0`. See [docs/ops/install.md § Version alignment](docs/ops/install.md#version-alignment).
+## [1.1.0] - 2026-10-29
+
+Second PD self-host release. Adds SMTP tip email, department branding, OIDC SSO, and PD-facing docs on top of the `v1.0.0` package (Safe Compose, httpOnly sessions, TOTP MFA, navy/gold UI, GHCR images).
 
 ### Added
 
@@ -15,6 +17,12 @@ Features on `master` **after** the `v1.0.0` tag. They are available via image `:
 - Configurable department branding (`BRAND_*` env + admin UI) without forking
 - Optional officer OIDC SSO (`OIDC_*`; SAML not included)
 - PD-facing docs: evaluator README, privacy model, SECURITY.md, MIT LICENSE, troubleshooting, user-admin, evaluation one-pager
+
+### Ops notes
+
+- Pin production: `CRIME_TIPS_IMAGE=ghcr.io/benjaminsingleton/crime-tips:1.1.0`
+- Install / update: [docs/ops/install.md](docs/ops/install.md), [docs/ops/update.md](docs/ops/update.md)
+- **GHCR package visibility:** packages often default to private. After this release publishes, a repo admin must keep (or set) the `crime-tips` package **Public** so departments can `docker pull` without a GitHub token. Steps: [docs/ops/ghcr.md](docs/ops/ghcr.md)
 
 ## [1.0.0] - 2026-10-29
 
@@ -35,7 +43,8 @@ First tagged release for police-department self-hosting. Production pulls a vers
 - Pin production: `CRIME_TIPS_IMAGE=ghcr.io/benjaminsingleton/crime-tips:1.0.0`
 - Install / update: [docs/ops/install.md](docs/ops/install.md), [docs/ops/update.md](docs/ops/update.md)
 - **GHCR package visibility:** new packages default to private. After this release publishes, a repo admin must set the `crime-tips` package to **Public** so departments can `docker pull` without a GitHub token. Steps: [docs/ops/ghcr.md](docs/ops/ghcr.md)
-- SMTP, branding, and OIDC are **not** in this tag — see [Unreleased](#unreleased)
+- SMTP, branding, and OIDC are **not** in this tag — use **`v1.1.0` / `:1.1.0`** (or later)
 
-[Unreleased]: https://github.com/benjaminsingleton/crime-tips/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/benjaminsingleton/crime-tips/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/benjaminsingleton/crime-tips/releases/tag/v1.1.0
 [1.0.0]: https://github.com/benjaminsingleton/crime-tips/releases/tag/v1.0.0

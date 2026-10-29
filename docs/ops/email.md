@@ -1,6 +1,6 @@
 # Email notifications (new tips)
 
-**Limits:** Tipster email is **not** implemented. Password-reset email is **not** implemented. Notification messages never include tip narrative or attachments. **SMTP support requires a post-`v1.0.0` image** (`:master` or a newer release) — [install.md § Version alignment](./install.md#version-alignment).
+**Limits:** Tipster email is **not** implemented. Password-reset email is **not** implemented. Notification messages never include tip narrative or attachments. **SMTP support requires `v1.1.0+`** (`:1.1.0` or later) — [install.md § Version alignment](./install.md#version-alignment).
 
 When a tip is **submitted**, the API emails every **active** officer account with **Email notifications** enabled (`users.notifications = true`). Tip body text is never included in the message — only the tip id and (when configured) a dashboard link.
 
