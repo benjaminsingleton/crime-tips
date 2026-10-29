@@ -53,6 +53,7 @@ Ops runbooks:
 - [TLS](docs/ops/tls.md)
 - [Hardening checklist](docs/ops/hardening.md)
 - [Officer MFA (TOTP)](docs/ops/auth-mfa.md)
+- [Email notifications (SMTP)](docs/ops/email.md)
 - [Backup & restore](docs/ops/backup-restore.md)
 
 Helpers: `scripts/gen-secrets.sh`, `scripts/preflight.sh`, `scripts/backup.sh`, `scripts/restore.sh`, `scripts/update.sh`.
@@ -81,7 +82,7 @@ See `.env.example`. Important variables:
 | `PUBLIC_ORIGIN` | Allowed CORS origin(s); required when the SPA and API are on different origins (`credentials: include`) |
 | `DOMAIN` | Hostname for Caddy / Let’s Encrypt |
 | `UPLOAD_DIR` | Tip file storage (volume in Compose) |
-| `SMTP_*` | Optional new-tip email; otherwise the API logs a stub |
+| `SMTP_*` | Optional new-tip email to officers with notifications on; unset `SMTP_HOST` → console stub ([email.md](docs/ops/email.md)) |
 | `MFA_REQUIRED` | `true` to require TOTP enrollment for all officers (optional) |
 | `MFA_ISSUER` | Authenticator app label (default `Crime Tips`) |
 
