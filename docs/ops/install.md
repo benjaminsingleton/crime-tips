@@ -65,6 +65,8 @@ Optional officer **TOTP MFA**: enroll under My Settings, or set `MFA_REQUIRED=tr
 
 Optional **new-tip email**: set `SMTP_*` to your agency relay so officers with notifications enabled get mail on submit; leave `SMTP_HOST` empty to keep stub logging. See [email.md](./email.md).
 
+**Department branding** (name, logo, navy/gold colors) without forking: set `BRAND_*` in `.env`, or sign in as admin → **Branding**. See [branding.md](./branding.md).
+
 ## 4. Local developer path (not for production)
 
 ```bash
@@ -73,4 +75,4 @@ docker compose up --build
 # http://localhost:8080 — weak example secrets allowed when CRIME_TIPS_ENV=development
 ```
 
-See also [update.md](./update.md), [hardening.md](./hardening.md), [tls.md](./tls.md), [email.md](./email.md), and [backup-restore.md](./backup-restore.md).
+See also [update.md](./update.md), [hardening.md](./hardening.md), [tls.md](./tls.md), [email.md](./email.md), [branding.md](./branding.md), and [backup-restore.md](./backup-restore.md).

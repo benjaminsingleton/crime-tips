@@ -54,6 +54,12 @@ services:
       MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-26214400}
       MAX_ATTACHMENTS_PER_TIP: ${MAX_ATTACHMENTS_PER_TIP:-10}
       TRUST_PROXY: ${TRUST_PROXY:-false}
+      # Department branding (defaults; admin UI can override without redeploy)
+      BRAND_NAME: ${BRAND_NAME:-}
+      BRAND_TAGLINE: ${BRAND_TAGLINE:-}
+      BRAND_LOGO_URL: ${BRAND_LOGO_URL:-}
+      BRAND_PRIMARY_COLOR: ${BRAND_PRIMARY_COLOR:-}
+      BRAND_ACCENT_COLOR: ${BRAND_ACCENT_COLOR:-}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:

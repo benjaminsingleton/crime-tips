@@ -299,7 +299,14 @@ ConfirmDialog.propTypes = {
   onConfirm: PropTypes.func,
 };
 
-export function BrandMark() {
+export function BrandMark({ logoUrl, alt = '' }) {
+  if (logoUrl) {
+    return (
+      <span className="brand__mark brand__mark--logo">
+        <img src={logoUrl} alt={alt} />
+      </span>
+    );
+  }
   return (
     <span className="brand__mark" aria-hidden="true">
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -308,3 +315,8 @@ export function BrandMark() {
     </span>
   );
 }
+
+BrandMark.propTypes = {
+  logoUrl: PropTypes.string,
+  alt: PropTypes.string,
+};

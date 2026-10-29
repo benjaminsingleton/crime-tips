@@ -13,6 +13,7 @@ import FAQ from './FAQ';
 import { language } from '../helpers/languages';
 import { api } from '../api';
 import { omitUnchanged } from '../helpers/helpers';
+import { useBranding } from '../branding';
 
 class HomeInner extends Component {
   constructor() {
@@ -413,14 +414,30 @@ class HomeInner extends Component {
 
     const showHero =
       this.state.moduleIndex !== 'about' && this.state.moduleIndex !== 'faq';
+    const brandName = this.props.branding?.name || 'Crime Tips';
+    // Split last word for the gold accent span when name has 2+ words
+    const parts = brandName.trim().split(/\s+/);
+    const heroLead =
+      parts.length > 1 ? (
+        <>
+          {parts.slice(0, -1).join(' ')} <span>{parts[parts.length - 1]}</span>
+        </>
+      ) : (
+        brandName
+      );
 
     return (
       <Layout>
         {showHero && (
           <header className="public-hero">
-            <h1 className="public-hero__brand">
-              Gotham <span>Crime Tips</span>
-            </h1>
+            {this.props.branding?.logoUrl ? (
+              <img
+                className="public-hero__logo"
+                src={this.props.branding.logoUrl}
+                alt=""
+              />
+            ) : null}
+            <h1 className="public-hero__brand">{heroLead}</h1>
             <p className="public-hero__lead">
               Share information with police confidentially. Your tip helps keep the community safe.
             </p>
@@ -436,5 +453,6 @@ class HomeInner extends Component {
 export default function Home() {
   const location = useLocation();
   const navigate = useNavigate();
-  return <HomeInner location={location} navigate={navigate} />;
+  const branding = useBranding();
+  return <HomeInner location={location} navigate={navigate} branding={branding} />;
 }
