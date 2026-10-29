@@ -32,6 +32,7 @@ Edit `.env`:
 | `ADMIN_EMAIL` | Initial admin mailbox |
 | `CRIME_TIPS_IMAGE` | `ghcr.io/benjaminsingleton/crime-tips:X.Y.Z` (match the release; default `:latest`) |
 | `CRIME_TIPS_ENV` | Leave unset in `.env` if using the prod overlay (overlay forces `production`) |
+| `SMTP_HOST` (and related `SMTP_*`) | Optional agency relay for new-tip officer email; leave empty to stub/log only — see [email.md](./email.md) |
 
 ```bash
 chmod 600 .env
@@ -62,6 +63,8 @@ Officer auth uses a Secure (on HTTPS), httpOnly, SameSite session cookie. Set `P
 
 Optional officer **TOTP MFA**: enroll under My Settings, or set `MFA_REQUIRED=true` to require it for all officers. See [auth-mfa.md](./auth-mfa.md). Agency OIDC/SAML SSO is a documented follow-up (not in this release).
 
+Optional **new-tip email**: set `SMTP_*` to your agency relay so officers with notifications enabled get mail on submit; leave `SMTP_HOST` empty to keep stub logging. See [email.md](./email.md).
+
 **Department branding** (name, logo, navy/gold colors) without forking: set `BRAND_*` in `.env`, or sign in as admin → **Branding**. See [branding.md](./branding.md).
 
 ## 4. Local developer path (not for production)
@@ -72,4 +75,4 @@ docker compose up --build
 # http://localhost:8080 — weak example secrets allowed when CRIME_TIPS_ENV=development
 ```
 
-See also [update.md](./update.md), [hardening.md](./hardening.md), [tls.md](./tls.md), and [backup-restore.md](./backup-restore.md).
+See also [update.md](./update.md), [hardening.md](./hardening.md), [tls.md](./tls.md), [email.md](./email.md), [branding.md](./branding.md), and [backup-restore.md](./backup-restore.md).

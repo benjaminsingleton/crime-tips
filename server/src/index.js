@@ -12,6 +12,7 @@ import {
   configureTrustProxy,
   globalApiLimiter,
 } from './middleware/rateLimit.js';
+import { logEmailConfig } from './services/email.js';
 import authRoutes from './routes/auth.js';
 import tipRoutes from './routes/tips.js';
 import userRoutes from './routes/users.js';
@@ -108,6 +109,7 @@ async function start() {
 
   await migrate();
   await seedAdmin();
+  logEmailConfig();
 
   app.listen(port, () => {
     console.log(`Crime Tips API listening on :${port}`);
