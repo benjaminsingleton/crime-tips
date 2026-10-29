@@ -20,6 +20,8 @@ CRIME_TIPS_IMAGE=ghcr.io/benjaminsingleton/crime-tips:1.2.3
 List releases: https://github.com/benjaminsingleton/crime-tips/releases  
 Packages: https://github.com/benjaminsingleton/crime-tips/pkgs/container/crime-tips
 
+**Visibility:** GHCR packages often start **private**. Departments need either a **Public** package or `docker login ghcr.io` with `read:packages`. Maintainer steps to publish and flip visibility: [ghcr.md](./ghcr.md).
+
 If pulls fail with `unauthorized`, the package may still be private: in GitHub → Packages → crime-tips → Package settings → change visibility to **Public**, or `docker login ghcr.io` with a PAT that has `read:packages`.
 
 ## Before every update
