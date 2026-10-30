@@ -30,36 +30,22 @@ function enrollmentBlocked(req, res) {
   return true;
 }
 
-/**
- * Self credential changes require current password; when MFA is enrolled,
- * also require a TOTP or backup code (M6).
- */
-async function verifySelfReauth(req, userRow, { currentPassword, mfaCode }) {
-  if (!currentPassword) {
-    return { ok: false, status: 401, error: 'Current password required' };
-  }
-  const pwOk = await bcrypt.compare(String(currentPassword), userRow.password_hash);
-  if (!pwOk) {
-    return { ok: false, status: 401, error: 'Current password is incorrect' };
-  }
-  if (!userRow.mfa_enabled) return { ok: true };
+/** Max age of an OIDC session JWT to count as step-up reauth (default 30m). */
+function oidcReauthMaxAgeSec() {
+  const n = Number(process.env.OIDC_REAUTH_MAX_AGE_SEC || 1800);
+  return Number.isFinite(n) && n > 60 ? Math.floor(n) : 1800;
+}
 
+async function verifyTotpOrBackup(userRow, mfaCode) {
   if (!mfaCode) {
-    return {
-      ok: false,
-      status: 401,
-      error: 'Authentication code required',
-      mfaRequired: true,
-    };
+    return { ok: false, status: 401, error: 'Authentication code required', mfaRequired: true };
   }
-
   let secret;
   try {
     secret = decryptSecret(userRow.mfa_secret_enc);
   } catch {
     return { ok: false, status: 500, error: 'MFA configuration error' };
   }
-
   let ok = verifyTotpCode(secret, mfaCode);
   if (!ok) {
     const consumed = await consumeBackupCode(userRow.mfa_backup_hashes, mfaCode);
@@ -77,11 +63,57 @@ async function verifySelfReauth(req, userRow, { currentPassword, mfaCode }) {
   return { ok: true };
 }
 
+function oidcSessionIsFresh(req) {
+  if (req.user?.auth !== 'oidc') return false;
+  const iat = Number(req.user.iat);
+  if (!Number.isFinite(iat)) return false;
+  const ageSec = Math.floor(Date.now() / 1000) - iat;
+  return ageSec >= 0 && ageSec <= oidcReauthMaxAgeSec();
+}
+
+/**
+ * Self credential changes require step-up reauth (M6):
+ * - Local password (+ TOTP/backup when MFA enrolled), or
+ * - SSO-linked accounts: TOTP/backup alone, or a fresh OIDC session
+ *   (auto-provisioned users have a random unusable password hash).
+ */
+async function verifySelfReauth(req, userRow, { currentPassword, mfaCode }) {
+  const oidcLinked = Boolean(userRow.oidc_sub);
+
+  if (currentPassword) {
+    const pwOk = await bcrypt.compare(String(currentPassword), userRow.password_hash);
+    if (!pwOk) {
+      return { ok: false, status: 401, error: 'Current password is incorrect' };
+    }
+    if (!userRow.mfa_enabled) return { ok: true };
+    return verifyTotpOrBackup(userRow, mfaCode);
+  }
+
+  // No password supplied — SSO-linked officers may use MFA or a fresh OIDC session.
+  if (oidcLinked) {
+    if (userRow.mfa_enabled) {
+      return verifyTotpOrBackup(userRow, mfaCode);
+    }
+    if (oidcSessionIsFresh(req)) {
+      return { ok: true };
+    }
+    return {
+      ok: false,
+      status: 401,
+      error:
+        'Re-authenticate with agency SSO (sign out and back in), or enroll MFA and enter an authenticator code',
+      oidcReauthRequired: true,
+    };
+  }
+
+  return { ok: false, status: 401, error: 'Current password required' };
+}
+
 // Admin account ops require MFA when MFA_REQUIRED=true; self settings stay available for enroll.
 router.get('/', requireMfaIfEnforced, requireAdmin, async (_req, res) => {
   const { rows } = await query(
     `SELECT id, email, rank, first_name, last_name, admin, notifications, account_active,
-            mfa_enabled, created_at
+            mfa_enabled, oidc_sub, created_at
      FROM users ORDER BY last_name, first_name`,
   );
   const users = {};
@@ -122,7 +154,7 @@ router.post('/', requireMfaIfEnforced, requireAdmin, async (req, res) => {
   const { rows } = await query(
     `INSERT INTO users (email, password_hash, rank, first_name, last_name, admin, notifications, account_active)
      VALUES ($1, $2, $3, $4, $5, $6, TRUE, TRUE)
-     RETURNING id, email, rank, first_name, last_name, admin, notifications, account_active, mfa_enabled`,
+     RETURNING id, email, rank, first_name, last_name, admin, notifications, account_active, mfa_enabled, oidc_sub`,
     [email, hash, rank, firstName, lastName, Boolean(admin)],
   );
 
@@ -191,7 +223,7 @@ router.patch('/:id', async (req, res) => {
          rank = $1, first_name = $2, last_name = $3, email = $4,
          notifications = $5, account_active = $6, admin = $7, updated_at = NOW()
        WHERE id = $8
-       RETURNING id, email, rank, first_name, last_name, admin, notifications, account_active, mfa_enabled`,
+       RETURNING id, email, rank, first_name, last_name, admin, notifications, account_active, mfa_enabled, oidc_sub`,
       [
         next.rank,
         next.firstName,

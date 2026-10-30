@@ -59,17 +59,21 @@ export function sniffAttachmentMime(buffer) {
   if (asciiAt(buffer, 0, 'RIFF') && asciiAt(buffer, 8, 'WEBP')) return 'image/webp';
   if (asciiAt(buffer, 0, '%PDF')) return 'application/pdf';
 
-  // ISO BMFF (mp4 / heic / heif / m4a): size(4) + 'ftyp' + brand
+  // ISO BMFF (mp4 / quicktime / heic / heif / m4a): size(4) + 'ftyp' + brand
   if (buffer.length >= 12 && asciiAt(buffer, 4, 'ftyp')) {
     const brand = buffer.slice(8, 12).toString('ascii');
     if (['heic', 'heix', 'hevc', 'hevx', 'mif1', 'msf1'].includes(brand)) {
       return brand.startsWith('he') ? 'image/heic' : 'image/heif';
     }
+    // iPhone .mov often uses brand "qt  " (QuickTime)
+    if (brand === 'qt  ' || brand.startsWith('qt')) {
+      return 'video/quicktime';
+    }
     if (['isom', 'iso2', 'mp41', 'mp42', 'avc1', 'M4V ', 'M4A '].includes(brand)) {
       if (brand === 'M4A ') return 'audio/mp4';
       return 'video/mp4';
     }
-    // Generic ftyp — treat as mp4 family when client claimed video/mp4
+    // Generic ftyp — mp4/quicktime family (compatibility resolved vs client MIME)
     return 'video/mp4';
   }
 
@@ -121,7 +125,13 @@ export function resolveAttachmentMime(clientMime, buffer) {
     return { ok: false, error: 'File content does not match declared type' };
   }
 
-  // Prefer sniffed canonical type for storage.
+  // Prefer client MIME when it is in the same video-container family (e.g. .mov
+  // declared as video/quicktime but brand sniffs as mp4 / vice versa).
+  const videoFamily = new Set(['video/mp4', 'video/quicktime']);
+  if (videoFamily.has(declared) && videoFamily.has(sniffed)) {
+    return { ok: true, mime: declared };
+  }
+
   return { ok: true, mime: sniffed };
 }
 
@@ -134,6 +144,9 @@ function mimeFamiliesMatch(declared, sniffed) {
     'image/heic': 'image/heif',
   };
   if (aliases[declared] === sniffed) return true;
+  // mp4 / QuickTime share ISO BMFF containers (iPhone .mov often ftyp qt  )
+  const videoFamily = new Set(['video/mp4', 'video/quicktime']);
+  if (videoFamily.has(declared) && videoFamily.has(sniffed)) return true;
   // mp4 container brands may sniff as video/mp4 vs audio/mp4
   if (
     (declared === 'video/mp4' || declared === 'audio/mp4') &&

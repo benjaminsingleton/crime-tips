@@ -24,4 +24,24 @@ assert.equal(mismatch.ok, false);
 const spoof = resolveAttachmentMime('image/jpeg', plain);
 assert.equal(spoof.ok, false);
 
+// iPhone .mov: ftyp + brand "qt  " — must accept as video/quicktime
+const qtMov = Buffer.alloc(16, 0);
+qtMov.writeUInt32BE(16, 0);
+qtMov.write('ftyp', 4, 4, 'ascii');
+qtMov.write('qt  ', 8, 4, 'ascii');
+assert.equal(sniffAttachmentMime(qtMov), 'video/quicktime');
+const qtOk = resolveAttachmentMime('video/quicktime', qtMov);
+assert.equal(qtOk.ok, true);
+assert.equal(qtOk.mime, 'video/quicktime');
+
+// Declared quicktime with generic mp4 brand still compatible
+const mp4Buf = Buffer.alloc(16, 0);
+mp4Buf.writeUInt32BE(16, 0);
+mp4Buf.write('ftyp', 4, 4, 'ascii');
+mp4Buf.write('isom', 8, 4, 'ascii');
+assert.equal(sniffAttachmentMime(mp4Buf), 'video/mp4');
+const qtVsMp4 = resolveAttachmentMime('video/quicktime', mp4Buf);
+assert.equal(qtVsMp4.ok, true);
+assert.equal(qtVsMp4.mime, 'video/quicktime');
+
 console.log('uploads.test.js: ok');

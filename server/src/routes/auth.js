@@ -43,8 +43,8 @@ import {
 
 const router = Router();
 
-async function issueSession(res, req, user) {
-  const token = signToken(user);
+async function issueSession(res, req, user, options = {}) {
+  const token = signToken(user, options);
   setSessionCookie(res, req, token);
   return res.json({ user: publicUser(user) });
 }
@@ -211,7 +211,7 @@ router.get('/oidc/callback', loginLimiter, async (req, res) => {
     }
 
     const user = resolved.user;
-    const sessionJwt = signToken(user);
+    const sessionJwt = signToken(user, { authMethod: 'oidc' });
     setSessionCookie(res, req, sessionJwt);
 
     await query(`INSERT INTO activity_logs (user_id, action) VALUES ($1, $2)`, [
@@ -275,7 +275,7 @@ router.post('/login', loginLimiter, async (req, res) => {
   if (mfaRequiredGlobally() && !user.mfa_enabled) {
     // Password OK but agency requires MFA — issue session so officer can enroll,
     // and flag the client that enrollment is mandatory.
-    const token = signToken(user);
+    const token = signToken(user, { authMethod: 'password' });
     setSessionCookie(res, req, token);
     return res.json({
       user: publicUser(user),
@@ -283,7 +283,7 @@ router.post('/login', loginLimiter, async (req, res) => {
     });
   }
 
-  return issueSession(res, req, user);
+  return issueSession(res, req, user, { authMethod: 'password' });
 });
 
 router.post('/mfa/verify', loginLimiter, async (req, res) => {
@@ -316,7 +316,7 @@ router.post('/mfa/verify', loginLimiter, async (req, res) => {
     await query(`INSERT INTO activity_logs (user_id, action) VALUES ($1, 'mfaLogin')`, [
       user.id,
     ]);
-    return issueSession(res, req, user);
+    return issueSession(res, req, user, { authMethod: 'password' });
   }
 
   // Fallback: one-time backup code
@@ -330,7 +330,7 @@ router.post('/mfa/verify', loginLimiter, async (req, res) => {
       `INSERT INTO activity_logs (user_id, action) VALUES ($1, 'mfaBackupLogin')`,
       [user.id],
     );
-    return issueSession(res, req, user);
+    return issueSession(res, req, user, { authMethod: 'password' });
   }
 
   return res.status(401).json({ error: 'Invalid authentication code' });

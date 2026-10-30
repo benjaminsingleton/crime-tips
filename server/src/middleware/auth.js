@@ -5,12 +5,19 @@ import { readSessionToken } from './cookies.js';
 
 const JWT_SECRET = () => resolveJwtSecret();
 
-export function signToken(user) {
+/**
+ * @param {object} user
+ * @param {{ authMethod?: 'password' | 'oidc' }} [options]
+ *   authMethod is recorded for step-up reauth (SSO sessions can confirm without a local password).
+ */
+export function signToken(user, options = {}) {
+  const authMethod = options.authMethod === 'oidc' ? 'oidc' : 'password';
   return jwt.sign(
     {
       sub: user.id,
       email: user.email,
       admin: user.admin,
+      auth: authMethod,
     },
     JWT_SECRET(),
     { expiresIn: process.env.JWT_EXPIRES_IN || '12h' },
@@ -80,7 +87,7 @@ export async function loadUser(req, res, next) {
   if (!req.user?.sub) return next();
   const { rows } = await query(
     `SELECT id, email, rank, first_name, last_name, admin, notifications, account_active,
-            mfa_enabled
+            mfa_enabled, oidc_sub
      FROM users WHERE id = $1`,
     [req.user.sub],
   );
@@ -102,5 +109,6 @@ export function publicUser(row) {
     notifications: row.notifications,
     accountActive: row.account_active,
     mfaEnabled: Boolean(row.mfa_enabled),
+    oidcLinked: Boolean(row.oidc_sub),
   };
 }

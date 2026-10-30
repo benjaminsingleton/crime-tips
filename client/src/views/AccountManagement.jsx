@@ -168,6 +168,8 @@ class EditUser extends Component {
       notifications: props.user.notifications,
       accountActive: props.user.accountActive,
       newPassword: '',
+      currentPassword: '',
+      mfaCode: '',
     };
   }
 
@@ -189,6 +191,9 @@ class EditUser extends Component {
 
   toggleBool = (name) => this.setState({ [name]: !this.state[name] });
 
+  isEditingSelf = () =>
+    Boolean(this.props.viewer?.id) && this.props.viewer.id === this.props.uid;
+
   resetPassword = async (e) => {
     e.preventDefault();
     if (!this.state.newPassword || this.state.newPassword.length < 10) {
@@ -199,14 +204,42 @@ class EditUser extends Component {
       });
       return;
     }
+    const self = this.isEditingSelf();
+    if (self && !this.state.currentPassword && !this.props.viewer?.oidcLinked) {
+      this.setState({
+        error: true,
+        header: 'Error!',
+        message: 'Enter your current password to reset your own account.',
+      });
+      return;
+    }
+    if (self && this.props.viewer?.oidcLinked && this.props.user.mfaEnabled && !this.state.mfaCode) {
+      this.setState({
+        error: true,
+        header: 'Error!',
+        message: 'Enter an authenticator code to confirm resetting your own password.',
+      });
+      return;
+    }
     try {
-      await api.changePassword(this.props.uid, this.state.newPassword);
+      await api.changePassword(
+        this.props.uid,
+        this.state.newPassword,
+        self
+          ? {
+              currentPassword: this.state.currentPassword || undefined,
+              mfaCode: this.state.mfaCode || undefined,
+            }
+          : {},
+      );
       this.setState({
         error: false,
         success: true,
         header: 'Success!',
         message: 'Password updated.',
         newPassword: '',
+        currentPassword: '',
+        mfaCode: '',
       });
     } catch (error) {
       this.setState({ error: true, success: false, header: 'Error!', message: error.message });
@@ -304,6 +337,31 @@ class EditUser extends Component {
                 value={this.state.newPassword}
                 onChange={this.handleInputChange}
               />
+              {this.isEditingSelf() ? (
+                <>
+                  <TextInput
+                    label={
+                      this.props.viewer?.oidcLinked
+                        ? 'Current password (optional if SSO / MFA confirms)'
+                        : 'Current password (required for your own account)'
+                    }
+                    name="currentPassword"
+                    type="password"
+                    value={this.state.currentPassword}
+                    onChange={this.handleInputChange}
+                    autoComplete="current-password"
+                  />
+                  {this.props.user.mfaEnabled ? (
+                    <TextInput
+                      label="Authentication code"
+                      name="mfaCode"
+                      value={this.state.mfaCode}
+                      onChange={this.handleInputChange}
+                      autoComplete="one-time-code"
+                    />
+                  ) : null}
+                </>
+              ) : null}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'end' }}>
                 <Button size="sm" variant="secondary" content="Reset password" onClick={this.resetPassword} />
                 {this.props.user.mfaEnabled ? (
@@ -367,6 +425,11 @@ EditUser.propTypes = {
   toggle: PropTypes.func.isRequired,
   uid: PropTypes.string.isRequired,
   onSaved: PropTypes.func.isRequired,
+  viewer: PropTypes.object,
+};
+
+EditUser.defaultProps = {
+  viewer: null,
 };
 
 export default class AccountManagement extends Component {
@@ -425,6 +488,7 @@ export default class AccountManagement extends Component {
               <EditUser
                 uid={this.state.editUserId}
                 user={this.state.users[this.state.editUserId]}
+                viewer={this.props.user}
                 toggle={this.toggle}
                 onSaved={this.loadUsers}
               />

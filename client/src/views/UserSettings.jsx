@@ -85,10 +85,22 @@ export default class UserSettings extends Component {
       });
       return;
     }
-    if (!currentPasswordForPassword) {
+    if (!currentPasswordForPassword && !userDetails.oidcLinked) {
       this.setState({
         passwordMsgStatus: 'error',
         passwordMsg: 'Enter your current password to confirm.',
+      });
+      return;
+    }
+    if (
+      userDetails.oidcLinked &&
+      !currentPasswordForPassword &&
+      userDetails.mfaEnabled &&
+      !passwordMfaCode
+    ) {
+      this.setState({
+        passwordMsgStatus: 'error',
+        passwordMsg: 'Enter an authenticator code (or your current password) to confirm.',
       });
       return;
     }
@@ -101,8 +113,8 @@ export default class UserSettings extends Component {
     }
     try {
       await api.changePassword(userDetails.id, newPassword, {
-        currentPassword: currentPasswordForPassword,
-        mfaCode: userDetails.mfaEnabled ? passwordMfaCode : undefined,
+        currentPassword: currentPasswordForPassword || undefined,
+        mfaCode: passwordMfaCode || undefined,
       });
       this.setState({
         passwordMsgStatus: 'success',
@@ -141,18 +153,30 @@ export default class UserSettings extends Component {
       });
       return;
     }
-    if (!currentPasswordForEmail) {
+    if (!currentPasswordForEmail && !userDetails.oidcLinked) {
       this.setState({
         emailMsgStatus: 'error',
         emailMsg: 'Enter your current password to confirm.',
       });
       return;
     }
+    if (
+      userDetails.oidcLinked &&
+      !currentPasswordForEmail &&
+      userDetails.mfaEnabled &&
+      !emailMfaCode
+    ) {
+      this.setState({
+        emailMsgStatus: 'error',
+        emailMsg: 'Enter an authenticator code (or your current password) to confirm.',
+      });
+      return;
+    }
     try {
       const { user } = await api.updateUser(userDetails.id, {
         email: newEmail,
-        currentPassword: currentPasswordForEmail,
-        mfaCode: userDetails.mfaEnabled ? emailMfaCode : undefined,
+        currentPassword: currentPasswordForEmail || undefined,
+        mfaCode: emailMfaCode || undefined,
       });
       this.setState({
         emailMsgStatus: 'success',
@@ -364,7 +388,11 @@ export default class UserSettings extends Component {
             <hr className="section-divider" />
             <form onSubmit={this.changePassword}>
               <TextInput
-                label="Current password"
+                label={
+                  this.state.userDetails.oidcLinked
+                    ? 'Current password (optional for SSO accounts)'
+                    : 'Current password'
+                }
                 name="currentPasswordForPassword"
                 type="password"
                 value={this.state.currentPasswordForPassword}
@@ -401,6 +429,12 @@ export default class UserSettings extends Component {
                   />
                 </>
               )}
+              {this.state.userDetails.oidcLinked && !this.state.userDetails.mfaEnabled && (
+                <p style={{ color: 'var(--ct-muted)', fontSize: '0.9rem' }}>
+                  SSO accounts can confirm with a fresh agency sign-in (within 30 minutes) when MFA
+                  is not enrolled.
+                </p>
+              )}
               {this.state.passwordMsgStatus === 'success' && (
                 <Alert tone="success" content={this.state.passwordMsg} />
               )}
@@ -416,7 +450,11 @@ export default class UserSettings extends Component {
             <hr className="section-divider" />
             <form onSubmit={this.changeEmail}>
               <TextInput
-                label="Current password"
+                label={
+                  this.state.userDetails.oidcLinked
+                    ? 'Current password (optional for SSO accounts)'
+                    : 'Current password'
+                }
                 name="currentPasswordForEmail"
                 type="password"
                 value={this.state.currentPasswordForEmail}
@@ -439,11 +477,15 @@ export default class UserSettings extends Component {
                 value={this.state.newEmailRepeat}
                 onChange={this.handleInputChange}
               />
-              {this.state.userDetails.mfaEnabled && (
+              {(this.state.userDetails.mfaEnabled || this.state.userDetails.oidcLinked) && (
                 <>
                   <div style={{ height: '0.65rem' }} />
                   <TextInput
-                    label="Authentication code"
+                    label={
+                      this.state.userDetails.mfaEnabled
+                        ? 'Authentication code'
+                        : 'Authentication code (if MFA enrolled)'
+                    }
                     name="emailMfaCode"
                     value={this.state.emailMfaCode}
                     onChange={this.handleInputChange}
