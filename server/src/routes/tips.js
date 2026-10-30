@@ -2,7 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4, validate as uuidValidate, version as uuidVersion } from 'uuid';
 import { query, tipToJson } from '../db.js';
 import { requireAuth, loadUser, requireMfaIfEnforced } from '../middleware/auth.js';
 
@@ -25,20 +25,22 @@ const uploadDir = process.env.UPLOAD_DIR || path.join(process.cwd(), 'uploads');
 
 fs.mkdirSync(uploadDir, { recursive: true });
 
-const storage = multer.diskStorage({
-  destination: (req, _file, cb) => {
-    const dir = path.join(uploadDir, req.params.id);
-    fs.mkdirSync(dir, { recursive: true });
-    cb(null, dir);
-  },
-  filename: (_req, file, cb) => {
-    const safe = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
-    cb(null, `${uuidv4()}-${safe}`);
-  },
-});
+/** Tip ids are UUID v4; reject other path segments before any filesystem use. */
+function isTipUuid(id) {
+  return typeof id === 'string' && uuidValidate(id) && uuidVersion(id) === 4;
+}
 
+function unlinkQuiet(filePath) {
+  try {
+    if (filePath) fs.unlinkSync(filePath);
+  } catch {
+    /* ignore */
+  }
+}
+
+// Memory first: authorize draft capability before any disk write (H1).
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: Number(process.env.MAX_UPLOAD_BYTES || 25 * 1024 * 1024) },
   fileFilter: (_req, file, cb) => {
     if (!isAllowedAttachmentMime(file.mimetype)) {
@@ -47,6 +49,31 @@ const upload = multer({
     return cb(null, true);
   },
 });
+
+/** Load tip + verify edit token before multer accepts the body. */
+async function requireDraftUploadAuth(req, res, next) {
+  if (!isTipUuid(req.params.id)) {
+    return res.status(404).json({ error: 'Tip not found' });
+  }
+  try {
+    const { rows } = await query(`SELECT * FROM tips WHERE id = $1`, [req.params.id]);
+    if (!rows[0]) return res.status(404).json({ error: 'Tip not found' });
+    const gate = requireDraftCapability(req, rows[0]);
+    if (!gate.ok) return res.status(gate.status).json({ error: gate.error });
+    req.draftTip = rows[0];
+    return next();
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Upload authorization failed' });
+  }
+}
+
+function requireSubmittedTip(tipRow) {
+  if (!tipRow || !tipRow.submitted) {
+    return { ok: false, status: 404, error: 'Tip not found' };
+  }
+  return { ok: true };
+}
 
 async function getAttachments(tipId) {
   const { rows } = await query(
@@ -216,64 +243,69 @@ router.post('/:id/submit', tipWriteLimiter, async (req, res) => {
   return res.json({ tip });
 });
 
-// Public: upload attachment to draft tip
-router.post('/:id/attachments', tipUploadLimiter, (req, res, next) => {
-  upload.single('file')(req, res, (err) => {
-    if (err) {
-      const message = err.message || 'Upload failed';
-      const status = err.code === 'LIMIT_FILE_SIZE' ? 413 : 400;
-      return res.status(status).json({ error: message });
-    }
-    return next();
-  });
-}, async (req, res) => {
-  const { rows } = await query(`SELECT * FROM tips WHERE id = $1`, [req.params.id]);
-  if (!rows[0]) return res.status(404).json({ error: 'Tip not found' });
-
-  const gate = requireDraftCapability(req, rows[0]);
-  if (!gate.ok) return res.status(gate.status).json({ error: gate.error });
-
-  if (!req.file) return res.status(400).json({ error: 'file required' });
-
-  const countRes = await query(
-    `SELECT COUNT(*)::int AS count FROM tip_attachments WHERE tip_id = $1`,
-    [req.params.id],
-  );
-  if (countRes.rows[0].count >= maxAttachmentsPerTip()) {
-    try {
-      fs.unlinkSync(req.file.path);
-    } catch {
-      /* ignore */
-    }
-    return res.status(400).json({
-      error: `Maximum of ${maxAttachmentsPerTip()} attachments per tip`,
+// Public: upload attachment to draft tip (auth before disk write)
+router.post(
+  '/:id/attachments',
+  tipUploadLimiter,
+  requireDraftUploadAuth,
+  (req, res, next) => {
+    upload.single('file')(req, res, (err) => {
+      if (err) {
+        const message = err.message || 'Upload failed';
+        const status = err.code === 'LIMIT_FILE_SIZE' ? 413 : 400;
+        return res.status(status).json({ error: message });
+      }
+      return next();
     });
-  }
+  },
+  async (req, res) => {
+    if (!req.file?.buffer) return res.status(400).json({ error: 'file required' });
 
-  const inserted = await query(
-    `INSERT INTO tip_attachments (tip_id, filename, stored_name, mime_type, size_bytes)
-     VALUES ($1, $2, $3, $4, $5)
-     RETURNING *`,
-    [
-      req.params.id,
-      req.file.originalname,
-      req.file.filename,
-      req.file.mimetype,
-      req.file.size,
-    ],
-  );
+    const tipId = req.params.id;
+    let writtenPath = null;
 
-  const row = inserted.rows[0];
-  return res.status(201).json({
-    attachment: {
-      id: row.id,
-      filename: row.filename,
-      storedName: row.stored_name,
-      type: row.mime_type,
-      size: Number(row.size_bytes),
-    },
-  });
-});
+    try {
+      const countRes = await query(
+        `SELECT COUNT(*)::int AS count FROM tip_attachments WHERE tip_id = $1`,
+        [tipId],
+      );
+      if (countRes.rows[0].count >= maxAttachmentsPerTip()) {
+        return res.status(400).json({
+          error: `Maximum of ${maxAttachmentsPerTip()} attachments per tip`,
+        });
+      }
+
+      const safe = req.file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const storedName = `${uuidv4()}-${safe}`;
+      const dir = path.join(uploadDir, tipId);
+      fs.mkdirSync(dir, { recursive: true });
+      writtenPath = path.join(dir, storedName);
+      fs.writeFileSync(writtenPath, req.file.buffer);
+
+      const inserted = await query(
+        `INSERT INTO tip_attachments (tip_id, filename, stored_name, mime_type, size_bytes)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING *`,
+        [tipId, req.file.originalname, storedName, req.file.mimetype, req.file.size],
+      );
+
+      const row = inserted.rows[0];
+      return res.status(201).json({
+        attachment: {
+          id: row.id,
+          filename: row.filename,
+          storedName: row.stored_name,
+          type: row.mime_type,
+          size: Number(row.size_bytes),
+        },
+      });
+    } catch (err) {
+      unlinkQuiet(writtenPath);
+      console.error(err);
+      return res.status(500).json({ error: 'Upload failed' });
+    }
+  },
+);
 
 // Public draft (edit token) or officer (session): list attachments
 router.get('/:id/attachments', async (req, res) => {
@@ -355,9 +387,9 @@ router.get('/', ...officerAuth, async (req, res) => {
 
 router.get('/:id', ...officerAuth, async (req, res) => {
   const tip = await loadTip(req.params.id, { withExtras: true });
+  // Mailbox is submitted-only; do not expose unsubmitted drafts by UUID (M1).
   if (!tip || !tip.submitted) {
-    // officers can still see submitted only for mailbox; allow any for admin debugging of drafts? Prefer submitted only.
-    if (!tip) return res.status(404).json({ error: 'Tip not found' });
+    return res.status(404).json({ error: 'Tip not found' });
   }
   return res.json({ tip });
 });
@@ -365,7 +397,8 @@ router.get('/:id', ...officerAuth, async (req, res) => {
 router.patch('/:id/flags', ...officerAuth, async (req, res) => {
   const { read, archived, important } = req.body || {};
   const existing = await query(`SELECT * FROM tips WHERE id = $1`, [req.params.id]);
-  if (!existing.rows[0]) return res.status(404).json({ error: 'Tip not found' });
+  const gate = requireSubmittedTip(existing.rows[0]);
+  if (!gate.ok) return res.status(gate.status).json({ error: gate.error });
 
   const next = {
     read: typeof read === 'boolean' ? read : existing.rows[0].read,
@@ -397,8 +430,9 @@ router.post('/:id/notes', ...officerAuth, async (req, res) => {
   const note = (req.body?.note || '').trim();
   if (!note) return res.status(400).json({ error: 'note required' });
 
-  const tip = await query(`SELECT id FROM tips WHERE id = $1`, [req.params.id]);
-  if (!tip.rows[0]) return res.status(404).json({ error: 'Tip not found' });
+  const tip = await query(`SELECT id, submitted FROM tips WHERE id = $1`, [req.params.id]);
+  const gate = requireSubmittedTip(tip.rows[0]);
+  if (!gate.ok) return res.status(gate.status).json({ error: gate.error });
 
   const inserted = await query(
     `INSERT INTO tip_notes (tip_id, user_id, note) VALUES ($1, $2, $3) RETURNING *`,
@@ -418,6 +452,10 @@ router.post('/:id/notes', ...officerAuth, async (req, res) => {
 });
 
 router.delete('/:id/notes/:noteId', ...officerAuth, async (req, res) => {
+  const tipRes = await query(`SELECT id, submitted FROM tips WHERE id = $1`, [req.params.id]);
+  const tipGate = requireSubmittedTip(tipRes.rows[0]);
+  if (!tipGate.ok) return res.status(tipGate.status).json({ error: tipGate.error });
+
   const { rows } = await query(
     `SELECT * FROM tip_notes WHERE id = $1 AND tip_id = $2`,
     [req.params.noteId, req.params.id],
@@ -434,8 +472,12 @@ router.delete('/:id/notes/:noteId', ...officerAuth, async (req, res) => {
   return res.json({ ok: true });
 });
 
-// Officer download
+// Officer download (submitted tips only)
 router.get('/:id/attachments/:attachmentId/download', ...officerAuth, async (req, res) => {
+  const tipRes = await query(`SELECT id, submitted FROM tips WHERE id = $1`, [req.params.id]);
+  const tipGate = requireSubmittedTip(tipRes.rows[0]);
+  if (!tipGate.ok) return res.status(tipGate.status).json({ error: tipGate.error });
+
   const att = await query(
     `SELECT * FROM tip_attachments WHERE id = $1 AND tip_id = $2`,
     [req.params.attachmentId, req.params.id],

@@ -156,7 +156,7 @@ class BrandingSettingsInner extends Component {
                       Upload logo
                       <input
                         type="file"
-                        accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+                        accept="image/png,image/jpeg,image/webp,image/gif"
                         hidden
                         onChange={this.onLogoSelected}
                       />
@@ -169,7 +169,7 @@ class BrandingSettingsInner extends Component {
                   </div>
                 </div>
                 <span className="field__hint">
-                  PNG, JPEG, WebP, GIF, or SVG up to 2&nbsp;MB. Or paste an https URL below.
+                  PNG, JPEG, WebP, or GIF up to 2&nbsp;MB. Or paste an https URL below.
                 </span>
               </div>
 

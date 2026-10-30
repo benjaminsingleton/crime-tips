@@ -3,12 +3,19 @@ import {
   resolveBranding,
   sanitizeBrandingPatch,
   normalizeHex,
+  isSafeLogoUrl,
   BRANDING_DEFAULTS,
 } from './branding.js';
 
 assert.strictEqual(normalizeHex('#abc'), '#aabbcc');
 assert.strictEqual(normalizeHex('#102033'), '#102033');
 assert.strictEqual(normalizeHex('nope'), null);
+
+assert.strictEqual(isSafeLogoUrl('/api/branding/logo'), true);
+assert.strictEqual(isSafeLogoUrl('https://example.gov/seal.png'), true);
+assert.strictEqual(isSafeLogoUrl('//evil.example/x.svg'), false);
+assert.strictEqual(isSafeLogoUrl('javascript:alert(1)'), false);
+assert.strictEqual(isSafeLogoUrl('http://example.gov/logo.png'), false);
 
 {
   const b = resolveBranding({});
@@ -46,6 +53,21 @@ try {
   assert.fail('expected throw');
 } catch (err) {
   assert.ok(err.status === 400);
+}
+
+try {
+  sanitizeBrandingPatch({ logoUrl: '//evil.example/x.svg' });
+  assert.fail('expected throw for protocol-relative URL');
+} catch (err) {
+  assert.ok(err.status === 400);
+}
+
+{
+  // Unsafe env / DB logoUrl must not surface in resolved branding
+  process.env.BRAND_LOGO_URL = '//evil.example/x.svg';
+  const b = resolveBranding({ logoUrl: '//other.evil/y.svg' });
+  assert.strictEqual(b.logoUrl, null);
+  delete process.env.BRAND_LOGO_URL;
 }
 
 console.log('branding.test.js: ok');

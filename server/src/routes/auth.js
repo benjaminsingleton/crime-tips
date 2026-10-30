@@ -27,6 +27,7 @@ import {
   oidcConfigured,
   oidcAllowPassword,
   oidcAutoProvision,
+  oidcRequireEmailVerified,
   publicOidcStatus,
   buildOidcAuthorization,
   exchangeOidcCallback,
@@ -76,7 +77,7 @@ function redirectOidcError(res, req, message) {
  * forces enrollment for defense-in-depth on password login paths.
  */
 async function resolveOidcUser(identity) {
-  const { sub, email, firstName, lastName } = identity;
+  const { sub, email, emailVerified, firstName, lastName } = identity;
   if (!sub) {
     return { error: 'Identity provider did not return a subject' };
   }
@@ -87,6 +88,15 @@ async function resolveOidcUser(identity) {
       return { error: 'Account is inactive' };
     }
     return { user: rows[0] };
+  }
+
+  // Email link / auto-provision require a verified email claim (H4).
+  // Prefer oidc_sub-only after the first successful link.
+  if (email && oidcRequireEmailVerified() && !emailVerified) {
+    return {
+      error:
+        'Identity provider email is not verified. Ask your IdP admin to assert email_verified, or link the account by SSO subject after an admin creates it.',
+    };
   }
 
   if (email) {

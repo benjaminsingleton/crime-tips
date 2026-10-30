@@ -13,6 +13,19 @@ export const BRANDING_DEFAULTS = {
 
 const HEX_RE = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 
+/** Same-origin path (not protocol-relative) or https URL (H3). */
+const SAFE_LOGO_PATH_RE = /^\/[A-Za-z0-9._/~%-]+$/;
+const SAFE_LOGO_HTTPS_RE = /^https:\/\/[^\s]+$/i;
+
+export function isSafeLogoUrl(value) {
+  if (typeof value !== 'string') return false;
+  const url = value.trim();
+  if (!url || url.length > 2048) return false;
+  if (url.startsWith('//')) return false;
+  if (SAFE_LOGO_HTTPS_RE.test(url)) return true;
+  return SAFE_LOGO_PATH_RE.test(url);
+}
+
 export function isValidHexColor(value) {
   return typeof value === 'string' && HEX_RE.test(value.trim());
 }
@@ -73,13 +86,25 @@ export function resolveBranding(dbValue = {}) {
     return env[key] || BRANDING_DEFAULTS[key];
   };
 
+  const safeLogoOrFallback = (candidate, fallback) => {
+    if (candidate && isSafeLogoUrl(candidate)) return candidate.trim();
+    if (fallback && isSafeLogoUrl(fallback)) return fallback.trim();
+    return BRANDING_DEFAULTS.logoUrl;
+  };
+
   const pickLogo = () => {
     if (Object.prototype.hasOwnProperty.call(db, 'logoUrl')) {
       const v = db.logoUrl;
-      if (v === null || v === '') return env.logoUrl || BRANDING_DEFAULTS.logoUrl;
-      if (typeof v === 'string') return v.trim() || env.logoUrl || BRANDING_DEFAULTS.logoUrl;
+      if (v === null || v === '') {
+        return safeLogoOrFallback(env.logoUrl, null);
+      }
+      if (typeof v === 'string') {
+        const trimmed = v.trim();
+        if (!trimmed) return safeLogoOrFallback(env.logoUrl, null);
+        return safeLogoOrFallback(trimmed, env.logoUrl);
+      }
     }
-    return env.logoUrl || BRANDING_DEFAULTS.logoUrl;
+    return safeLogoOrFallback(env.logoUrl, null);
   };
 
   return {
@@ -111,11 +136,13 @@ export function sanitizeBrandingPatch(body = {}) {
       out.logoUrl = null;
     } else {
       const url = String(body.logoUrl).trim().slice(0, 2048);
-      // Allow same-origin paths and https URLs only (no javascript:).
-      if (url.startsWith('/') || /^https:\/\//i.test(url)) {
+      // Same-origin path (not //…) or https only — no javascript: / protocol-relative (H3).
+      if (isSafeLogoUrl(url)) {
         out.logoUrl = url;
       } else {
-        const err = new Error('logoUrl must be a same-origin path or https URL');
+        const err = new Error(
+          'logoUrl must be a same-origin path (e.g. /api/branding/logo) or https URL',
+        );
         err.status = 400;
         throw err;
       }
@@ -161,10 +188,15 @@ export function ensureBrandingUploadDir() {
   return dir;
 }
 
+const RASTER_LOGO_EXTS = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif']);
+
 export function findStoredLogoPath() {
   const dir = brandingUploadDir();
   if (!fs.existsSync(dir)) return null;
-  const files = fs.readdirSync(dir).filter((f) => f.startsWith('logo.'));
+  const files = fs
+    .readdirSync(dir)
+    .filter((f) => f.startsWith('logo.'))
+    .filter((f) => RASTER_LOGO_EXTS.has(path.extname(f).toLowerCase()));
   if (!files.length) return null;
   return path.join(dir, files[0]);
 }

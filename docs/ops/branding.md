@@ -33,7 +33,7 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d app
 
 1. Sign in as an admin officer
 2. Open **Branding** in the header
-3. Set name, tagline, colors; upload a logo (PNG/JPEG/WebP/GIF/SVG, ≤2 MB) or paste an https URL
+3. Set name, tagline, colors; upload a logo (PNG/JPEG/WebP/GIF, ≤2 MB) or paste an https URL (SVG is not allowed)
 4. **Save branding** — the tip site and officer shell refresh immediately
 
 **Reset to env / defaults** clears database overrides and any uploaded logo so env values apply again.

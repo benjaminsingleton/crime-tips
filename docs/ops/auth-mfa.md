@@ -103,12 +103,13 @@ Minimal enable rule: **`OIDC_ISSUER` + `OIDC_CLIENT_ID`**. Set `OIDC_ENABLED=fal
 | `OIDC_DEFAULT_RANK` | `Officer` | Rank for auto-provisioned users |
 | `OIDC_ENABLED` | implied true when issuer+client set | Set `false` to disable SSO |
 | `OIDC_ALLOW_INSECURE` | `false` | Allow `http://` IdP discovery — **dev only** |
+| `OIDC_REQUIRE_EMAIL_VERIFIED` | `true` | Require IdP `email_verified` before email link / auto-provision |
 
 ### 3. How accounts are linked
 
 1. Match existing user by IdP `sub` (`users.oidc_sub`).
-2. Else match by email (case-insensitive) and store `oidc_sub` for next time.
-3. Else, if `OIDC_AUTO_PROVISION=true`, create an active non-admin officer with that email.
+2. Else match by email (case-insensitive) **only if** `email_verified` is true (unless `OIDC_REQUIRE_EMAIL_VERIFIED=false`), and store `oidc_sub` for next time.
+3. Else, if `OIDC_AUTO_PROVISION=true`, create an active non-admin officer with that email (same verified-email rule).
 4. Else, show an error: ask an admin to create the officer account first (recommended for LE).
 
 **Recommended for police departments:** keep `OIDC_AUTO_PROVISION=false` and create officers in **Account Management** with the same work email the IdP asserts.

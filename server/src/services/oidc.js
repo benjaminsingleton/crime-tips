@@ -241,10 +241,21 @@ export function callbackUrlFromRequest(req) {
   return new URL(req.originalUrl || req.url, `${proto}://${host}`);
 }
 
+/**
+ * Whether the IdP asserts a verified email for linking / auto-provision.
+ * Default: require `email_verified === true` (or string "true").
+ * Set OIDC_REQUIRE_EMAIL_VERIFIED=false only for IdPs that never send the claim.
+ */
+export function oidcRequireEmailVerified() {
+  return process.env.OIDC_REQUIRE_EMAIL_VERIFIED !== 'false';
+}
+
 export function extractOidcIdentity(claims) {
   const sub = claims.sub ? String(claims.sub) : null;
   const emailRaw = claims[oidcEmailClaim()];
   const email = emailRaw ? String(emailRaw).trim().toLowerCase() : null;
+  const verifiedRaw = claims.email_verified;
+  const emailVerified = verifiedRaw === true || verifiedRaw === 'true';
   const firstName =
     (claims.given_name && String(claims.given_name)) ||
     (claims.first_name && String(claims.first_name)) ||
@@ -253,5 +264,5 @@ export function extractOidcIdentity(claims) {
     (claims.family_name && String(claims.family_name)) ||
     (claims.last_name && String(claims.last_name)) ||
     '';
-  return { sub, email, firstName, lastName };
+  return { sub, email, emailVerified, firstName, lastName };
 }
