@@ -2,7 +2,7 @@
 #   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 #
 # Prefer pulling a version-pinned GHCR image (no build on the PD host):
-#   CRIME_TIPS_IMAGE=ghcr.io/benjaminsingleton/crime-tips:1.1.1
+#   CRIME_TIPS_IMAGE=ghcr.io/benjaminsingleton/crime-tips:1.1.2
 # See docs/ops/update.md. To build from source instead: CRIME_TIPS_BUILD=1
 # and `docker compose … up -d --build`.
 #
@@ -19,7 +19,7 @@ services:
 
   app:
     # Pull published image by default; keep Dockerfile path for air-gap / audit.
-    image: ${CRIME_TIPS_IMAGE:-ghcr.io/benjaminsingleton/crime-tips:1.1.1}
+    image: ${CRIME_TIPS_IMAGE:-ghcr.io/benjaminsingleton/crime-tips:1.1.2}
     build: !reset null
     pull_policy: ${CRIME_TIPS_PULL_POLICY:-missing}
     ports: !reset []

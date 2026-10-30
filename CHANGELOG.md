@@ -7,9 +7,19 @@ Versioning follows [SemVer](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-10-30
+
+Security patch on the `v1.1.1` PD package. Includes [#18](https://github.com/benjaminsingleton/crime-tips/pull/18) (Medium findings + Bugbot follow-ups).
+
 ### Security
 
 - Medium findings: DB-backed `requireAdmin`; submitted attachment list uses full officer auth; edit tokens header/body only (no query); attachment/logo magic-byte sniff (drop `text/plain`); self password/email re-auth + MFA; admin MFA-reset gated; Origin CSRF checks (strict when `COOKIE_SAMESITE=none`); refuse `OIDC_ALLOW_INSECURE` in production; pin prod image default / preflight reject `:latest`; non-root container user + centralized error handler; password minimum 10
+
+### Ops notes
+
+- Pin production: `CRIME_TIPS_IMAGE=ghcr.io/benjaminsingleton/crime-tips:1.1.2`
+- Install / update: [docs/ops/install.md](docs/ops/install.md), [docs/ops/update.md](docs/ops/update.md)
+- **GHCR package visibility:** packages often default to private. After this release publishes, a repo admin must keep (or set) the `crime-tips` package **Public** so departments can `docker pull` without a GitHub token. Steps: [docs/ops/ghcr.md](docs/ops/ghcr.md)
 
 ## [1.1.1] - 2026-10-30
 
@@ -67,7 +77,8 @@ First tagged release for police-department self-hosting. Production pulls a vers
 - **GHCR package visibility:** new packages default to private. After this release publishes, a repo admin must set the `crime-tips` package to **Public** so departments can `docker pull` without a GitHub token. Steps: [docs/ops/ghcr.md](docs/ops/ghcr.md)
 - SMTP, branding, and OIDC are **not** in this tag — use **`v1.1.0` / `:1.1.0`** (or later)
 
-[Unreleased]: https://github.com/benjaminsingleton/crime-tips/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/benjaminsingleton/crime-tips/compare/v1.1.2...HEAD
+[1.1.2]: https://github.com/benjaminsingleton/crime-tips/releases/tag/v1.1.2
 [1.1.1]: https://github.com/benjaminsingleton/crime-tips/releases/tag/v1.1.1
 [1.1.0]: https://github.com/benjaminsingleton/crime-tips/releases/tag/v1.1.0
 [1.0.0]: https://github.com/benjaminsingleton/crime-tips/releases/tag/v1.0.0

@@ -8,7 +8,7 @@ Before you start, decide:
 
 | Decision | Options |
 |----------|---------|
-| **Release pin** | Recommended **`v1.1.1` / `:1.1.1`** (security patch on SMTP/branding/OIDC package). Prefer a semver pin over `:latest` / `:master` for long-term prod |
+| **Release pin** | Recommended **`v1.1.2` / `:1.1.2`** (Medium security patch on SMTP/branding/OIDC package). Prefer a semver pin over `:latest` / `:master` for long-term prod |
 | **DNS / TLS** | Public hostname + Let’s Encrypt via Caddy, or agency TLS / BYO proxy ([tls.md](./tls.md)) |
 | **IdP?** | Skip, or OIDC ([auth-mfa.md](./auth-mfa.md)) — included in `v1.1.0+` |
 | **SMTP?** | Agency relay for new-tip mail, or stub/log only ([email.md](./email.md)) — included in `v1.1.0+` |
@@ -20,7 +20,8 @@ Windows Server / non-Ubuntu: best-effort if Docker Engine + Compose work the sam
 
 | You want | Git checkout | `CRIME_TIPS_IMAGE` |
 |----------|--------------|--------------------|
-| Current PD package (incl. security patch #16) | `git checkout v1.1.1` | `ghcr.io/benjaminsingleton/crime-tips:1.1.1` |
+| Current PD package (incl. Medium security #18) | `git checkout v1.1.2` | `ghcr.io/benjaminsingleton/crime-tips:1.1.2` |
+| Previous security patch (#16) | `git checkout v1.1.1` | `ghcr.io/benjaminsingleton/crime-tips:1.1.1` |
 | Previous feature release (SMTP, branding, OIDC; pre-#16) | `git checkout v1.1.0` | `ghcr.io/benjaminsingleton/crime-tips:1.1.0` |
 | First release only (no SMTP / branding / OIDC) | `git checkout v1.0.0` | `ghcr.io/benjaminsingleton/crime-tips:1.0.0` |
 | Pre-release / tip of tree | `git checkout master` | `ghcr.io/benjaminsingleton/crime-tips:master` (or a `:sha-…`) |
@@ -40,7 +41,7 @@ sudo mkdir -p /opt/crime-tips
 sudo chown "$USER":"$USER" /opt/crime-tips
 cd /opt/crime-tips
 git clone https://github.com/benjaminsingleton/crime-tips.git .
-git checkout v1.1.1   # pin Compose/scripts to a release tag
+git checkout v1.1.2   # pin Compose/scripts to a release tag
 
 cp .env.example .env
 ./scripts/gen-secrets.sh
@@ -53,7 +54,7 @@ Edit `.env`:
 | `DOMAIN` | Public hostname, e.g. `tips.example.gov` |
 | `PUBLIC_ORIGIN` | `https://tips.example.gov` |
 | `ADMIN_EMAIL` | Initial admin mailbox |
-| `CRIME_TIPS_IMAGE` | `ghcr.io/benjaminsingleton/crime-tips:1.1.1` (match the release; default `:latest`) |
+| `CRIME_TIPS_IMAGE` | `ghcr.io/benjaminsingleton/crime-tips:1.1.2` (match the release; default `:latest`) |
 | `CRIME_TIPS_ENV` | Leave unset in `.env` if using the prod overlay (overlay forces `production`) |
 | `SMTP_HOST` (and related `SMTP_*`) | Optional agency relay for new-tip officer email; leave empty to stub/log only — see [email.md](./email.md) |
 
