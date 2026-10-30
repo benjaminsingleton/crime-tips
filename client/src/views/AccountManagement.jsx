@@ -167,6 +167,7 @@ class EditUser extends Component {
       admin: props.user.admin,
       notifications: props.user.notifications,
       accountActive: props.user.accountActive,
+      originalEmail: props.user.email,
       newPassword: '',
       currentPassword: '',
       mfaCode: '',
@@ -180,6 +181,7 @@ class EditUser extends Component {
         firstName: this.props.user.firstName,
         lastName: this.props.user.lastName,
         email: this.props.user.email,
+        originalEmail: this.props.user.email,
         admin: this.props.user.admin,
         notifications: this.props.user.notifications,
         accountActive: this.props.user.accountActive,
@@ -193,6 +195,13 @@ class EditUser extends Component {
 
   isEditingSelf = () =>
     Boolean(this.props.viewer?.id) && this.props.viewer.id === this.props.uid;
+
+  selfEmailChanging = () => {
+    if (!this.isEditingSelf()) return false;
+    const next = String(this.state.email || '').trim().toLowerCase();
+    const prev = String(this.state.originalEmail || '').trim().toLowerCase();
+    return next !== prev;
+  };
 
   resetPassword = async (e) => {
     e.preventDefault();
@@ -281,8 +290,30 @@ class EditUser extends Component {
       return;
     }
 
+    const emailChanging = this.selfEmailChanging();
+    if (emailChanging && this.props.user.mfaEnabled && !this.state.mfaCode) {
+      this.setState({
+        error: true,
+        header: 'Error!',
+        message: 'Enter an authenticator code to confirm changing your own email.',
+      });
+      return;
+    }
+    if (
+      emailChanging &&
+      !this.state.currentPassword &&
+      !this.props.viewer?.oidcLinked
+    ) {
+      this.setState({
+        error: true,
+        header: 'Error!',
+        message: 'Enter your current password to confirm changing your own email.',
+      });
+      return;
+    }
+
     try {
-      await api.updateUser(this.props.uid, {
+      const body = {
         rank: this.state.rank,
         firstName: this.state.firstName,
         lastName: this.state.lastName,
@@ -290,7 +321,13 @@ class EditUser extends Component {
         admin: this.state.admin,
         notifications: this.state.notifications,
         accountActive: this.state.accountActive,
-      });
+      };
+      if (emailChanging) {
+        body.currentPassword = this.state.currentPassword || undefined;
+        body.mfaCode = this.state.mfaCode || undefined;
+      }
+      await api.updateUser(this.props.uid, body);
+      this.setState({ currentPassword: '', mfaCode: '' });
       this.props.onSaved();
       this.props.toggle('showEditUser');
     } catch (error) {
@@ -342,10 +379,10 @@ class EditUser extends Component {
                   <TextInput
                     label={
                       this.props.user.mfaEnabled
-                        ? 'Current password (authenticator code also required)'
+                        ? 'Current password (for own password/email; authenticator also required)'
                         : this.props.viewer?.oidcLinked
-                          ? 'Current password (optional with a fresh SSO sign-in)'
-                          : 'Current password (required for your own account)'
+                          ? 'Current password (optional with fresh SSO; needed for own email/password)'
+                          : 'Current password (required to change your own password or email)'
                     }
                     name="currentPassword"
                     type="password"
@@ -355,7 +392,7 @@ class EditUser extends Component {
                   />
                   {this.props.user.mfaEnabled ? (
                     <TextInput
-                      label="Authentication code"
+                      label="Authentication code (own password or email change)"
                       name="mfaCode"
                       value={this.state.mfaCode}
                       onChange={this.handleInputChange}
