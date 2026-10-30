@@ -2,7 +2,7 @@
 #   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 #
 # Prefer pulling a version-pinned GHCR image (no build on the PD host):
-#   CRIME_TIPS_IMAGE=ghcr.io/benjaminsingleton/crime-tips:1.1.0
+#   CRIME_TIPS_IMAGE=ghcr.io/benjaminsingleton/crime-tips:1.1.1
 # See docs/ops/update.md. To build from source instead: CRIME_TIPS_BUILD=1
 # and `docker compose … up -d --build`.
 #

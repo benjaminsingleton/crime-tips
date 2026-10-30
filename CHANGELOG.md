@@ -7,6 +7,10 @@ Versioning follows [SemVer](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-10-30
+
+Security patch on the `v1.1.0` PD package (SMTP, branding, OIDC, Safe Compose). Includes [#16](https://github.com/benjaminsingleton/crime-tips/pull/16).
+
 ### Security
 
 - Tip attachment upload authorizes draft edit token before any disk write; reject non-UUID tip ids
@@ -14,6 +18,12 @@ Versioning follows [SemVer](https://semver.org/).
 - OIDC: require `email_verified` before email account link / auto-provision (`OIDC_REQUIRE_EMAIL_VERIFIED`, default true)
 - Officers get 404 for unsubmitted tip detail / flags / notes / download (mailbox submitted-only)
 - Upgrade `nodemailer` past High advisories
+
+### Ops notes
+
+- Pin production: `CRIME_TIPS_IMAGE=ghcr.io/benjaminsingleton/crime-tips:1.1.1`
+- Install / update: [docs/ops/install.md](docs/ops/install.md), [docs/ops/update.md](docs/ops/update.md)
+- **GHCR package visibility:** packages often default to private. After this release publishes, a repo admin must keep (or set) the `crime-tips` package **Public** so departments can `docker pull` without a GitHub token. Steps: [docs/ops/ghcr.md](docs/ops/ghcr.md)
 
 ## [1.1.0] - 2026-10-29
 
@@ -53,6 +63,7 @@ First tagged release for police-department self-hosting. Production pulls a vers
 - **GHCR package visibility:** new packages default to private. After this release publishes, a repo admin must set the `crime-tips` package to **Public** so departments can `docker pull` without a GitHub token. Steps: [docs/ops/ghcr.md](docs/ops/ghcr.md)
 - SMTP, branding, and OIDC are **not** in this tag — use **`v1.1.0` / `:1.1.0`** (or later)
 
-[Unreleased]: https://github.com/benjaminsingleton/crime-tips/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/benjaminsingleton/crime-tips/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/benjaminsingleton/crime-tips/releases/tag/v1.1.1
 [1.1.0]: https://github.com/benjaminsingleton/crime-tips/releases/tag/v1.1.0
 [1.0.0]: https://github.com/benjaminsingleton/crime-tips/releases/tag/v1.0.0
