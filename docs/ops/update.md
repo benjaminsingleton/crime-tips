@@ -2,7 +2,7 @@
 
 Keep production on a **pinned GHCR image tag**. Do not run `git pull` on `master` and rebuild casually.
 
-**Do not mix** checkout and image tags (e.g. `v1.1.0` docs with `:1.0.0`). Match checkout ↔ image ↔ [CHANGELOG](../../CHANGELOG.md). Alignment table: [install.md § Version alignment](./install.md#version-alignment).
+**Do not mix** checkout and image tags (e.g. `v1.1.1` docs with `:1.0.0`). Match checkout ↔ image ↔ [CHANGELOG](../../CHANGELOG.md). Alignment table: [install.md § Version alignment](./install.md#version-alignment).
 
 ## Image name and tags
 
@@ -16,7 +16,7 @@ Keep production on a **pinned GHCR image tag**. Do not run `git pull` on `master
 Pin with `CRIME_TIPS_IMAGE` in `.env`, for example:
 
 ```bash
-CRIME_TIPS_IMAGE=ghcr.io/benjaminsingleton/crime-tips:1.1.0
+CRIME_TIPS_IMAGE=ghcr.io/benjaminsingleton/crime-tips:1.1.1
 ```
 
 List releases: https://github.com/benjaminsingleton/crime-tips/releases  

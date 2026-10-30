@@ -39,7 +39,7 @@ Backups and restore drills, updates (pinned GHCR tags), TLS/DNS, optional IdP an
 
 ## Version note
 
-Tagged **`v1.1.0`** is the current PD package (SMTP, branding, OIDC + core). **`v1.0.0`** remains the first release without those features. Match checkout ↔ image via [version alignment](./install.md#version-alignment).
+Tagged **`v1.1.1`** is the current PD package (security patch on SMTP/branding/OIDC). **`v1.0.0`** remains the first release without those features. Match checkout ↔ image via [version alignment](./install.md#version-alignment).
 
 ## License
 

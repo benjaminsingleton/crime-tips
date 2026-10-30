@@ -477,21 +477,23 @@ export default class UserSettings extends Component {
                 value={this.state.newEmailRepeat}
                 onChange={this.handleInputChange}
               />
-              {(this.state.userDetails.mfaEnabled || this.state.userDetails.oidcLinked) && (
+              {this.state.userDetails.mfaEnabled && (
                 <>
                   <div style={{ height: '0.65rem' }} />
                   <TextInput
-                    label={
-                      this.state.userDetails.mfaEnabled
-                        ? 'Authentication code'
-                        : 'Authentication code (if MFA enrolled)'
-                    }
+                    label="Authentication code"
                     name="emailMfaCode"
                     value={this.state.emailMfaCode}
                     onChange={this.handleInputChange}
                     autoComplete="one-time-code"
                   />
                 </>
+              )}
+              {this.state.userDetails.oidcLinked && !this.state.userDetails.mfaEnabled && (
+                <p style={{ color: 'var(--ct-muted)', fontSize: '0.9rem' }}>
+                  SSO accounts can confirm with a fresh agency sign-in (within 30 minutes) when MFA
+                  is not enrolled.
+                </p>
               )}
               {this.state.emailMsgStatus === 'success' && (
                 <Alert tone="success" content={this.state.emailMsg} />
