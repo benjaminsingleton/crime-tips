@@ -19,7 +19,7 @@ services:
 
   app:
     # Pull published image by default; keep Dockerfile path for air-gap / audit.
-    image: ${CRIME_TIPS_IMAGE:-ghcr.io/benjaminsingleton/crime-tips:1.1.0}
+    image: ${CRIME_TIPS_IMAGE:-ghcr.io/benjaminsingleton/crime-tips:1.1.1}
     build: !reset null
     pull_policy: ${CRIME_TIPS_PULL_POLICY:-missing}
     ports: !reset []

@@ -7,7 +7,7 @@ Common go-live and ops failures. Prefer `docker compose -f docker-compose.yml -f
 | Symptom | Check |
 |---------|--------|
 | App exits immediately | Weak secrets in production — run `./scripts/gen-secrets.sh`, set strong `JWT_SECRET` / DB / admin passwords, remove `ADMIN_PASSWORD` after seed, and ensure `OIDC_ALLOW_INSECURE` is not set. See [hardening.md](./hardening.md). |
-| Preflight fails on image tag | Pin `CRIME_TIPS_IMAGE` to a release (e.g. `:1.1.0`); `:latest` is refused in prod mode. |
+| Preflight fails on image tag | Pin `CRIME_TIPS_IMAGE` to a release (e.g. `:1.1.1`); `:latest` is refused in prod mode. |
 | `403 Origin not allowed` on API writes | Same-origin via Caddy is preferred. If cross-origin, set `PUBLIC_ORIGIN` to the browser origin. Avoid `COOKIE_SAMESITE=none` unless required. |
 | `curl https://$DOMAIN/api/health` fails | Caddy up? `DOMAIN` / DNS correct? App healthy? `docker compose … ps` |
 | Health OK but UI blank / API CORS errors | `PUBLIC_ORIGIN` must match the browser origin; prefer same-origin via Caddy |

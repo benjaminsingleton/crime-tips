@@ -90,10 +90,10 @@ if [[ "$MODE" == "prod" ]]; then
   image="${CRIME_TIPS_IMAGE:-$(get_val CRIME_TIPS_IMAGE)}"
   if [[ -z "$image" ]]; then
     # Compose prod default when unset
-    image="ghcr.io/benjaminsingleton/crime-tips:1.1.0"
+    image="ghcr.io/benjaminsingleton/crime-tips:1.1.1"
   fi
   if [[ "$image" == *:latest || "$image" == *:latest@* ]]; then
-    fail "CRIME_TIPS_IMAGE must not use floating :latest in production (pin a release tag, e.g. :1.1.0)"
+    fail "CRIME_TIPS_IMAGE must not use floating :latest in production (pin a release tag, e.g. :1.1.1)"
   else
     ok "CRIME_TIPS_IMAGE is pinned ($image)"
   fi
