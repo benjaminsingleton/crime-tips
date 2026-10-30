@@ -102,7 +102,7 @@ Minimal enable rule: **`OIDC_ISSUER` + `OIDC_CLIENT_ID`**. Set `OIDC_ENABLED=fal
 | `OIDC_AUTO_PROVISION` | `false` | `true` = create a non-admin officer on first SSO if email is unknown |
 | `OIDC_DEFAULT_RANK` | `Officer` | Rank for auto-provisioned users |
 | `OIDC_ENABLED` | implied true when issuer+client set | Set `false` to disable SSO |
-| `OIDC_ALLOW_INSECURE` | `false` | Allow `http://` IdP discovery — **dev only** |
+| `OIDC_ALLOW_INSECURE` | `false` | Allow `http://` IdP discovery — **dev only**; production boot **refuses** if truthy |
 | `OIDC_REQUIRE_EMAIL_VERIFIED` | `true` | Require IdP `email_verified` before email link / auto-provision |
 
 ### 3. How accounts are linked

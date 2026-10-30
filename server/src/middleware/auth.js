@@ -52,8 +52,9 @@ export function requireAuth(req, res, next) {
   }
 }
 
+/** Admin gate uses DB role after loadUser — not the JWT `admin` claim (M2). */
 export function requireAdmin(req, res, next) {
-  if (!req.user?.admin) {
+  if (!req.dbUser?.admin) {
     return res.status(403).json({ error: 'Admin access required' });
   }
   return next();

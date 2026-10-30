@@ -83,7 +83,7 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d app
 4. `curl -fsS https://$DOMAIN/api/health` → `{"ok":true}`
 5. Confirm host ports: only 80/443 (and SSH) are public — not 5432
 
-Officer auth uses a Secure (on HTTPS), httpOnly, SameSite session cookie. Set `PUBLIC_ORIGIN` to your HTTPS origin so CORS allows credentialed browser calls if the API is ever served cross-origin. Draft tip edits require an unguessable edit token returned only on draft create (held in the tip wizard, not the receipt id alone).
+Officer auth uses a Secure (on HTTPS), httpOnly, SameSite=`lax` session cookie. Keep the API same-origin behind Caddy; set `PUBLIC_ORIGIN` if the browser origin differs. **Do not** set `COOKIE_SAMESITE=none` unless you intentionally run a cross-site API — that mode enables CSRF risk and turns on strict Origin checks. Draft tip edits require an unguessable edit token (header `X-Tip-Edit-Token`, not a query string) returned only on draft create.
 
 Optional officer **TOTP MFA**: enroll under My Settings, or set `MFA_REQUIRED=true`. Optional **OIDC SSO**: set `OIDC_ISSUER` + `OIDC_CLIENT_ID` (and usually `OIDC_CLIENT_SECRET`); password login stays available unless `OIDC_ALLOW_PASSWORD=false`. See [auth-mfa.md](./auth-mfa.md) and [user-admin.md](./user-admin.md).
 

@@ -84,6 +84,13 @@ export function validateProductionSecrets(env = process.env) {
     );
   }
 
+  const oidcInsecure = (env.OIDC_ALLOW_INSECURE || '').trim().toLowerCase();
+  if (oidcInsecure === 'true' || oidcInsecure === '1' || oidcInsecure === 'yes') {
+    problems.push(
+      'OIDC_ALLOW_INSECURE must not be enabled in production (HTTP IdP discovery / token flows)',
+    );
+  }
+
   return problems;
 }
 

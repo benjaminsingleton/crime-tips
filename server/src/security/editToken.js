@@ -8,13 +8,14 @@ export function hashEditToken(token) {
   return crypto.createHash('sha256').update(String(token), 'utf8').digest('hex');
 }
 
+/**
+ * Edit tokens from header (preferred) or multipart/JSON body only.
+ * Query-string tokens are rejected — they leak into access logs / Referer (M4).
+ */
 export function extractEditToken(req) {
   const header = req.headers['x-tip-edit-token'];
   if (header && typeof header === 'string' && header.trim()) {
     return header.trim();
-  }
-  if (req.query?.editToken && typeof req.query.editToken === 'string') {
-    return req.query.editToken.trim();
   }
   if (req.body?.editToken && typeof req.body.editToken === 'string') {
     return req.body.editToken.trim();

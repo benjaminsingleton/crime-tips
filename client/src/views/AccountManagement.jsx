@@ -42,6 +42,15 @@ class CreateUser extends Component {
       });
       return;
     }
+    if (this.state.password.length < 10) {
+      this.setState({
+        error: true,
+        success: false,
+        header: 'Error!',
+        message: 'Password must be at least 10 characters.',
+      });
+      return;
+    }
 
     try {
       await api.createUser({
@@ -111,7 +120,7 @@ class CreateUser extends Component {
                 onChange={this.handleInputChange}
               />
               <TextInput
-                label="Password"
+                label="Password (min 10 characters)"
                 name="password"
                 value={this.state.password}
                 type="password"
@@ -182,11 +191,11 @@ class EditUser extends Component {
 
   resetPassword = async (e) => {
     e.preventDefault();
-    if (!this.state.newPassword || this.state.newPassword.length < 6) {
+    if (!this.state.newPassword || this.state.newPassword.length < 10) {
       this.setState({
         error: true,
         header: 'Error!',
-        message: 'Enter a new password (min 6 characters) to reset.',
+        message: 'Enter a new password (min 10 characters) to reset.',
       });
       return;
     }

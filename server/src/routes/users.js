@@ -8,10 +8,74 @@ import {
   requireMfaIfEnforced,
   publicUser,
 } from '../middleware/auth.js';
+import { validatePasswordStrength } from '../security/passwordPolicy.js';
+import {
+  decryptSecret,
+  verifyTotpCode,
+  consumeBackupCode,
+  mfaRequiredGlobally,
+} from '../services/mfa.js';
 
 const router = Router();
 
 router.use(requireAuth, loadUser);
+
+function enrollmentBlocked(req, res) {
+  if (!mfaRequiredGlobally()) return false;
+  if (req.dbUser?.mfa_enabled) return false;
+  res.status(403).json({
+    error: 'Multi-factor authentication enrollment required',
+    mfaEnrollmentRequired: true,
+  });
+  return true;
+}
+
+/**
+ * Self credential changes require current password; when MFA is enrolled,
+ * also require a TOTP or backup code (M6).
+ */
+async function verifySelfReauth(req, userRow, { currentPassword, mfaCode }) {
+  if (!currentPassword) {
+    return { ok: false, status: 401, error: 'Current password required' };
+  }
+  const pwOk = await bcrypt.compare(String(currentPassword), userRow.password_hash);
+  if (!pwOk) {
+    return { ok: false, status: 401, error: 'Current password is incorrect' };
+  }
+  if (!userRow.mfa_enabled) return { ok: true };
+
+  if (!mfaCode) {
+    return {
+      ok: false,
+      status: 401,
+      error: 'Authentication code required',
+      mfaRequired: true,
+    };
+  }
+
+  let secret;
+  try {
+    secret = decryptSecret(userRow.mfa_secret_enc);
+  } catch {
+    return { ok: false, status: 500, error: 'MFA configuration error' };
+  }
+
+  let ok = verifyTotpCode(secret, mfaCode);
+  if (!ok) {
+    const consumed = await consumeBackupCode(userRow.mfa_backup_hashes, mfaCode);
+    ok = consumed.ok;
+    if (ok) {
+      await query(`UPDATE users SET mfa_backup_hashes = $1::jsonb WHERE id = $2`, [
+        JSON.stringify(consumed.remaining),
+        userRow.id,
+      ]);
+    }
+  }
+  if (!ok) {
+    return { ok: false, status: 401, error: 'Invalid authentication code' };
+  }
+  return { ok: true };
+}
 
 // Admin account ops require MFA when MFA_REQUIRED=true; self settings stay available for enroll.
 router.get('/', requireMfaIfEnforced, requireAdmin, async (_req, res) => {
@@ -44,6 +108,11 @@ router.post('/', requireMfaIfEnforced, requireAdmin, async (req, res) => {
     });
   }
 
+  const strength = validatePasswordStrength(password);
+  if (!strength.ok) {
+    return res.status(400).json({ error: strength.error });
+  }
+
   const existing = await query(`SELECT id FROM users WHERE LOWER(email) = LOWER($1)`, [email]);
   if (existing.rows[0]) {
     return res.status(409).json({ error: 'Email already in use' });
@@ -67,10 +136,32 @@ router.patch('/:id', async (req, res) => {
     return res.status(403).json({ error: 'Forbidden' });
   }
 
+  const body = req.body || {};
+  const privilegeChange =
+    !isSelf || body.admin !== undefined || body.accountActive !== undefined;
+  if (privilegeChange && enrollmentBlocked(req, res)) return undefined;
+
   const { rows } = await query(`SELECT * FROM users WHERE id = $1`, [targetId]);
   if (!rows[0]) return res.status(404).json({ error: 'User not found' });
 
-  const body = req.body || {};
+  const emailChanging =
+    body.email !== undefined &&
+    String(body.email).trim().toLowerCase() !== String(rows[0].email).toLowerCase();
+
+  if (isSelf && emailChanging) {
+    if (enrollmentBlocked(req, res)) return undefined;
+    const reauth = await verifySelfReauth(req, rows[0], {
+      currentPassword: body.currentPassword,
+      mfaCode: body.mfaCode,
+    });
+    if (!reauth.ok) {
+      return res.status(reauth.status).json({
+        error: reauth.error,
+        ...(reauth.mfaRequired ? { mfaRequired: true } : {}),
+      });
+    }
+  }
+
   const next = {
     rank: body.rank !== undefined ? body.rank : rows[0].rank,
     firstName: body.firstName !== undefined ? body.firstName : rows[0].first_name,
@@ -129,16 +220,30 @@ router.patch('/:id', async (req, res) => {
   }
 });
 
-router.post('/:id/password', async (req, res) => {
+router.post('/:id/password', requireMfaIfEnforced, async (req, res) => {
   const targetId = req.params.id;
   const isSelf = targetId === req.user.sub;
   if (!isSelf && !req.dbUser.admin) {
     return res.status(403).json({ error: 'Forbidden' });
   }
 
-  const { password } = req.body || {};
-  if (!password || String(password).length < 6) {
-    return res.status(400).json({ error: 'Password must be at least 6 characters' });
+  const { password, currentPassword, mfaCode } = req.body || {};
+  const strength = validatePasswordStrength(password);
+  if (!strength.ok) {
+    return res.status(400).json({ error: strength.error });
+  }
+
+  const { rows } = await query(`SELECT * FROM users WHERE id = $1`, [targetId]);
+  if (!rows[0]) return res.status(404).json({ error: 'User not found' });
+
+  if (isSelf) {
+    const reauth = await verifySelfReauth(req, rows[0], { currentPassword, mfaCode });
+    if (!reauth.ok) {
+      return res.status(reauth.status).json({
+        error: reauth.error,
+        ...(reauth.mfaRequired ? { mfaRequired: true } : {}),
+      });
+    }
   }
 
   const hash = await bcrypt.hash(password, 12);

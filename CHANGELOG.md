@@ -14,6 +14,7 @@ Versioning follows [SemVer](https://semver.org/).
 - OIDC: require `email_verified` before email account link / auto-provision (`OIDC_REQUIRE_EMAIL_VERIFIED`, default true)
 - Officers get 404 for unsubmitted tip detail / flags / notes / download (mailbox submitted-only)
 - Upgrade `nodemailer` past High advisories
+- Medium findings: DB-backed `requireAdmin`; submitted attachment list uses full officer auth; edit tokens header/body only (no query); attachment/logo magic-byte sniff (drop `text/plain`); self password/email re-auth + MFA; admin MFA-reset gated; Origin CSRF checks (strict when `COOKIE_SAMESITE=none`); refuse `OIDC_ALLOW_INSECURE` in production; pin prod image default / preflight reject `:latest`; non-root container user + centralized error handler; password minimum 10
 
 ## [1.1.0] - 2026-10-29
 

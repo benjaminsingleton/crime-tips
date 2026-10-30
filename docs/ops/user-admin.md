@@ -28,19 +28,19 @@ In **Account Management**, set the user inactive (`accountActive` / active toggl
 
 ## Reset password (no email flow)
 
-Password-reset email is **not implemented**.
+Password-reset email is **not implemented**. Passwords must be **at least 10 characters**.
 
 1. Admin → **Account Management** → set a new password for the officer, **or**
-2. Officer changes their own password under **My Settings**.
+2. Officer changes their own password under **My Settings** (requires **current password**, plus a TOTP/backup code when MFA is enrolled).
 
-Communicate the temporary password out of band (phone, in person, agency password tool).
+Communicate the temporary password out of band (phone, in person, agency password tool). Self email changes use the same re-auth rules.
 
 ## MFA reset (lost authenticator)
 
-1. Admin with working access → **Account Management** → **Reset MFA**.
+1. Admin with working MFA (when `MFA_REQUIRED=true`) → **Account Management** → **Reset MFA**.
 2. Officer enrolls again under **My Settings**.
 
-If `MFA_REQUIRED=true`, officers cannot self-disable MFA; admin reset is the recovery path. Details: [auth-mfa.md](./auth-mfa.md).
+If `MFA_REQUIRED=true`, officers cannot self-disable MFA; admin reset is the recovery path and itself requires the admin to be MFA-enrolled. Details: [auth-mfa.md](./auth-mfa.md).
 
 ## SSO-only / break-glass
 

@@ -8,6 +8,7 @@ import {
   verifyMfaPendingToken,
   requireAuth,
   loadUser,
+  requireMfaIfEnforced,
   publicUser,
 } from '../middleware/auth.js';
 import { loginLimiter } from '../middleware/rateLimit.js';
@@ -464,27 +465,33 @@ router.post('/mfa/disable', requireAuth, loadUser, async (req, res) => {
 });
 
 /** Admin: clear MFA for another officer (lost authenticator). */
-router.post('/mfa/admin-reset/:userId', requireAuth, loadUser, async (req, res) => {
-  if (!req.dbUser.admin) {
-    return res.status(403).json({ error: 'Admin access required' });
-  }
-  const targetId = req.params.userId;
-  const { rows } = await query(`SELECT id, email FROM users WHERE id = $1`, [targetId]);
-  if (!rows[0]) return res.status(404).json({ error: 'User not found' });
+router.post(
+  '/mfa/admin-reset/:userId',
+  requireAuth,
+  loadUser,
+  requireMfaIfEnforced,
+  async (req, res) => {
+    if (!req.dbUser.admin) {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    const targetId = req.params.userId;
+    const { rows } = await query(`SELECT id, email FROM users WHERE id = $1`, [targetId]);
+    if (!rows[0]) return res.status(404).json({ error: 'User not found' });
 
-  await query(
-    `UPDATE users SET mfa_enabled = FALSE, mfa_secret_enc = NULL,
-       mfa_backup_hashes = '[]'::jsonb, updated_at = NOW()
-     WHERE id = $1`,
-    [targetId],
-  );
-  await query(
-    `INSERT INTO activity_logs (user_id, action) VALUES ($1, 'mfaAdminReset')`,
-    [req.user.sub],
-  );
+    await query(
+      `UPDATE users SET mfa_enabled = FALSE, mfa_secret_enc = NULL,
+         mfa_backup_hashes = '[]'::jsonb, updated_at = NOW()
+       WHERE id = $1`,
+      [targetId],
+    );
+    await query(
+      `INSERT INTO activity_logs (user_id, action) VALUES ($1, 'mfaAdminReset')`,
+      [req.user.sub],
+    );
 
-  return res.json({ ok: true });
-});
+    return res.json({ ok: true });
+  },
+);
 
 router.get('/me', requireAuth, loadUser, (req, res) => {
   res.json({
