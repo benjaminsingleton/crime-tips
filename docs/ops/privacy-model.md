@@ -17,7 +17,7 @@ The **agency is the data controller**. This software stores tip data on **your**
 
 - Tipsters are **not required** to create an account or provide a name, phone, or email.
 - Tipsters **may opt in** to contact details. If they do, officers see those fields with the tip.
-- Submitted tips, drafts, attachments, and officer notes live in **agency Postgres** and the **uploads** volume. Officers with dashboard access can read tip content.
+- Submitted tips, drafts, attachments, and officer notes live in **agency Postgres** and the **uploads** volume. Officers with dashboard access can read **submitted** tip content; unsubmitted drafts are tipster-only (edit token) and return 404 in the officer mailbox API.
 - Notification emails (when SMTP is configured) include tip id and a dashboard link — **never** the tip narrative or attachments. See [email.md](./email.md).
 
 ## What may still identify or locate a tipster

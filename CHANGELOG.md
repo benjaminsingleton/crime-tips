@@ -7,6 +7,14 @@ Versioning follows [SemVer](https://semver.org/).
 
 ## [Unreleased]
 
+### Security
+
+- Tip attachment upload authorizes draft edit token before any disk write; reject non-UUID tip ids
+- Branding: ban SVG logos; reject protocol-relative `logoUrl` (`//…`)
+- OIDC: require `email_verified` before email account link / auto-provision (`OIDC_REQUIRE_EMAIL_VERIFIED`, default true)
+- Officers get 404 for unsubmitted tip detail / flags / notes / download (mailbox submitted-only)
+- Upgrade `nodemailer` past High advisories
+
 ## [1.1.0] - 2026-10-29
 
 Second PD self-host release. Adds SMTP tip email, department branding, OIDC SSO, and PD-facing docs on top of the `v1.0.0` package (Safe Compose, httpOnly sessions, TOTP MFA, navy/gold UI, GHCR images).

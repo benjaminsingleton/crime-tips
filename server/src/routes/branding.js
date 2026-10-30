@@ -21,11 +21,11 @@ import {
 
 const router = Router();
 
+// Raster only — SVG can execute script when served same-origin (H2).
 const LOGO_MIMES = new Set([
   'image/png',
   'image/jpeg',
   'image/webp',
-  'image/svg+xml',
   'image/gif',
 ]);
 
@@ -33,9 +33,10 @@ const LOGO_EXT = {
   'image/png': '.png',
   'image/jpeg': '.jpg',
   'image/webp': '.webp',
-  'image/svg+xml': '.svg',
   'image/gif': '.gif',
 };
+
+const SAFE_LOGO_EXTS = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif']);
 
 const upload = multer({
   storage: multer.diskStorage({
@@ -54,7 +55,7 @@ const upload = multer({
   limits: { fileSize: 2 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     if (!LOGO_MIMES.has(file.mimetype)) {
-      return cb(new Error('Logo must be PNG, JPEG, WebP, GIF, or SVG'));
+      return cb(new Error('Logo must be PNG, JPEG, WebP, or GIF'));
     }
     return cb(null, true);
   },
@@ -86,13 +87,18 @@ router.get('/', async (_req, res) => {
   }
 });
 
-/** Public: streamed uploaded logo (same-origin). */
+/** Public: streamed uploaded logo (same-origin; raster only). */
 router.get('/logo', (req, res) => {
   const filePath = findStoredLogoPath();
   if (!filePath || !fs.existsSync(filePath)) {
     return res.status(404).json({ error: 'No logo uploaded' });
   }
+  const ext = path.extname(filePath).toLowerCase();
+  if (!SAFE_LOGO_EXTS.has(ext)) {
+    return res.status(404).json({ error: 'No logo uploaded' });
+  }
   res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
   return res.sendFile(path.resolve(filePath));
 });
 
