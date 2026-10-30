@@ -5,6 +5,7 @@ import {
   requestHostOrigins,
   isLocalDevOrigin,
   csrfIsProduction,
+  csrfSchemeFlexible,
 } from './csrf.js';
 
 assert.deepEqual(configuredOrigins({ PUBLIC_ORIGIN: 'https://a.example, https://b.example' }), [
@@ -14,12 +15,21 @@ assert.deepEqual(configuredOrigins({ PUBLIC_ORIGIN: 'https://a.example, https://
 
 assert.equal(csrfIsProduction({ CRIME_TIPS_ENV: 'development', NODE_ENV: 'production' }), false);
 assert.equal(csrfIsProduction({ CRIME_TIPS_ENV: 'production', NODE_ENV: 'production' }), true);
+assert.equal(csrfSchemeFlexible({ CRIME_TIPS_ENV: 'development', COOKIE_SAMESITE: 'lax' }), true);
+assert.equal(csrfSchemeFlexible({ CRIME_TIPS_ENV: 'production', COOKIE_SAMESITE: 'lax' }), false);
+assert.equal(
+  csrfSchemeFlexible({ CRIME_TIPS_ENV: 'development', COOKIE_SAMESITE: 'none' }),
+  false,
+);
 
 const prodReq = {
   headers: { host: 'tips.example.gov', 'x-forwarded-proto': 'https' },
 };
 assert.equal(
-  isAllowedOrigin('https://tips.example.gov', prodReq, { PUBLIC_ORIGIN: '', CRIME_TIPS_ENV: 'production' }),
+  isAllowedOrigin('https://tips.example.gov', prodReq, {
+    PUBLIC_ORIGIN: '',
+    CRIME_TIPS_ENV: 'production',
+  }),
   true,
 );
 assert.equal(
@@ -33,6 +43,33 @@ assert.equal(
   isAllowedOrigin('https://portal.example.gov', prodReq, {
     PUBLIC_ORIGIN: 'https://portal.example.gov',
     CRIME_TIPS_ENV: 'production',
+  }),
+  true,
+);
+
+// Production + XF-Proto=https: HTTP Origin on same host must NOT pass
+assert.equal(
+  isAllowedOrigin('http://tips.example.gov', prodReq, {
+    PUBLIC_ORIGIN: '',
+    CRIME_TIPS_ENV: 'production',
+  }),
+  false,
+);
+
+// SameSite=none: also scheme-strict even if CRIME_TIPS_ENV=development
+assert.equal(
+  isAllowedOrigin('http://tips.example.gov', prodReq, {
+    PUBLIC_ORIGIN: '',
+    CRIME_TIPS_ENV: 'development',
+    COOKIE_SAMESITE: 'none',
+  }),
+  false,
+);
+assert.equal(
+  isAllowedOrigin('https://tips.example.gov', prodReq, {
+    PUBLIC_ORIGIN: '',
+    CRIME_TIPS_ENV: 'development',
+    COOKIE_SAMESITE: 'none',
   }),
   true,
 );
@@ -80,14 +117,21 @@ assert.equal(
   false,
 );
 
-// Same Host:port, scheme mismatch (HTTP Origin vs NODE_ENV-forced https footgun)
+// Production without XF-Proto: HTTP Origin must not match invented https:// self
 assert.equal(
   isAllowedOrigin('http://localhost:8080', localHttpReq, {
     PUBLIC_ORIGIN: '',
     CRIME_TIPS_ENV: 'production',
     NODE_ENV: 'production',
   }),
-  true,
+  false,
+);
+assert.deepEqual(
+  requestHostOrigins(localHttpReq, {
+    CRIME_TIPS_ENV: 'production',
+    NODE_ENV: 'production',
+  }),
+  ['https://localhost:8080'],
 );
 
 console.log('csrf.test.js: ok');

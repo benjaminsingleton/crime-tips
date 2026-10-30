@@ -9,9 +9,10 @@
  * - Prefer X-Forwarded-Proto / req.secure; do not treat NODE_ENV=production alone
  *   as HTTPS (runtime image sets NODE_ENV=production while Compose may keep
  *   CRIME_TIPS_ENV=development on HTTP).
- * - Same Host:port as the request is allowed (scheme-flexible).
- * - When CRIME_TIPS_ENV is development, localhost / 127.0.0.1 origins are
- *   allowed (Vite :5173 → API :3000), matching CORS-style local fallbacks.
+ * - Production (and COOKIE_SAMESITE=none): Origin must exactly match a
+ *   requestHostOrigin (scheme included). No http↔https equivalence.
+ * - CRIME_TIPS_ENV=development (with SameSite ≠ none): same Host may match
+ *   either http or https; localhost / 127.0.0.1 origins allowed (Vite :5173).
  */
 
 import { sessionCookieName } from './cookies.js';
@@ -34,6 +35,14 @@ export function csrfIsProduction(env = process.env) {
   if (mode === 'production') return true;
   if (mode === 'development' || mode === 'dev') return false;
   return env.NODE_ENV === 'production';
+}
+
+/** Scheme-flexible Host matching only for lax/strict development deploys. */
+export function csrfSchemeFlexible(env = process.env) {
+  if (csrfIsProduction(env)) return false;
+  const sameSite = (env.COOKIE_SAMESITE || 'lax').toLowerCase();
+  if (sameSite === 'none') return false;
+  return true;
 }
 
 /** Origins explicitly allowed via PUBLIC_ORIGIN (comma-separated). */
@@ -72,9 +81,9 @@ export function requestSchemes(req, env = process.env) {
   } else {
     schemes.add('http');
   }
-  // Dev / non-prod: accept either scheme for the request Host (HTTP Compose
-  // with NODE_ENV=production must not force https://localhost).
-  if (!csrfIsProduction(env)) {
+  // Dev Compose HTTP with NODE_ENV=production: also accept the other scheme
+  // for the request Host only when scheme-flexible (not prod / SameSite=none).
+  if (csrfSchemeFlexible(env)) {
     schemes.add('http');
     schemes.add('https');
   }
@@ -93,25 +102,6 @@ export function requestHostOrigins(req, env = process.env) {
     }
   }
   return out;
-}
-
-function defaultPortForProtocol(protocol) {
-  return protocol === 'https:' ? '443' : '80';
-}
-
-function originHostPort(url) {
-  const port = url.port || defaultPortForProtocol(url.protocol);
-  return `${url.hostname.toLowerCase()}:${port}`;
-}
-
-function hostHeaderHostPort(hostHeader, fallbackProtocol) {
-  try {
-    const u = new URL(`${fallbackProtocol}//${hostHeader}`);
-    const port = u.port || defaultPortForProtocol(fallbackProtocol);
-    return `${u.hostname.toLowerCase()}:${port}`;
-  } catch {
-    return null;
-  }
 }
 
 export function isLocalDevOrigin(url) {
@@ -135,21 +125,14 @@ export function isAllowedOrigin(origin, req, env = process.env) {
   const allowed = configuredOrigins(env);
   if (allowed.includes(parsed.origin)) return true;
 
+  // Exact origin match against reconstructed request host origins (scheme
+  // included). In production / SameSite=none this is the only Host path.
   const hostOrigins = requestHostOrigins(req, env);
   if (hostOrigins.includes(parsed.origin)) return true;
 
-  // Same Host:port as this request (scheme-flexible) — covers HTTP deploys
-  // where NODE_ENV=production would otherwise invent an https:// self origin.
-  const host = requestHostHeader(req);
-  if (host) {
-    const hostKey = hostHeaderHostPort(host, parsed.protocol);
-    if (hostKey && hostKey === originHostPort(parsed)) {
-      return true;
-    }
-  }
-
-  // Local Vite / tooling when not in CRIME_TIPS_ENV=production
-  if (!csrfIsProduction(env) && isLocalDevOrigin(parsed)) {
+  // Local Vite / tooling when CRIME_TIPS_ENV is development (and not
+  // SameSite=none, which keeps Origin checks scheme-strict).
+  if (csrfSchemeFlexible(env) && isLocalDevOrigin(parsed)) {
     return true;
   }
 
