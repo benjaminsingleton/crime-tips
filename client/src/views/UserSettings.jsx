@@ -381,9 +381,11 @@ export default class UserSettings extends Component {
             <form onSubmit={this.changePassword}>
               <TextInput
                 label={
-                  this.state.userDetails.oidcLinked
-                    ? 'Current password (optional for SSO accounts)'
-                    : 'Current password'
+                  this.state.userDetails.mfaEnabled
+                    ? 'Current password (authenticator code also required)'
+                    : this.state.userDetails.oidcLinked
+                      ? 'Current password (optional for SSO accounts)'
+                      : 'Current password'
                 }
                 name="currentPasswordForPassword"
                 type="password"
@@ -443,9 +445,11 @@ export default class UserSettings extends Component {
             <form onSubmit={this.changeEmail}>
               <TextInput
                 label={
-                  this.state.userDetails.oidcLinked
-                    ? 'Current password (optional for SSO accounts)'
-                    : 'Current password'
+                  this.state.userDetails.mfaEnabled
+                    ? 'Current password (authenticator code also required)'
+                    : this.state.userDetails.oidcLinked
+                      ? 'Current password (optional for SSO accounts)'
+                      : 'Current password'
                 }
                 name="currentPasswordForEmail"
                 type="password"
