@@ -12,10 +12,14 @@ export default class UserSettings extends Component {
     mfaRequired: false,
     newPassword: '',
     newPasswordRepeat: '',
+    currentPasswordForPassword: '',
+    passwordMfaCode: '',
     passwordMsgStatus: null,
     passwordMsg: '',
     newEmail: '',
     newEmailRepeat: '',
+    currentPasswordForEmail: '',
+    emailMfaCode: '',
     emailMsgStatus: null,
     emailMsg: '',
     mfaSetup: null,
@@ -65,7 +69,13 @@ export default class UserSettings extends Component {
 
   changePassword = async (e) => {
     e.preventDefault();
-    const { newPassword, newPasswordRepeat } = this.state;
+    const {
+      newPassword,
+      newPasswordRepeat,
+      currentPasswordForPassword,
+      passwordMfaCode,
+      userDetails,
+    } = this.state;
     if (newPassword !== newPasswordRepeat) {
       this.setState({
         passwordMsgStatus: 'error',
@@ -75,13 +85,40 @@ export default class UserSettings extends Component {
       });
       return;
     }
+    // Server always requires TOTP/backup when MFA is enrolled (password alone is not enough).
+    if (userDetails.mfaEnabled && !passwordMfaCode) {
+      this.setState({
+        passwordMsgStatus: 'error',
+        passwordMsg: 'Enter an authenticator code to confirm.',
+      });
+      return;
+    }
+    if (!currentPasswordForPassword && !userDetails.oidcLinked) {
+      this.setState({
+        passwordMsgStatus: 'error',
+        passwordMsg: 'Enter your current password to confirm.',
+      });
+      return;
+    }
+    if (newPassword.length < 10) {
+      this.setState({
+        passwordMsgStatus: 'error',
+        passwordMsg: 'Password must be at least 10 characters.',
+      });
+      return;
+    }
     try {
-      await api.changePassword(this.state.userDetails.id, newPassword);
+      await api.changePassword(userDetails.id, newPassword, {
+        currentPassword: currentPasswordForPassword || undefined,
+        mfaCode: passwordMfaCode || undefined,
+      });
       this.setState({
         passwordMsgStatus: 'success',
         passwordMsg: 'Your password has been updated.',
         newPassword: '',
         newPasswordRepeat: '',
+        currentPasswordForPassword: '',
+        passwordMfaCode: '',
       });
       this.refresh();
     } catch (error) {
@@ -96,7 +133,13 @@ export default class UserSettings extends Component {
 
   changeEmail = async (e) => {
     e.preventDefault();
-    const { newEmail, newEmailRepeat } = this.state;
+    const {
+      newEmail,
+      newEmailRepeat,
+      currentPasswordForEmail,
+      emailMfaCode,
+      userDetails,
+    } = this.state;
     if (newEmail !== newEmailRepeat) {
       this.setState({
         emailMsgStatus: 'error',
@@ -106,13 +149,34 @@ export default class UserSettings extends Component {
       });
       return;
     }
+    // Server always requires TOTP/backup when MFA is enrolled (password alone is not enough).
+    if (userDetails.mfaEnabled && !emailMfaCode) {
+      this.setState({
+        emailMsgStatus: 'error',
+        emailMsg: 'Enter an authenticator code to confirm.',
+      });
+      return;
+    }
+    if (!currentPasswordForEmail && !userDetails.oidcLinked) {
+      this.setState({
+        emailMsgStatus: 'error',
+        emailMsg: 'Enter your current password to confirm.',
+      });
+      return;
+    }
     try {
-      const { user } = await api.updateUser(this.state.userDetails.id, { email: newEmail });
+      const { user } = await api.updateUser(userDetails.id, {
+        email: newEmail,
+        currentPassword: currentPasswordForEmail || undefined,
+        mfaCode: emailMfaCode || undefined,
+      });
       this.setState({
         emailMsgStatus: 'success',
         emailMsg: 'Your email has been updated.',
         newEmail: '',
         newEmailRepeat: '',
+        currentPasswordForEmail: '',
+        emailMfaCode: '',
         userDetails: user,
       });
       if (this.props.setUser) this.props.setUser(user);
@@ -316,11 +380,27 @@ export default class UserSettings extends Component {
             <hr className="section-divider" />
             <form onSubmit={this.changePassword}>
               <TextInput
-                label="New password"
+                label={
+                  this.state.userDetails.mfaEnabled
+                    ? 'Current password (authenticator code also required)'
+                    : this.state.userDetails.oidcLinked
+                      ? 'Current password (optional for SSO accounts)'
+                      : 'Current password'
+                }
+                name="currentPasswordForPassword"
+                type="password"
+                value={this.state.currentPasswordForPassword}
+                onChange={this.handleInputChange}
+                autoComplete="current-password"
+              />
+              <div style={{ height: '0.65rem' }} />
+              <TextInput
+                label="New password (min 10 characters)"
                 name="newPassword"
                 type="password"
                 value={this.state.newPassword}
                 onChange={this.handleInputChange}
+                autoComplete="new-password"
               />
               <div style={{ height: '0.65rem' }} />
               <TextInput
@@ -329,7 +409,26 @@ export default class UserSettings extends Component {
                 type="password"
                 value={this.state.newPasswordRepeat}
                 onChange={this.handleInputChange}
+                autoComplete="new-password"
               />
+              {this.state.userDetails.mfaEnabled && (
+                <>
+                  <div style={{ height: '0.65rem' }} />
+                  <TextInput
+                    label="Authentication code"
+                    name="passwordMfaCode"
+                    value={this.state.passwordMfaCode}
+                    onChange={this.handleInputChange}
+                    autoComplete="one-time-code"
+                  />
+                </>
+              )}
+              {this.state.userDetails.oidcLinked && !this.state.userDetails.mfaEnabled && (
+                <p style={{ color: 'var(--ct-muted)', fontSize: '0.9rem' }}>
+                  SSO accounts can confirm with a fresh agency sign-in (within 30 minutes) when MFA
+                  is not enrolled.
+                </p>
+              )}
               {this.state.passwordMsgStatus === 'success' && (
                 <Alert tone="success" content={this.state.passwordMsg} />
               )}
@@ -345,6 +444,21 @@ export default class UserSettings extends Component {
             <hr className="section-divider" />
             <form onSubmit={this.changeEmail}>
               <TextInput
+                label={
+                  this.state.userDetails.mfaEnabled
+                    ? 'Current password (authenticator code also required)'
+                    : this.state.userDetails.oidcLinked
+                      ? 'Current password (optional for SSO accounts)'
+                      : 'Current password'
+                }
+                name="currentPasswordForEmail"
+                type="password"
+                value={this.state.currentPasswordForEmail}
+                onChange={this.handleInputChange}
+                autoComplete="current-password"
+              />
+              <div style={{ height: '0.65rem' }} />
+              <TextInput
                 label="New email"
                 name="newEmail"
                 type="email"
@@ -359,6 +473,24 @@ export default class UserSettings extends Component {
                 value={this.state.newEmailRepeat}
                 onChange={this.handleInputChange}
               />
+              {this.state.userDetails.mfaEnabled && (
+                <>
+                  <div style={{ height: '0.65rem' }} />
+                  <TextInput
+                    label="Authentication code"
+                    name="emailMfaCode"
+                    value={this.state.emailMfaCode}
+                    onChange={this.handleInputChange}
+                    autoComplete="one-time-code"
+                  />
+                </>
+              )}
+              {this.state.userDetails.oidcLinked && !this.state.userDetails.mfaEnabled && (
+                <p style={{ color: 'var(--ct-muted)', fontSize: '0.9rem' }}>
+                  SSO accounts can confirm with a fresh agency sign-in (within 30 minutes) when MFA
+                  is not enrolled.
+                </p>
+              )}
               {this.state.emailMsgStatus === 'success' && (
                 <Alert tone="success" content={this.state.emailMsg} />
               )}

@@ -130,7 +130,10 @@ export const api = {
   listUsers: () => request('/users'),
   createUser: (body) => request('/users', { method: 'POST', body }),
   updateUser: (id, body) => request(`/users/${id}`, { method: 'PATCH', body }),
-  changePassword: (id, password) =>
-    request(`/users/${id}/password`, { method: 'POST', body: { password } }),
+  changePassword: (id, password, { currentPassword, mfaCode } = {}) =>
+    request(`/users/${id}/password`, {
+      method: 'POST',
+      body: { password, currentPassword, mfaCode },
+    }),
   userActivity: (id) => request(`/users/${id}/activity`),
 };

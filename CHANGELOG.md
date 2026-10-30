@@ -7,6 +7,10 @@ Versioning follows [SemVer](https://semver.org/).
 
 ## [Unreleased]
 
+### Security
+
+- Medium findings: DB-backed `requireAdmin`; submitted attachment list uses full officer auth; edit tokens header/body only (no query); attachment/logo magic-byte sniff (drop `text/plain`); self password/email re-auth + MFA; admin MFA-reset gated; Origin CSRF checks (strict when `COOKIE_SAMESITE=none`); refuse `OIDC_ALLOW_INSECURE` in production; pin prod image default / preflight reject `:latest`; non-root container user + centralized error handler; password minimum 10
+
 ## [1.1.1] - 2026-10-30
 
 Security patch on the `v1.1.0` PD package (SMTP, branding, OIDC, Safe Compose). Includes [#16](https://github.com/benjaminsingleton/crime-tips/pull/16).

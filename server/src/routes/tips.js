@@ -11,6 +11,7 @@ import { tipUploadLimiter, tipWriteLimiter } from '../middleware/rateLimit.js';
 import {
   isAllowedAttachmentMime,
   maxAttachmentsPerTip,
+  resolveAttachmentMime,
 } from '../security/uploads.js';
 import {
   extractEditToken,
@@ -275,6 +276,11 @@ router.post(
         });
       }
 
+      const mimeCheck = resolveAttachmentMime(req.file.mimetype, req.file.buffer);
+      if (!mimeCheck.ok) {
+        return res.status(400).json({ error: mimeCheck.error });
+      }
+
       const safe = req.file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
       const storedName = `${uuidv4()}-${safe}`;
       const dir = path.join(uploadDir, tipId);
@@ -286,7 +292,7 @@ router.post(
         `INSERT INTO tip_attachments (tip_id, filename, stored_name, mime_type, size_bytes)
          VALUES ($1, $2, $3, $4, $5)
          RETURNING *`,
-        [tipId, req.file.originalname, storedName, req.file.mimetype, req.file.size],
+        [tipId, req.file.originalname, storedName, mimeCheck.mime, req.file.size],
       );
 
       const row = inserted.rows[0];
@@ -307,16 +313,21 @@ router.post(
   },
 );
 
-// Public draft (edit token) or officer (session): list attachments
+// Public draft (edit token) or officer (full session + MFA): list attachments
 router.get('/:id/attachments', async (req, res) => {
   const { rows } = await query(`SELECT * FROM tips WHERE id = $1`, [req.params.id]);
   if (!rows[0]) return res.status(404).json({ error: 'Tip not found' });
 
   if (rows[0].submitted) {
-    return requireAuth(req, res, async () => {
-      const attachments = await getAttachments(req.params.id);
-      return res.json({ attachments });
-    });
+    // Same officerAuth stack as detail/download (M3) — not JWT-only.
+    return requireAuth(req, res, () =>
+      loadUser(req, res, () =>
+        requireMfaIfEnforced(req, res, async () => {
+          const attachments = await getAttachments(req.params.id);
+          return res.json({ attachments });
+        }),
+      ),
+    );
   }
 
   const gate = requireDraftCapability(req, rows[0]);

@@ -42,6 +42,15 @@ class CreateUser extends Component {
       });
       return;
     }
+    if (this.state.password.length < 10) {
+      this.setState({
+        error: true,
+        success: false,
+        header: 'Error!',
+        message: 'Password must be at least 10 characters.',
+      });
+      return;
+    }
 
     try {
       await api.createUser({
@@ -111,7 +120,7 @@ class CreateUser extends Component {
                 onChange={this.handleInputChange}
               />
               <TextInput
-                label="Password"
+                label="Password (min 10 characters)"
                 name="password"
                 value={this.state.password}
                 type="password"
@@ -158,7 +167,10 @@ class EditUser extends Component {
       admin: props.user.admin,
       notifications: props.user.notifications,
       accountActive: props.user.accountActive,
+      originalEmail: props.user.email,
       newPassword: '',
+      currentPassword: '',
+      mfaCode: '',
     };
   }
 
@@ -169,6 +181,7 @@ class EditUser extends Component {
         firstName: this.props.user.firstName,
         lastName: this.props.user.lastName,
         email: this.props.user.email,
+        originalEmail: this.props.user.email,
         admin: this.props.user.admin,
         notifications: this.props.user.notifications,
         accountActive: this.props.user.accountActive,
@@ -180,24 +193,62 @@ class EditUser extends Component {
 
   toggleBool = (name) => this.setState({ [name]: !this.state[name] });
 
+  isEditingSelf = () =>
+    Boolean(this.props.viewer?.id) && this.props.viewer.id === this.props.uid;
+
+  selfEmailChanging = () => {
+    if (!this.isEditingSelf()) return false;
+    const next = String(this.state.email || '').trim().toLowerCase();
+    const prev = String(this.state.originalEmail || '').trim().toLowerCase();
+    return next !== prev;
+  };
+
   resetPassword = async (e) => {
     e.preventDefault();
-    if (!this.state.newPassword || this.state.newPassword.length < 6) {
+    if (!this.state.newPassword || this.state.newPassword.length < 10) {
       this.setState({
         error: true,
         header: 'Error!',
-        message: 'Enter a new password (min 6 characters) to reset.',
+        message: 'Enter a new password (min 10 characters) to reset.',
+      });
+      return;
+    }
+    const self = this.isEditingSelf();
+    if (self && this.props.user.mfaEnabled && !this.state.mfaCode) {
+      this.setState({
+        error: true,
+        header: 'Error!',
+        message: 'Enter an authenticator code to confirm resetting your own password.',
+      });
+      return;
+    }
+    if (self && !this.state.currentPassword && !this.props.viewer?.oidcLinked) {
+      this.setState({
+        error: true,
+        header: 'Error!',
+        message: 'Enter your current password to reset your own account.',
       });
       return;
     }
     try {
-      await api.changePassword(this.props.uid, this.state.newPassword);
+      await api.changePassword(
+        this.props.uid,
+        this.state.newPassword,
+        self
+          ? {
+              currentPassword: this.state.currentPassword || undefined,
+              mfaCode: this.state.mfaCode || undefined,
+            }
+          : {},
+      );
       this.setState({
         error: false,
         success: true,
         header: 'Success!',
         message: 'Password updated.',
         newPassword: '',
+        currentPassword: '',
+        mfaCode: '',
       });
     } catch (error) {
       this.setState({ error: true, success: false, header: 'Error!', message: error.message });
@@ -239,8 +290,30 @@ class EditUser extends Component {
       return;
     }
 
+    const emailChanging = this.selfEmailChanging();
+    if (emailChanging && this.props.user.mfaEnabled && !this.state.mfaCode) {
+      this.setState({
+        error: true,
+        header: 'Error!',
+        message: 'Enter an authenticator code to confirm changing your own email.',
+      });
+      return;
+    }
+    if (
+      emailChanging &&
+      !this.state.currentPassword &&
+      !this.props.viewer?.oidcLinked
+    ) {
+      this.setState({
+        error: true,
+        header: 'Error!',
+        message: 'Enter your current password to confirm changing your own email.',
+      });
+      return;
+    }
+
     try {
-      await api.updateUser(this.props.uid, {
+      const body = {
         rank: this.state.rank,
         firstName: this.state.firstName,
         lastName: this.state.lastName,
@@ -248,7 +321,13 @@ class EditUser extends Component {
         admin: this.state.admin,
         notifications: this.state.notifications,
         accountActive: this.state.accountActive,
-      });
+      };
+      if (emailChanging) {
+        body.currentPassword = this.state.currentPassword || undefined;
+        body.mfaCode = this.state.mfaCode || undefined;
+      }
+      await api.updateUser(this.props.uid, body);
+      this.setState({ currentPassword: '', mfaCode: '' });
       this.props.onSaved();
       this.props.toggle('showEditUser');
     } catch (error) {
@@ -295,6 +374,33 @@ class EditUser extends Component {
                 value={this.state.newPassword}
                 onChange={this.handleInputChange}
               />
+              {this.isEditingSelf() ? (
+                <>
+                  <TextInput
+                    label={
+                      this.props.user.mfaEnabled
+                        ? 'Current password (for own password/email; authenticator also required)'
+                        : this.props.viewer?.oidcLinked
+                          ? 'Current password (optional with fresh SSO; needed for own email/password)'
+                          : 'Current password (required to change your own password or email)'
+                    }
+                    name="currentPassword"
+                    type="password"
+                    value={this.state.currentPassword}
+                    onChange={this.handleInputChange}
+                    autoComplete="current-password"
+                  />
+                  {this.props.user.mfaEnabled ? (
+                    <TextInput
+                      label="Authentication code (own password or email change)"
+                      name="mfaCode"
+                      value={this.state.mfaCode}
+                      onChange={this.handleInputChange}
+                      autoComplete="one-time-code"
+                    />
+                  ) : null}
+                </>
+              ) : null}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'end' }}>
                 <Button size="sm" variant="secondary" content="Reset password" onClick={this.resetPassword} />
                 {this.props.user.mfaEnabled ? (
@@ -358,6 +464,11 @@ EditUser.propTypes = {
   toggle: PropTypes.func.isRequired,
   uid: PropTypes.string.isRequired,
   onSaved: PropTypes.func.isRequired,
+  viewer: PropTypes.object,
+};
+
+EditUser.defaultProps = {
+  viewer: null,
 };
 
 export default class AccountManagement extends Component {
@@ -416,6 +527,7 @@ export default class AccountManagement extends Component {
               <EditUser
                 uid={this.state.editUserId}
                 user={this.state.users[this.state.editUserId]}
+                viewer={this.props.user}
                 toggle={this.toggle}
                 onSaved={this.loadUsers}
               />

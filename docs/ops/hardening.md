@@ -36,17 +36,19 @@ Production boots **refuse** weak JWT / DB / admin example secrets when `CRIME_TI
 ## Auth and tip privacy
 
 - [ ] Officer session uses httpOnly cookie (not JWT in `localStorage`); Secure cookie over HTTPS
+- [ ] `COOKIE_SAMESITE` left at default **`lax`** (or `strict`). **Do not** set `none` unless the API is truly cross-site — then Origin CSRF checks are strict and `PUBLIC_ORIGIN` must list every browser origin. Prefer same-origin via Caddy (no cross-site cookies).
 - [ ] `PUBLIC_ORIGIN` matches the browser origin when API is cross-origin (CORS + `credentials`)
-- [ ] Unsubmitted tip PATCH / upload / delete require the draft **edit token** (UUID alone is not enough)
+- [ ] Unsubmitted tip PATCH / upload / delete require the draft **edit token** header (not query string); UUID alone is not enough
 - [ ] Officers enrolled in TOTP MFA (or `MFA_REQUIRED=true`); see [auth-mfa.md](./auth-mfa.md)
 - [ ] Seeded admin MFA enrolled; backup codes stored in the agency password manager
-- [ ] If using OIDC SSO: redirect URI matches IdP; `OIDC_CLIENT_SECRET` in `.env` (`chmod 600`); prefer `OIDC_AUTO_PROVISION=false` and create officers explicitly; keep a break-glass password admin unless policy forbids it
+- [ ] If using OIDC SSO: redirect URI matches IdP; `OIDC_CLIENT_SECRET` in `.env` (`chmod 600`); prefer `OIDC_AUTO_PROVISION=false` and create officers explicitly; keep a break-glass password admin unless policy forbids it; **`OIDC_ALLOW_INSECURE` must stay unset/false in production** (boot refuses it)
 
 ## Abuse controls
 
 - [ ] Login rate limit active (`POST /api/auth/login`)
 - [ ] Tip write / upload rate limits active
-- [ ] Attachment MIME allowlist + per-tip count cap (`MAX_ATTACHMENTS_PER_TIP`)
+- [ ] Attachment MIME allowlist + magic-byte sniff + per-tip count cap (`MAX_ATTACHMENTS_PER_TIP`)
+- [ ] Cookie-authenticated mutating `/api/*` requests checked against Origin/Referer (strict when `COOKIE_SAMESITE=none` or `CSRF_STRICT=true`)
 
 ## Email (optional)
 
@@ -57,7 +59,7 @@ Production boots **refuse** weak JWT / DB / admin example secrets when `CRIME_TI
 
 ## Ops
 
-- [ ] `CRIME_TIPS_IMAGE` pinned to a release tag (not floating `:latest` long-term); checkout matches features ([install.md](./install.md#version-alignment))
+- [ ] `CRIME_TIPS_IMAGE` pinned to a release tag (prod Compose default is `:1.1.1`; preflight **fails** on `:latest`); checkout matches features ([install.md](./install.md#version-alignment))
 - [ ] Anonymous `docker pull` of the pinned tag succeeded before go-live ([ghcr.md](./ghcr.md))
 - [ ] Update runbook followed: backup → `./scripts/update.sh vX.Y.Z` ([update.md](./update.md))
 - [ ] Backup script scheduled (example cron in [backup-restore.md](./backup-restore.md)); encrypt + off-box copy verified

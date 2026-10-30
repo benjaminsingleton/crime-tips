@@ -105,7 +105,7 @@ See `.env.example`. Important variables:
 |----------|---------|
 | `CRIME_TIPS_ENV` | `development` (local) or `production` (secret refusal + prod CORS) |
 | `JWT_SECRET` | Signs officer session cookies (≥32 chars in prod) |
-| `COOKIE_SECURE` / `COOKIE_SAMESITE` | Session cookie flags |
+| `COOKIE_SECURE` / `COOKIE_SAMESITE` | Session cookie flags (prefer `lax`; avoid `none` — see hardening) |
 | `ADMIN_*` | Seeded on first boot when `users` is empty |
 | `DATABASE_URL` | Postgres connection string |
 | `PUBLIC_ORIGIN` | Allowed CORS origin(s); required when SPA and API differ |

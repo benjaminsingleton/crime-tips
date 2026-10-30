@@ -73,6 +73,31 @@ if [[ "$MODE" == "prod" ]]; then
     ok "PUBLIC_ORIGIN=$origin"
   fi
 
+  oidc_insecure="$(get_val OIDC_ALLOW_INSECURE)"
+  oidc_insecure_l="$(echo "$oidc_insecure" | tr '[:upper:]' '[:lower:]')"
+  if [[ "$oidc_insecure_l" == "true" || "$oidc_insecure_l" == "1" || "$oidc_insecure_l" == "yes" ]]; then
+    fail "OIDC_ALLOW_INSECURE must not be enabled in production"
+  else
+    ok "OIDC_ALLOW_INSECURE not enabled"
+  fi
+
+  samesite="$(get_val COOKIE_SAMESITE)"
+  samesite_l="$(echo "$samesite" | tr '[:upper:]' '[:lower:]')"
+  if [[ "$samesite_l" == "none" ]]; then
+    warn "COOKIE_SAMESITE=none — Origin CSRF checks are strict; prefer same-origin Caddy + lax (see docs/ops/hardening.md)"
+  fi
+
+  image="${CRIME_TIPS_IMAGE:-$(get_val CRIME_TIPS_IMAGE)}"
+  if [[ -z "$image" ]]; then
+    # Compose prod default when unset
+    image="ghcr.io/benjaminsingleton/crime-tips:1.1.1"
+  fi
+  if [[ "$image" == *:latest || "$image" == *:latest@* ]]; then
+    fail "CRIME_TIPS_IMAGE must not use floating :latest in production (pin a release tag, e.g. :1.1.1)"
+  else
+    ok "CRIME_TIPS_IMAGE is pinned ($image)"
+  fi
+
   for port in "${HTTP_PORT:-80}" "${HTTPS_PORT:-443}"; do
     if command -v ss >/dev/null 2>&1; then
       if ss -ltn "( sport = :$port )" 2>/dev/null | grep -q ":$port"; then

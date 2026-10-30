@@ -18,6 +18,7 @@ import {
   clearStoredLogoFiles,
   findStoredLogoPath,
 } from '../services/branding.js';
+import { sniffLogoMime } from '../security/uploads.js';
 
 const router = Router();
 
@@ -39,19 +40,7 @@ const LOGO_EXT = {
 const SAFE_LOGO_EXTS = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif']);
 
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: (_req, _file, cb) => {
-      try {
-        cb(null, ensureBrandingUploadDir());
-      } catch (err) {
-        cb(err);
-      }
-    },
-    filename: (_req, file, cb) => {
-      const ext = LOGO_EXT[file.mimetype] || path.extname(file.originalname) || '.png';
-      cb(null, `logo${ext}`);
-    },
-  }),
+  storage: multer.memoryStorage(),
   limits: { fileSize: 2 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     if (!LOGO_MIMES.has(file.mimetype)) {
@@ -186,17 +175,19 @@ router.post(
       if (err) {
         return res.status(400).json({ error: err.message || 'Upload failed' });
       }
-      if (!req.file) {
+      if (!req.file?.buffer) {
         return res.status(400).json({ error: 'logo file required' });
       }
       try {
-        // Remove other extensions left from a previous upload
-        const dir = ensureBrandingUploadDir();
-        for (const f of fs.readdirSync(dir)) {
-          if (f.startsWith('logo.') && f !== req.file.filename) {
-            fs.unlinkSync(path.join(dir, f));
-          }
+        const sniffed = sniffLogoMime(req.file.buffer);
+        if (!sniffed || !LOGO_MIMES.has(sniffed)) {
+          return res.status(400).json({ error: 'Logo must be PNG, JPEG, WebP, or GIF' });
         }
+        const dir = ensureBrandingUploadDir();
+        clearStoredLogoFiles();
+        const ext = LOGO_EXT[sniffed] || '.png';
+        const dest = path.join(dir, `logo${ext}`);
+        fs.writeFileSync(dest, req.file.buffer);
         const logoUrl = '/api/branding/logo';
         const current = await loadDbBranding();
         const next = { ...current, logoUrl };

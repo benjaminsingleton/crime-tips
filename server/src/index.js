@@ -12,7 +12,9 @@ import {
   configureTrustProxy,
   globalApiLimiter,
 } from './middleware/rateLimit.js';
+import { csrfOriginCheck } from './middleware/csrf.js';
 import { logEmailConfig } from './services/email.js';
+import { isProductionEnv } from './security/secrets.js';
 import authRoutes from './routes/auth.js';
 import tipRoutes from './routes/tips.js';
 import userRoutes from './routes/users.js';
@@ -75,6 +77,8 @@ app.use(
 app.use(cookieParser());
 app.use(express.json({ limit: '2mb' }));
 app.use('/api', globalApiLimiter);
+// Cookie-auth CSRF: Origin/Referer allowlist (required when COOKIE_SAMESITE=none).
+app.use('/api', csrfOriginCheck);
 
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true });
@@ -94,6 +98,18 @@ if (fs.existsSync(clientDist)) {
     return res.sendFile(path.join(clientDist, 'index.html'));
   });
 }
+
+/** Centralized errors — generic JSON in production (M10). */
+// eslint-disable-next-line no-unused-vars
+app.use((err, _req, res, _next) => {
+  console.error(err);
+  if (res.headersSent) return undefined;
+  const status = Number(err.status || err.statusCode) || 500;
+  const expose = status < 500 && err.message;
+  return res.status(status).json({
+    error: expose || (isProductionEnv() ? 'Internal server error' : err.message || 'Internal server error'),
+  });
+});
 
 async function start() {
   for (let attempt = 1; attempt <= 30; attempt += 1) {
