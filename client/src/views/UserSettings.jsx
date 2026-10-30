@@ -85,22 +85,18 @@ export default class UserSettings extends Component {
       });
       return;
     }
+    // Server always requires TOTP/backup when MFA is enrolled (password alone is not enough).
+    if (userDetails.mfaEnabled && !passwordMfaCode) {
+      this.setState({
+        passwordMsgStatus: 'error',
+        passwordMsg: 'Enter an authenticator code to confirm.',
+      });
+      return;
+    }
     if (!currentPasswordForPassword && !userDetails.oidcLinked) {
       this.setState({
         passwordMsgStatus: 'error',
         passwordMsg: 'Enter your current password to confirm.',
-      });
-      return;
-    }
-    if (
-      userDetails.oidcLinked &&
-      !currentPasswordForPassword &&
-      userDetails.mfaEnabled &&
-      !passwordMfaCode
-    ) {
-      this.setState({
-        passwordMsgStatus: 'error',
-        passwordMsg: 'Enter an authenticator code (or your current password) to confirm.',
       });
       return;
     }
@@ -153,22 +149,18 @@ export default class UserSettings extends Component {
       });
       return;
     }
+    // Server always requires TOTP/backup when MFA is enrolled (password alone is not enough).
+    if (userDetails.mfaEnabled && !emailMfaCode) {
+      this.setState({
+        emailMsgStatus: 'error',
+        emailMsg: 'Enter an authenticator code to confirm.',
+      });
+      return;
+    }
     if (!currentPasswordForEmail && !userDetails.oidcLinked) {
       this.setState({
         emailMsgStatus: 'error',
         emailMsg: 'Enter your current password to confirm.',
-      });
-      return;
-    }
-    if (
-      userDetails.oidcLinked &&
-      !currentPasswordForEmail &&
-      userDetails.mfaEnabled &&
-      !emailMfaCode
-    ) {
-      this.setState({
-        emailMsgStatus: 'error',
-        emailMsg: 'Enter an authenticator code (or your current password) to confirm.',
       });
       return;
     }

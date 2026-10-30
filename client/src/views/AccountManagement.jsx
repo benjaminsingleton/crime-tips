@@ -205,19 +205,19 @@ class EditUser extends Component {
       return;
     }
     const self = this.isEditingSelf();
+    if (self && this.props.user.mfaEnabled && !this.state.mfaCode) {
+      this.setState({
+        error: true,
+        header: 'Error!',
+        message: 'Enter an authenticator code to confirm resetting your own password.',
+      });
+      return;
+    }
     if (self && !this.state.currentPassword && !this.props.viewer?.oidcLinked) {
       this.setState({
         error: true,
         header: 'Error!',
         message: 'Enter your current password to reset your own account.',
-      });
-      return;
-    }
-    if (self && this.props.viewer?.oidcLinked && this.props.user.mfaEnabled && !this.state.mfaCode) {
-      this.setState({
-        error: true,
-        header: 'Error!',
-        message: 'Enter an authenticator code to confirm resetting your own password.',
       });
       return;
     }
@@ -341,9 +341,11 @@ class EditUser extends Component {
                 <>
                   <TextInput
                     label={
-                      this.props.viewer?.oidcLinked
-                        ? 'Current password (optional if SSO / MFA confirms)'
-                        : 'Current password (required for your own account)'
+                      this.props.user.mfaEnabled
+                        ? 'Current password (authenticator code also required)'
+                        : this.props.viewer?.oidcLinked
+                          ? 'Current password (optional with a fresh SSO sign-in)'
+                          : 'Current password (required for your own account)'
                     }
                     name="currentPassword"
                     type="password"
