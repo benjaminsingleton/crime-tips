@@ -59,7 +59,7 @@ Production boots **refuse** weak JWT / DB / admin example secrets when `CRIME_TI
 
 ## Ops
 
-- [ ] `CRIME_TIPS_IMAGE` pinned to a release tag (prod Compose default is `:1.1.1`; preflight **fails** on `:latest`); checkout matches features ([install.md](./install.md#version-alignment))
+- [ ] `CRIME_TIPS_IMAGE` pinned to a release tag (prod Compose default is `:1.1.2`; preflight **fails** on `:latest`); checkout matches features ([install.md](./install.md#version-alignment))
 - [ ] Anonymous `docker pull` of the pinned tag succeeded before go-live ([ghcr.md](./ghcr.md))
 - [ ] Update runbook followed: backup → `./scripts/update.sh vX.Y.Z` ([update.md](./update.md))
 - [ ] Backup script scheduled (example cron in [backup-restore.md](./backup-restore.md)); encrypt + off-box copy verified
