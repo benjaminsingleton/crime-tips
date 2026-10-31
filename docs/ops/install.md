@@ -86,13 +86,16 @@ Treat `.env` as sensitive: mode `600`, exclude from unencrypted off-box backup s
 ```bash
 chmod 600 .env
 ./scripts/preflight.sh prod
-# Load image pin from .env, then pull (literal $CRIME_TIPS_IMAGE is empty if you skip this)
-set -a && source .env && set +a
+# Read only the image pin for `docker pull`. Do **not** `source .env` — that
+# exports secrets into your shell and can truncate values containing $ ! or backticks;
+# exported vars would also override Compose's .env file.
+CRIME_TIPS_IMAGE="$(grep -E '^CRIME_TIPS_IMAGE=' .env | head -n1 | cut -d= -f2-)"
 # Acceptance: anonymous pull must succeed (or use docker login per policy)
-docker pull "$CRIME_TIPS_IMAGE"
-# Always use BOTH compose files in production — never bare `docker compose up`
-docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+docker pull "${CRIME_TIPS_IMAGE:-ghcr.io/benjaminsingleton/crime-tips:1.1.2}"
+# Always use BOTH compose files in production — never bare `docker compose up`.
+# Compose loads `.env` itself (`--env-file` makes that explicit); no shell export needed.
+docker compose --env-file .env -f docker-compose.yml -f docker-compose.prod.yml pull
+docker compose --env-file .env -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
 
 Production pulls the published app image from GHCR (no Node build on the PD host). For air-gap or audit builds, see [update.md](./update.md) (`docker-compose.build.yml`).

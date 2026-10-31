@@ -41,10 +41,11 @@ cp .env.example .env
 # leave CRIME_TIPS_ENV unset; CRIME_TIPS_IMAGE is already pinned in .env.example
 chmod 600 .env
 ./scripts/preflight.sh prod
-set -a && source .env && set +a
+# Do not `source .env` (exports secrets; can mangle $ ! `). Read the pin only:
+CRIME_TIPS_IMAGE="$(grep -E '^CRIME_TIPS_IMAGE=' .env | head -n1 | cut -d= -f2-)"
 docker pull "${CRIME_TIPS_IMAGE:-ghcr.io/benjaminsingleton/crime-tips:1.1.2}"   # verify pull
-docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+docker compose --env-file .env -f docker-compose.yml -f docker-compose.prod.yml pull
+docker compose --env-file .env -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
 
 Full runbook (decision checklist, smoke test, admin password cleanup): [docs/ops/install.md](docs/ops/install.md).
