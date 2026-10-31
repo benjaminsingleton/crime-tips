@@ -6,10 +6,12 @@ Default production path terminates TLS in **Caddy** (`docker-compose.prod.yml` +
 
 1. Point DNS A/AAAA at the VM
 2. Set `DOMAIN=tips.example.gov` and `PUBLIC_ORIGIN=https://tips.example.gov` in `.env`
-3. Open host ports 80 and 443
+3. Open host ports 80 and 443 **only after** DNS for `DOMAIN` is correct (premature ACME failures pollute Caddy logs and delay go-live)
 4. `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d`
 
 Caddy obtains and renews certificates automatically.
+
+**Lab / no public DNS:** use `DOMAIN=localhost` (Caddy internal cert) or Mode 2/3 below. Do not expect Let’s Encrypt to succeed on a private hostname.
 
 ## Mode 2 — Internal CA / uploaded certificates
 

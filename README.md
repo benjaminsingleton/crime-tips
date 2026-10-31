@@ -38,10 +38,10 @@ Police-department path: TLS via Caddy, Postgres not published, strong secrets re
 cp .env.example .env
 ./scripts/gen-secrets.sh
 # set DOMAIN=tips.example.gov and PUBLIC_ORIGIN=https://tips.example.gov
-# pin an image that matches the features you need (see Version & features)
-# e.g. CRIME_TIPS_IMAGE=ghcr.io/benjaminsingleton/crime-tips:1.1.2
+# leave CRIME_TIPS_ENV unset; CRIME_TIPS_IMAGE is already pinned in .env.example
 chmod 600 .env
 ./scripts/preflight.sh prod
+set -a && source .env && set +a
 docker pull "${CRIME_TIPS_IMAGE:-ghcr.io/benjaminsingleton/crime-tips:1.1.2}"   # verify pull
 docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
@@ -104,7 +104,7 @@ See `.env.example`. Important variables:
 
 | Variable | Purpose |
 |----------|---------|
-| `CRIME_TIPS_ENV` | `development` (local) or `production` (secret refusal + prod CORS) |
+| `CRIME_TIPS_ENV` | Leave **unset** for prod (overlay forces `production`). Local Compose defaults to `development` when unset. Do not copy `development` into a prod `.env` |
 | `JWT_SECRET` | Signs officer session cookies (≥32 chars in prod) |
 | `COOKIE_SECURE` / `COOKIE_SAMESITE` | Session cookie flags (prefer `lax`; avoid `none` — see hardening) |
 | `ADMIN_*` | Seeded on first boot when `users` is empty |
@@ -136,10 +136,11 @@ Repo map:
 
 ## Quick start (local / developer)
 
-**Not for production.** Example secrets and published Postgres are allowed only when `CRIME_TIPS_ENV=development`.
+**Not for production.** Example secrets and published Postgres are allowed only when `CRIME_TIPS_ENV=development` (base Compose default when unset).
 
 ```bash
 cp .env.example .env
+# optional: comment out CRIME_TIPS_IMAGE to keep the local crime-tips:local tag
 docker compose up --build
 ```
 

@@ -45,8 +45,20 @@ dbpass="$(get_val POSTGRES_PASSWORD)"
 admin="$(get_val ADMIN_PASSWORD)"
 domain="$(get_val DOMAIN)"
 origin="$(get_val PUBLIC_ORIGIN)"
+crime_env="$(get_val CRIME_TIPS_ENV)"
+crime_env_l="$(echo "$crime_env" | tr '[:upper:]' '[:lower:]')"
 
 if [[ "$MODE" == "prod" ]]; then
+  if [[ "$crime_env_l" == "development" ]]; then
+    warn "CRIME_TIPS_ENV=development is set in .env — remove or leave unset for production (prod overlay forces production, but base Compose alone would publish APP_PORT/POSTGRES_PORT)"
+  elif [[ -z "$crime_env" ]]; then
+    ok "CRIME_TIPS_ENV unset (prod overlay will force production)"
+  elif [[ "$crime_env_l" == "production" ]]; then
+    ok "CRIME_TIPS_ENV=production"
+  else
+    warn "CRIME_TIPS_ENV=$crime_env (unexpected; prefer unset or production)"
+  fi
+
   if [[ -z "$jwt" || ${#jwt} -lt 32 || "$jwt" == "change-me-in-production" || "$jwt" == "replace-with-a-long-random-string" ]]; then
     fail "JWT_SECRET weak or missing (run ./scripts/gen-secrets.sh)"
   else
@@ -57,13 +69,16 @@ if [[ "$MODE" == "prod" ]]; then
   else
     ok "POSTGRES_PASSWORD not an example default"
   fi
-  if [[ "$admin" == "changeme" || "$admin" == "change-me" ]]; then
+  if [[ -z "$admin" ]]; then
+    ok "ADMIN_PASSWORD absent from .env (expected after first seed)"
+  elif [[ "$admin" == "changeme" || "$admin" == "change-me" ]]; then
     fail "ADMIN_PASSWORD still an example default"
   else
-    ok "ADMIN_PASSWORD not an example default (remove from .env after first seed)"
+    warn "ADMIN_PASSWORD still present — remove from .env after first UI login (sed -i '/^ADMIN_PASSWORD=/d' .env)"
+    ok "ADMIN_PASSWORD not an example default"
   fi
   if [[ -z "$domain" ]]; then
-    warn "DOMAIN unset — Caddy will default to localhost"
+    warn "DOMAIN unset — Caddy will default to localhost (lab only; not for public tipsters)"
   else
     ok "DOMAIN=$domain"
   fi
@@ -87,19 +102,45 @@ if [[ "$MODE" == "prod" ]]; then
     warn "COOKIE_SAMESITE=none — Origin CSRF checks are strict; prefer same-origin Caddy + lax (see docs/ops/hardening.md)"
   fi
 
-  image="${CRIME_TIPS_IMAGE:-$(get_val CRIME_TIPS_IMAGE)}"
+  image_from_env="$(get_val CRIME_TIPS_IMAGE)"
+  image="${CRIME_TIPS_IMAGE:-$image_from_env}"
+  default_image="ghcr.io/benjaminsingleton/crime-tips:1.1.2"
   if [[ -z "$image" ]]; then
-    # Compose prod default when unset
-    image="ghcr.io/benjaminsingleton/crime-tips:1.1.2"
+    warn "CRIME_TIPS_IMAGE unset in .env — Compose prod default is $default_image; set an explicit pin in .env"
+    image="$default_image"
   fi
-  if [[ "$image" == *:latest || "$image" == *:latest@* ]]; then
-    fail "CRIME_TIPS_IMAGE must not use floating :latest in production (pin a release tag, e.g. :1.1.2)"
+  if [[ "$image" == *:latest || "$image" == *:latest@* || "$image" == *:master || "$image" == *:master@* ]]; then
+    fail "CRIME_TIPS_IMAGE must not use floating :latest or :master in production (pin a release tag, e.g. :1.1.2)"
+  elif [[ "$image" != *:* || "$image" == *: ]]; then
+    warn "CRIME_TIPS_IMAGE looks weakly pinned ($image) — prefer an explicit semver tag"
   else
     ok "CRIME_TIPS_IMAGE is pinned ($image)"
   fi
 
+  # Optional GHCR reachability via manifest inspect (no full image pull).
+  if command -v docker >/dev/null 2>&1; then
+    DOCKER=(docker)
+    if ! docker info >/dev/null 2>&1; then
+      if sudo docker info >/dev/null 2>&1; then
+        DOCKER=(sudo docker)
+      else
+        DOCKER=()
+      fi
+    fi
+    if [[ ${#DOCKER[@]} -gt 0 ]]; then
+      if "${DOCKER[@]}" manifest inspect "$image" >/dev/null 2>&1 \
+        || "${DOCKER[@]}" buildx imagetools inspect "$image" >/dev/null 2>&1; then
+        ok "GHCR image reachable ($image)"
+      else
+        warn "Could not reach $image (unauthorized/denied/network). Confirm package is public or docker login — see docs/ops/ghcr.md"
+      fi
+    fi
+  fi
+
+  port_checked=0
   for port in "${HTTP_PORT:-80}" "${HTTPS_PORT:-443}"; do
     if command -v ss >/dev/null 2>&1; then
+      port_checked=1
       if ss -ltn "( sport = :$port )" 2>/dev/null | grep -q ":$port"; then
         warn "Port $port appears in use on this host"
       else
@@ -107,6 +148,9 @@ if [[ "$MODE" == "prod" ]]; then
       fi
     fi
   done
+  if [[ "$port_checked" -eq 0 ]]; then
+    warn "ss not found — install iproute2 to check whether ports 80/443 are free"
+  fi
 else
   ok "Dev mode — skipping strict secret checks"
 fi

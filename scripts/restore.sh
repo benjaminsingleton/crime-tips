@@ -17,8 +17,16 @@ if [[ ! -f "$SRC/postgres.dump" ]]; then
   echo "Missing $SRC/postgres.dump" >&2
   exit 1
 fi
+if [[ ! -s "$SRC/postgres.dump" ]]; then
+  echo "Refusing restore: $SRC/postgres.dump is 0 bytes (incomplete backup)." >&2
+  exit 1
+fi
 if [[ ! -f "$SRC/uploads.tar.gz" ]]; then
   echo "Missing $SRC/uploads.tar.gz" >&2
+  exit 1
+fi
+if [[ ! -s "$SRC/uploads.tar.gz" ]]; then
+  echo "Refusing restore: $SRC/uploads.tar.gz is 0 bytes (incomplete backup)." >&2
   exit 1
 fi
 
