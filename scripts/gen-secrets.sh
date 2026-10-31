@@ -93,4 +93,7 @@ if [[ "${GEN_ADMIN_PASSWORD:-1}" == "1" ]]; then
 fi
 
 chmod 600 "$ENV_FILE" 2>/dev/null || true
-echo "Done. Review $ENV_FILE and set DOMAIN / PUBLIC_ORIGIN for production."
+echo "Done. Review $ENV_FILE and set DOMAIN / PUBLIC_ORIGIN / CRIME_TIPS_IMAGE for production."
+echo "Copy ADMIN_EMAIL and ADMIN_PASSWORD into the agency password manager now."
+echo "After first UI login and password change, remove ADMIN_PASSWORD from .env."
+echo "Leave CRIME_TIPS_ENV unset (or production) — do not keep development for prod."
