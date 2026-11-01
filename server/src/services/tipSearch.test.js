@@ -27,7 +27,9 @@ assert.match(text, /555-0100/);
 assert.match(text, /scene\.jpg/);
 assert.match(text, /11111111-1111-4111-8111-111111111111/);
 
-assert.equal(normalizeSearchQuery('  foo%bar_baz  '), 'foo bar baz');
+assert.equal(normalizeSearchQuery('  foo%bar_baz  '), 'foo\\%bar\\_baz');
+assert.equal(normalizeSearchQuery('river_photo.jpg'), 'river\\_photo.jpg');
+assert.equal(normalizeSearchQuery('a\\b%c'), 'a\\\\b\\%c');
 assert.equal(normalizeSearchQuery(''), '');
 
 assert.deepEqual(parseListPagination({}), { limit: 50, offset: 0 });

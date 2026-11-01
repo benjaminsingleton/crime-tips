@@ -305,7 +305,7 @@ router.post(
       );
 
       const row = inserted.rows[0];
-      await refreshTipSearchText(tipId);
+      await refreshTipSearchText(tipId, { touchUpdatedAt: true });
       return res.status(201).json({
         attachment: {
           id: row.id,
@@ -367,7 +367,7 @@ router.delete('/:id/attachments/:attachmentId', async (req, res) => {
     /* ignore missing file */
   }
   await query(`DELETE FROM tip_attachments WHERE id = $1`, [req.params.attachmentId]);
-  await refreshTipSearchText(req.params.id);
+  await refreshTipSearchText(req.params.id, { touchUpdatedAt: true });
   return res.json({ ok: true });
 });
 
@@ -405,11 +405,11 @@ router.get('/', ...officerAuth, async (req, res) => {
     params.push(`%${q}%`);
     const p = params.length;
     where += ` AND (
-      search_text ILIKE $${p}
-      OR id::text ILIKE $${p}
+      search_text ILIKE $${p} ESCAPE '\\'
+      OR id::text ILIKE $${p} ESCAPE '\\'
       OR EXISTS (
         SELECT 1 FROM tip_attachments att
-        WHERE att.tip_id = tips.id AND att.filename ILIKE $${p}
+        WHERE att.tip_id = tips.id AND att.filename ILIKE $${p} ESCAPE '\\'
       )
     )`;
   }

@@ -31,7 +31,12 @@ export function buildSearchText({ id, payload, filenames = [] }) {
   return parts.join(' ').replace(/\s+/g, ' ').trim().slice(0, MAX_SEARCH_TEXT);
 }
 
-export async function refreshTipSearchText(tipId) {
+/**
+ * Rebuild tips.search_text from payload + attachment filenames.
+ * Pass touchUpdatedAt on attachment upload/delete so draft retention ages from
+ * last file activity (do not use during boot backfill).
+ */
+export async function refreshTipSearchText(tipId, { touchUpdatedAt = false } = {}) {
   const tipRes = await query(`SELECT id, payload FROM tips WHERE id = $1`, [tipId]);
   if (!tipRes.rows[0]) return null;
   const att = await query(`SELECT filename FROM tip_attachments WHERE tip_id = $1`, [tipId]);
@@ -40,7 +45,14 @@ export async function refreshTipSearchText(tipId) {
     payload: tipRes.rows[0].payload,
     filenames: att.rows.map((r) => r.filename),
   });
-  await query(`UPDATE tips SET search_text = $1 WHERE id = $2`, [searchText, tipId]);
+  if (touchUpdatedAt) {
+    await query(`UPDATE tips SET search_text = $1, updated_at = NOW() WHERE id = $2`, [
+      searchText,
+      tipId,
+    ]);
+  } else {
+    await query(`UPDATE tips SET search_text = $1 WHERE id = $2`, [searchText, tipId]);
+  }
   return searchText;
 }
 
@@ -75,10 +87,16 @@ export function parseListPagination(queryParams = {}) {
   return { limit, offset };
 }
 
+/**
+ * Normalize officer mailbox `q` for ILIKE with ESCAPE '\'.
+ * Keeps underscores (filename matches); escapes \, %, _ as literals.
+ */
 export function normalizeSearchQuery(q) {
   if (q == null) return '';
-  const s = String(q).trim();
+  const s = String(q).trim().slice(0, 200);
   if (!s) return '';
-  // Cap length to keep plans cheap; strip wildcards used for LIKE injection noise.
-  return s.slice(0, 200).replace(/[%_]/g, ' ').replace(/\s+/g, ' ').trim();
+  return s
+    .replace(/\\/g, '\\\\')
+    .replace(/%/g, '\\%')
+    .replace(/_/g, '\\_');
 }
