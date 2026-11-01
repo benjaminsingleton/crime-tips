@@ -7,7 +7,7 @@ Common go-live and ops failures. Prefer `docker compose -f docker-compose.yml -f
 | Symptom | Check |
 |---------|--------|
 | App exits immediately | Weak secrets in production — run `./scripts/gen-secrets.sh`, set strong `JWT_SECRET` / DB / admin passwords, remove `ADMIN_PASSWORD` after seed, and ensure `OIDC_ALLOW_INSECURE` is not set. See [hardening.md](./hardening.md). |
-| Preflight fails on image tag | Pin `CRIME_TIPS_IMAGE` to a release (e.g. `:1.1.2`); `:latest` / `:master` are refused in prod mode. |
+| Preflight fails on image tag | Pin `CRIME_TIPS_IMAGE` to a release (e.g. `:1.1.3`); `:latest` / `:master` are refused in prod mode. |
 | Preflight warns on `CRIME_TIPS_ENV=development` | Remove or leave unset for prod; prod overlay forces `production`, but bare Compose publishes DB/app ports. |
 | Preflight warns GHCR unreachable | Package private or network block — [ghcr.md](./ghcr.md). Install `iproute2` if port checks are skipped (`ss` missing). |
 | `403 Origin not allowed` on API writes | Same-origin via Caddy is preferred. If cross-origin, set `PUBLIC_ORIGIN` to the browser origin. Avoid `COOKIE_SAMESITE=none` unless required. |

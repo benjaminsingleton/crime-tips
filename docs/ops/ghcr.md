@@ -14,14 +14,14 @@ CI workflow: [`.github/workflows/publish-image.yml`](../../.github/workflows/pub
 | Push to `master` | `:master`, `:sha-<short>` |
 | Manual `workflow_dispatch` | Same as the ref that ran |
 
-Police departments should pin a **release** tag for long-term production (e.g. `:1.1.2`). Use `:master` only when intentionally piloting unreleased tip-of-tree — see [install.md § Version alignment](./install.md#version-alignment).
+Police departments should pin a **release** tag for long-term production (e.g. `:1.1.3`). Use `:master` only when intentionally piloting unreleased tip-of-tree — see [install.md § Version alignment](./install.md#version-alignment).
 
 ## PD acceptance test (before go-live)
 
 From a machine **without** `docker login ghcr.io` (or after `docker logout ghcr.io`):
 
 ```bash
-docker pull ghcr.io/benjaminsingleton/crime-tips:1.1.2
+docker pull ghcr.io/benjaminsingleton/crime-tips:1.1.3
 # or your chosen pin, e.g. :1.0.0 / :master / :X.Y.Z
 ```
 
@@ -47,7 +47,7 @@ After tagging a release (or any image push that creates/updates the package):
 4. Verify without login:
 
    ```bash
-   docker pull ghcr.io/benjaminsingleton/crime-tips:1.1.2
+   docker pull ghcr.io/benjaminsingleton/crime-tips:1.1.3
    ```
 
 Org/user package policies can restrict who may change visibility; an org owner may need to allow public packages first.
@@ -59,10 +59,10 @@ From an up-to-date `master` (annotated tag preferred):
 ```bash
 git checkout master
 git pull origin master
-git tag -a v1.1.2 -m "v1.1.2"
-git push origin v1.1.2
-gh release create v1.1.2 --title "v1.1.2" --notes-file RELEASE_NOTES.md
-# or: gh release create v1.1.2 --generate-notes
+git tag -a v1.1.3 -m "v1.1.3"
+git push origin v1.1.3
+gh release create v1.1.3 --title "v1.1.3" --notes-file RELEASE_NOTES.md
+# or: gh release create v1.1.3 --generate-notes
 ```
 
 Pushing the `v*` tag starts the publish workflow. Creating the GitHub Release is the public changelog surface for PD IT; keep [CHANGELOG.md](../../CHANGELOG.md) in sync on `master`.

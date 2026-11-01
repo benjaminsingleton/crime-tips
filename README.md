@@ -4,7 +4,7 @@
 
 Public tip form for your community; mailbox and case notes for sworn or civilian officers. You run it on your own VM with Docker — tip data stays in your Postgres and upload volumes.
 
-**Status:** `v1.x` self-host package. Current release: **`v1.1.2`** (Medium security patch on SMTP/branding/OIDC package). See [Version & features](#version--features).
+**Status:** `v1.x` self-host package. Current release: **`v1.1.3`** (install/ops patch on Medium-hardened SMTP/branding/OIDC package). See [Version & features](#version--features).
 
 ## Is this for us?
 
@@ -43,7 +43,7 @@ chmod 600 .env
 ./scripts/preflight.sh prod
 # Do not `source .env` (exports secrets; can mangle $ ! `). Read the pin only:
 CRIME_TIPS_IMAGE="$(grep -E '^CRIME_TIPS_IMAGE=' .env | head -n1 | cut -d= -f2-)"
-docker pull "${CRIME_TIPS_IMAGE:-ghcr.io/benjaminsingleton/crime-tips:1.1.2}"   # verify pull
+docker pull "${CRIME_TIPS_IMAGE:-ghcr.io/benjaminsingleton/crime-tips:1.1.3}"   # verify pull
 docker compose --env-file .env -f docker-compose.yml -f docker-compose.prod.yml pull
 docker compose --env-file .env -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
@@ -62,7 +62,7 @@ Update: `./scripts/backup.sh && ./scripts/update.sh <tag>` — [docs/ops/update.
 
 ## Version & features
 
-Do **not** mix checkout and image tags (e.g. `v1.1.2` docs with `:1.0.0`) and expect parity.
+Do **not** mix checkout and image tags (e.g. `v1.1.3` docs with `:1.0.0`) and expect parity.
 
 | Capability | Min image / checkout | Notes |
 |------------|----------------------|--------|
@@ -74,8 +74,9 @@ Do **not** mix checkout and image tags (e.g. `v1.1.2` docs with `:1.0.0`) and ex
 | PD-facing docs rewrite (privacy, SECURITY, MIT, eval) | **`v1.1.0` / `:1.1.0`** | Docs/tag package |
 | Upload / branding / OIDC / draft mailbox hardening | **`v1.1.1` / `:1.1.1`** | [CHANGELOG](CHANGELOG.md) / [#16](https://github.com/benjaminsingleton/crime-tips/pull/16) |
 | Medium authZ / CSRF / upload / prod gates | **`v1.1.2` / `:1.1.2`** | [CHANGELOG](CHANGELOG.md) / [#18](https://github.com/benjaminsingleton/crime-tips/pull/18) |
+| PD install dry-run friction (docs, preflight, backup) | **`v1.1.3` / `:1.1.3`** | [CHANGELOG](CHANGELOG.md) / [#20](https://github.com/benjaminsingleton/crime-tips/pull/20) |
 
-**Recommended production pin:** `v1.1.2` / `:1.1.2`. Details: [install.md § Version alignment](docs/ops/install.md#version-alignment).
+**Recommended production pin:** `v1.1.3` / `:1.1.3`. Details: [install.md § Version alignment](docs/ops/install.md#version-alignment).
 
 ## Ops index
 
