@@ -152,7 +152,7 @@ router.delete(
   loadUser,
   requireMfaIfEnforced,
   requireAdmin,
-  async (_req, res) => {
+  async (req, res) => {
     try {
       await query(`DELETE FROM app_settings WHERE key = $1`, [BRANDING_KEY]);
       clearStoredLogoFiles();
@@ -216,7 +216,7 @@ router.delete(
   loadUser,
   requireMfaIfEnforced,
   requireAdmin,
-  async (_req, res) => {
+  async (req, res) => {
     try {
       clearStoredLogoFiles();
       const current = await loadDbBranding();

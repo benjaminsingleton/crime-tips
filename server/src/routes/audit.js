@@ -21,6 +21,19 @@ function parsePaging(req) {
   return { limit, offset };
 }
 
+/** Date-only `YYYY-MM-DD` → start/end of that UTC day; otherwise Date.parse. */
+function parseAuditBound(raw, edge) {
+  const s = String(raw || '').trim();
+  if (!s) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    const iso = edge === 'end' ? `${s}T23:59:59.999Z` : `${s}T00:00:00.000Z`;
+    const d = new Date(iso);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+  const d = new Date(s);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
 function buildAuditWhere(req) {
   const clauses = [];
   const params = [];
@@ -38,15 +51,15 @@ function buildAuditWhere(req) {
     clauses.push(`a.action = $${params.length}`);
   }
   if (req.query.from) {
-    const from = new Date(req.query.from);
-    if (!Number.isNaN(from.getTime())) {
+    const from = parseAuditBound(req.query.from, 'start');
+    if (from) {
       params.push(from.toISOString());
       clauses.push(`a.created_at >= $${params.length}`);
     }
   }
   if (req.query.to) {
-    const to = new Date(req.query.to);
-    if (!Number.isNaN(to.getTime())) {
+    const to = parseAuditBound(req.query.to, 'end');
+    if (to) {
       params.push(to.toISOString());
       clauses.push(`a.created_at <= $${params.length}`);
     }

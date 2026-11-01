@@ -20,6 +20,8 @@ export default class Mailbox extends Component {
   };
 
   searchTimer = null;
+  crimeTypeTimer = null;
+  loadGeneration = 0;
 
   componentDidMount() {
     this.loadTips();
@@ -33,9 +35,12 @@ export default class Mailbox extends Component {
 
   componentWillUnmount() {
     if (this.searchTimer) clearTimeout(this.searchTimer);
+    if (this.crimeTypeTimer) clearTimeout(this.crimeTypeTimer);
+    this.loadGeneration += 1;
   }
 
   loadTips = async () => {
+    const generation = ++this.loadGeneration;
     const { tipFilter } = this.props;
     const { currentPage, tipsPerPage, searchTerm, crimeType } = this.state;
     const offset = currentPage * tipsPerPage;
@@ -47,6 +52,7 @@ export default class Mailbox extends Component {
         limit: tipsPerPage,
         offset,
       });
+      if (generation !== this.loadGeneration) return;
       const tips = data.tips || {};
       const tipKeysToDisplay = Object.keys(tips);
       const total = Number(data.total || tipKeysToDisplay.length);
@@ -60,6 +66,7 @@ export default class Mailbox extends Component {
         showNextButton: offset + tipKeysToDisplay.length < total,
       });
     } catch (err) {
+      if (generation !== this.loadGeneration) return;
       console.error(err);
       this.setState({ loading: false });
     }
@@ -125,7 +132,9 @@ export default class Mailbox extends Component {
   };
 
   filterCrimeType = (crimeType) => {
-    this.setState({ crimeType, currentPage: 0 }, () => this.loadTips());
+    this.setState({ crimeType, currentPage: 0 });
+    if (this.crimeTypeTimer) clearTimeout(this.crimeTypeTimer);
+    this.crimeTypeTimer = setTimeout(() => this.loadTips(), 300);
   };
 
   renderMailboxRows = (tipKeysToDisplay) => {

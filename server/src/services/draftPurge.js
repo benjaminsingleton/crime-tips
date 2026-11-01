@@ -96,23 +96,33 @@ export async function runDraftPurge({ dryRun = false, userId = null } = {}) {
 
   const ids = candidates.rows.map((r) => r.id);
   let deletedCount = 0;
+  let deletedIds = [];
   let error = null;
 
   if (!dryRun && ids.length > 0) {
     try {
-      for (const id of ids) {
+      // Delete only rows that are still unsubmitted and still past cutoff, then
+      // remove upload dirs for RETURNING ids — avoids racing a tipster submit/update.
+      const del = await query(
+        `DELETE FROM tips
+         WHERE id = ANY($1::uuid[])
+           AND submitted = FALSE
+           AND COALESCE(updated_at, created_at) < $2
+         RETURNING id`,
+        [ids, cutoff.toISOString()],
+      );
+      deletedIds = del.rows.map((r) => r.id);
+      deletedCount = deletedIds.length;
+      for (const id of deletedIds) {
         rmTipUploadDir(id);
       }
-      const del = await query(
-        `DELETE FROM tips WHERE id = ANY($1::uuid[]) AND submitted = FALSE RETURNING id`,
-        [ids],
-      );
-      deletedCount = del.rows.length;
-      await logActivity({
-        userId,
-        action: 'draftPurge',
-        status: true,
-      });
+      if (deletedCount > 0) {
+        await logActivity({
+          userId,
+          action: 'draftPurge',
+          status: true,
+        });
+      }
     } catch (err) {
       console.error('draft purge failed', err);
       error = err.message || 'purge failed';
