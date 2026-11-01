@@ -104,13 +104,13 @@ if [[ "$MODE" == "prod" ]]; then
 
   image_from_env="$(get_val CRIME_TIPS_IMAGE)"
   image="${CRIME_TIPS_IMAGE:-$image_from_env}"
-  default_image="ghcr.io/benjaminsingleton/crime-tips:1.1.2"
+  default_image="ghcr.io/benjaminsingleton/crime-tips:1.1.3"
   if [[ -z "$image" ]]; then
     warn "CRIME_TIPS_IMAGE unset in .env — Compose prod default is $default_image; set an explicit pin in .env"
     image="$default_image"
   fi
   if [[ "$image" == *:latest || "$image" == *:latest@* || "$image" == *:master || "$image" == *:master@* ]]; then
-    fail "CRIME_TIPS_IMAGE must not use floating :latest or :master in production (pin a release tag, e.g. :1.1.2)"
+    fail "CRIME_TIPS_IMAGE must not use floating :latest or :master in production (pin a release tag, e.g. :1.1.3)"
   elif [[ "$image" != *:* || "$image" == *: ]]; then
     warn "CRIME_TIPS_IMAGE looks weakly pinned ($image) — prefer an explicit semver tag"
   else

@@ -13,6 +13,23 @@ Versioning follows [SemVer](https://semver.org/).
 - Abandoned-draft retention job (`DRAFT_RETENTION_DAYS`, default 30) with admin dry-run / purge (`/api/admin/draft-purge`) and [docs/ops/retention.md](docs/ops/retention.md)
 - Admin audit log browser + export (`/api/audit`, `/audit` UI) and per-tip activity timeline; expanded activity instrumentation (tip open, downloads, notes, branding, user create/disable, OIDC link)
 
+## [1.1.3] - 2026-11-01
+
+Ops / install patch on the `v1.1.2` PD package. Includes [#20](https://github.com/benjaminsingleton/crime-tips/pull/20) (PD install dry-run friction).
+
+### Fixed
+
+- Install runbook: Ubuntu Docker Engine + Compose apt path, `usermod`/re-login, lab vs public-DNS TLS branch, always-both-compose-files, password-manager cue, no `source .env` for image pin
+- `.env.example`: drop default `CRIME_TIPS_ENV=development`; production-safe pin comments
+- Preflight prod: warn on `CRIME_TIPS_ENV=development`, lingering `ADMIN_PASSWORD`, missing `ss`/`iproute2`; GHCR reachability via manifest inspect; refuse `:latest` / `:master`
+- Backup/restore: atomic stamp dirs (no leftover 0-byte dumps); restore refuses empty dumps; verify notes
+
+### Ops notes
+
+- Pin production: `CRIME_TIPS_IMAGE=ghcr.io/benjaminsingleton/crime-tips:1.1.3`
+- Install / update: [docs/ops/install.md](docs/ops/install.md), [docs/ops/update.md](docs/ops/update.md)
+- **GHCR package visibility:** packages often default to private. After this release publishes, a repo admin must keep (or set) the `crime-tips` package **Public** so departments can `docker pull` without a GitHub token. Steps: [docs/ops/ghcr.md](docs/ops/ghcr.md)
+
 ## [1.1.2] - 2026-10-30
 
 Security patch on the `v1.1.1` PD package. Includes [#18](https://github.com/benjaminsingleton/crime-tips/pull/18) (Medium findings + Bugbot follow-ups).
@@ -83,7 +100,8 @@ First tagged release for police-department self-hosting. Production pulls a vers
 - **GHCR package visibility:** new packages default to private. After this release publishes, a repo admin must set the `crime-tips` package to **Public** so departments can `docker pull` without a GitHub token. Steps: [docs/ops/ghcr.md](docs/ops/ghcr.md)
 - SMTP, branding, and OIDC are **not** in this tag — use **`v1.1.0` / `:1.1.0`** (or later)
 
-[Unreleased]: https://github.com/benjaminsingleton/crime-tips/compare/v1.1.2...HEAD
+[Unreleased]: https://github.com/benjaminsingleton/crime-tips/compare/v1.1.3...HEAD
+[1.1.3]: https://github.com/benjaminsingleton/crime-tips/releases/tag/v1.1.3
 [1.1.2]: https://github.com/benjaminsingleton/crime-tips/releases/tag/v1.1.2
 [1.1.1]: https://github.com/benjaminsingleton/crime-tips/releases/tag/v1.1.1
 [1.1.0]: https://github.com/benjaminsingleton/crime-tips/releases/tag/v1.1.0
