@@ -11,6 +11,7 @@ export default class TipDetail extends Component {
     userNote: '',
     open: false,
     noteToDelete: null,
+    activity: [],
   };
 
   componentDidMount() {
@@ -25,23 +26,50 @@ export default class TipDetail extends Component {
 
   loadTip = async (id) => {
     try {
-      const { tip } = await api.getTip(id);
-      this.setState({ tip });
+      const [{ tip }, activityRes] = await Promise.all([
+        api.getTip(id),
+        api.tipActivity(id, { limit: 50 }).catch(() => ({ activities: [] })),
+      ]);
+      this.setState({ tip, activity: activityRes.activities || [] });
     } catch (err) {
       console.error(err);
     }
+  };
+
+  formatActivityLine = (item) => {
+    const when = item.timestamp
+      ? moment(new Date(item.timestamp)).format('MMM D, YYYY h:mm a')
+      : '';
+    const who = item.user?.displayName || item.user?.email || 'System';
+    const label = item.actionLabel || item.action;
+    const status =
+      typeof item.status === 'boolean' ? ` → ${item.status ? 'true' : 'false'}` : '';
+    return `${when} · ${who} · ${label}${status}`;
   };
 
   handleTextChange = (event) => {
     this.setState({ userNote: event.target.value });
   };
 
+  refreshActivity = async () => {
+    try {
+      const activityRes = await api.tipActivity(this.props.tipDetailKey, { limit: 50 });
+      this.setState({ activity: activityRes.activities || [] });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   createUserNote = async (e) => {
     e.preventDefault();
     try {
-      await api.addNote(this.props.tipDetailKey, this.state.userNote);
-      this.setState({ userNote: '' });
-      this.loadTip(this.props.tipDetailKey);
+      const { note } = await api.addNote(this.props.tipDetailKey, this.state.userNote);
+      const tip = {
+        ...this.state.tip,
+        userNotes: { ...(this.state.tip.userNotes || {}), [note.id]: note },
+      };
+      this.setState({ tip, userNote: '' });
+      this.refreshActivity();
     } catch (err) {
       console.error(err);
     }
@@ -50,8 +78,20 @@ export default class TipDetail extends Component {
   deleteUserNote = async (userNoteKey) => {
     try {
       await api.deleteNote(this.props.tipDetailKey, userNoteKey);
-      this.setState({ open: false, noteToDelete: null });
-      this.loadTip(this.props.tipDetailKey);
+      const userNotes = { ...(this.state.tip.userNotes || {}) };
+      if (userNotes[userNoteKey]) {
+        userNotes[userNoteKey] = {
+          ...userNotes[userNoteKey],
+          deleted: true,
+          deleted_timestamp: Date.now(),
+        };
+      }
+      this.setState({
+        tip: { ...this.state.tip, userNotes },
+        open: false,
+        noteToDelete: null,
+      });
+      this.refreshActivity();
     } catch (err) {
       console.error(err);
     }
@@ -198,6 +238,23 @@ export default class TipDetail extends Component {
                   <Button type="submit" variant="primary" content="Add note" />
                 </div>
               </form>
+            </div>
+          </div>
+
+          <div className="subpanel">
+            <div className="subpanel__header">Activity timeline</div>
+            <div className="subpanel__body">
+              {(this.state.activity || []).length === 0 ? (
+                <p className="detail-row" style={{ color: 'var(--ct-muted)' }}>
+                  No recorded tip activity yet.
+                </p>
+              ) : (
+                <ul className="activity-timeline">
+                  {this.state.activity.map((item) => (
+                    <li key={item.id}>{this.formatActivityLine(item)}</li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
         </Panel>

@@ -20,6 +20,12 @@ import {
   verifyEditToken,
 } from '../security/editToken.js';
 import { notifyNewTip } from '../services/email.js';
+import { logActivity, activityToJson, actionLabel } from '../services/activityLog.js';
+import {
+  refreshTipSearchText,
+  parseListPagination,
+  normalizeSearchQuery,
+} from '../services/tipSearch.js';
 
 const router = Router();
 const uploadDir = process.env.UPLOAD_DIR || path.join(process.cwd(), 'uploads');
@@ -182,6 +188,7 @@ router.post('/', tipWriteLimiter, async (req, res) => {
 
   const tip = tipToJson(rows[0]);
   tip.attachments = {};
+  await refreshTipSearchText(tip.id);
 
   if (submitted) {
     notifyNewTip(tip.id).catch((err) => console.error('notify failed', err));
@@ -209,6 +216,7 @@ router.patch('/:id', tipWriteLimiter, async (req, res) => {
   );
   const tip = tipToJson(updated.rows[0]);
   tip.attachments = await getAttachments(req.params.id);
+  await refreshTipSearchText(req.params.id);
   return res.json({ tip });
 });
 
@@ -240,6 +248,7 @@ router.post('/:id/submit', tipWriteLimiter, async (req, res) => {
 
   const tip = tipToJson(updated.rows[0]);
   tip.attachments = await getAttachments(req.params.id);
+  await refreshTipSearchText(req.params.id);
   notifyNewTip(tip.id).catch((err) => console.error('notify failed', err));
   return res.json({ tip });
 });
@@ -296,6 +305,7 @@ router.post(
       );
 
       const row = inserted.rows[0];
+      await refreshTipSearchText(tipId);
       return res.status(201).json({
         attachment: {
           id: row.id,
@@ -357,43 +367,120 @@ router.delete('/:id/attachments/:attachmentId', async (req, res) => {
     /* ignore missing file */
   }
   await query(`DELETE FROM tip_attachments WHERE id = $1`, [req.params.attachmentId]);
+  await refreshTipSearchText(req.params.id);
   return res.json({ ok: true });
 });
 
-// Officer: list tips
+// Officer: list tips (server-side search + pagination)
 router.get('/', ...officerAuth, async (req, res) => {
   const criteria = req.query.criteria || 'archived';
   const rawValue = req.query.value;
-  let value = rawValue === 'true' ? true : rawValue === 'false' ? false : rawValue;
+  const value = rawValue === 'true' ? true : rawValue === 'false' ? false : rawValue;
 
   const allowed = ['archived', 'important', 'read', 'submitted'];
   if (!allowed.includes(criteria)) {
     return res.status(400).json({ error: 'Invalid filter criteria' });
   }
 
+  const { limit, offset } = parseListPagination(req.query);
+  const q = normalizeSearchQuery(req.query.q);
+  const crimeType = String(req.query.crimeType || '').trim().slice(0, 120);
+
   // Default mailbox: submitted + not archived
-  let sql = `SELECT * FROM tips WHERE submitted = TRUE`;
+  let where = `submitted = TRUE`;
   const params = [];
 
   if (criteria === 'archived') {
     params.push(value === undefined ? false : Boolean(value));
-    sql += ` AND archived = $${params.length}`;
+    where += ` AND archived = $${params.length}`;
   } else if (criteria === 'important') {
     params.push(Boolean(value));
-    sql += ` AND important = $${params.length} AND archived = FALSE`;
+    where += ` AND important = $${params.length} AND archived = FALSE`;
   } else if (criteria === 'read') {
     params.push(Boolean(value));
-    sql += ` AND read = $${params.length} AND archived = FALSE`;
+    where += ` AND read = $${params.length} AND archived = FALSE`;
   }
 
-  sql += ` ORDER BY COALESCE(timestamp_submit, timestamp_start, EXTRACT(EPOCH FROM created_at)*1000) DESC LIMIT 1000`;
+  if (q) {
+    params.push(`%${q}%`);
+    const p = params.length;
+    where += ` AND (
+      search_text ILIKE $${p}
+      OR id::text ILIKE $${p}
+      OR EXISTS (
+        SELECT 1 FROM tip_attachments att
+        WHERE att.tip_id = tips.id AND att.filename ILIKE $${p}
+      )
+    )`;
+  }
 
-  const { rows } = await query(sql, params);
+  if (crimeType) {
+    params.push(`%${crimeType}%`);
+    where += ` AND payload->>'crimeType' ILIKE $${params.length}`;
+  }
+
+  const countRes = await query(`SELECT COUNT(*)::int AS count FROM tips WHERE ${where}`, params);
+
+  const listParams = [...params, limit, offset];
+  const sql = `SELECT * FROM tips WHERE ${where}
+    ORDER BY COALESCE(timestamp_submit, timestamp_start, EXTRACT(EPOCH FROM created_at)*1000) DESC
+    LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+
+  const { rows } = await query(sql, listParams);
   const tips = {};
   for (const row of rows) {
     tips[row.id] = tipToJson(row);
   }
-  return res.json({ tips });
+  return res.json({
+    tips,
+    total: countRes.rows[0].count,
+    limit,
+    offset,
+    q: q || undefined,
+    crimeType: crimeType || undefined,
+  });
+});
+
+router.get('/:id/activity', ...officerAuth, async (req, res) => {
+  if (!isTipUuid(req.params.id)) {
+    return res.status(404).json({ error: 'Tip not found' });
+  }
+  const tipRes = await query(`SELECT id, submitted FROM tips WHERE id = $1`, [req.params.id]);
+  const gate = requireSubmittedTip(tipRes.rows[0]);
+  if (!gate.ok) return res.status(gate.status).json({ error: gate.error });
+
+  const rawLimit = Number(req.query.limit);
+  const limit = Number.isFinite(rawLimit)
+    ? Math.min(Math.max(Math.floor(rawLimit), 1), 200)
+    : 100;
+
+  const { rows } = await query(
+    `SELECT a.id, a.user_id, a.tip_id, a.action, a.status, a.created_at,
+            u.email, u.rank, u.first_name, u.last_name
+     FROM activity_logs a
+     LEFT JOIN users u ON u.id = a.user_id
+     WHERE a.tip_id = $1
+     ORDER BY a.created_at DESC
+     LIMIT $2`,
+    [req.params.id, limit],
+  );
+
+  const activities = rows.map((row) => ({
+    ...activityToJson(row, {
+      user: row.user_id
+        ? {
+            id: row.user_id,
+            email: row.email,
+            rank: row.rank,
+            first_name: row.first_name,
+            last_name: row.last_name,
+          }
+        : null,
+    }),
+    actionLabel: actionLabel(row.action),
+  }));
+
+  return res.json({ activities });
 });
 
 router.get('/:id', ...officerAuth, async (req, res) => {
@@ -402,6 +489,9 @@ router.get('/:id', ...officerAuth, async (req, res) => {
   if (!tip || !tip.submitted) {
     return res.status(404).json({ error: 'Tip not found' });
   }
+  logActivity({ userId: req.user.sub, tipId: req.params.id, action: 'tipOpen' }).catch(
+    (err) => console.error('activity log failed', err),
+  );
   return res.json({ tip });
 });
 
@@ -424,13 +514,14 @@ router.patch('/:id/flags', ...officerAuth, async (req, res) => {
     [next.read, next.archived, next.important, req.params.id],
   );
 
-  // activity log for changed flags
   for (const action of ['read', 'archived', 'important']) {
     if (typeof req.body?.[action] === 'boolean') {
-      await query(
-        `INSERT INTO activity_logs (user_id, tip_id, action, status) VALUES ($1, $2, $3, $4)`,
-        [req.user.sub, req.params.id, action, req.body[action]],
-      );
+      await logActivity({
+        userId: req.user.sub,
+        tipId: req.params.id,
+        action,
+        status: req.body[action],
+      });
     }
   }
 
@@ -450,6 +541,11 @@ router.post('/:id/notes', ...officerAuth, async (req, res) => {
     [req.params.id, req.user.sub, note],
   );
   const row = inserted.rows[0];
+  await logActivity({
+    userId: req.user.sub,
+    tipId: req.params.id,
+    action: 'tipNoteCreate',
+  });
   return res.status(201).json({
     note: {
       id: row.id,
@@ -480,6 +576,11 @@ router.delete('/:id/notes/:noteId', ...officerAuth, async (req, res) => {
     `UPDATE tip_notes SET deleted = TRUE, deleted_at = NOW() WHERE id = $1`,
     [req.params.noteId],
   );
+  await logActivity({
+    userId: req.user.sub,
+    tipId: req.params.id,
+    action: 'tipNoteDelete',
+  });
   return res.json({ ok: true });
 });
 
@@ -496,6 +597,11 @@ router.get('/:id/attachments/:attachmentId/download', ...officerAuth, async (req
   if (!att.rows[0]) return res.status(404).json({ error: 'Attachment not found' });
   const filePath = path.join(uploadDir, req.params.id, att.rows[0].stored_name);
   if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'File missing' });
+  logActivity({
+    userId: req.user.sub,
+    tipId: req.params.id,
+    action: 'tipAttachmentDownload',
+  }).catch((err) => console.error('activity log failed', err));
   return res.download(filePath, att.rows[0].filename);
 });
 

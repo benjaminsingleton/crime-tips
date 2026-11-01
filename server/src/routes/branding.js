@@ -19,6 +19,7 @@ import {
   findStoredLogoPath,
 } from '../services/branding.js';
 import { sniffLogoMime } from '../security/uploads.js';
+import { logActivity } from '../services/activityLog.js';
 
 const router = Router();
 
@@ -131,6 +132,7 @@ router.put(
         if (v === null) delete next[k];
       }
       await saveDbBranding(next);
+      await logActivity({ userId: req.user.sub, action: 'brandingUpdate' });
       const resolved = resolveBranding(next);
       res.json({
         branding: publicBrandingPayload(resolved),
@@ -154,6 +156,7 @@ router.delete(
     try {
       await query(`DELETE FROM app_settings WHERE key = $1`, [BRANDING_KEY]);
       clearStoredLogoFiles();
+      await logActivity({ userId: req.user.sub, action: 'brandingReset' });
       const resolved = resolveBranding({});
       res.json({ branding: publicBrandingPayload(resolved), overrides: {} });
     } catch (err) {
@@ -192,6 +195,7 @@ router.post(
         const current = await loadDbBranding();
         const next = { ...current, logoUrl };
         await saveDbBranding(next);
+        await logActivity({ userId: req.user.sub, action: 'brandingLogoUpload' });
         const resolved = resolveBranding(next);
         return res.json({
           branding: publicBrandingPayload(resolved),
@@ -219,6 +223,7 @@ router.delete(
       const next = { ...current };
       delete next.logoUrl;
       await saveDbBranding(next);
+      await logActivity({ userId: req.user.sub, action: 'brandingLogoDelete' });
       const resolved = resolveBranding(next);
       res.json({
         branding: publicBrandingPayload(resolved),

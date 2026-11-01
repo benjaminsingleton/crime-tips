@@ -91,6 +91,7 @@ Do **not** mix checkout and image tags (e.g. `v1.1.2` docs with `:1.0.0`) and ex
 | Email (SMTP) | [docs/ops/email.md](docs/ops/email.md) |
 | Backup & restore | [docs/ops/backup-restore.md](docs/ops/backup-restore.md) |
 | Privacy / anonymity | [docs/ops/privacy-model.md](docs/ops/privacy-model.md) |
+| Draft retention / purge | [docs/ops/retention.md](docs/ops/retention.md) |
 | User admin | [docs/ops/user-admin.md](docs/ops/user-admin.md) |
 | Troubleshooting | [docs/ops/troubleshooting.md](docs/ops/troubleshooting.md) |
 | PD evaluation | [docs/ops/pd-evaluation.md](docs/ops/pd-evaluation.md) |
@@ -116,6 +117,7 @@ See `.env.example`. Important variables:
 | `SMTP_*` | Optional new-tip email; unset `SMTP_HOST` → console stub ([email.md](docs/ops/email.md)) — `v1.1.0+` |
 | `MFA_REQUIRED` / `MFA_ISSUER` | Optional TOTP policy |
 | `OIDC_*` | Optional agency SSO ([auth-mfa.md](docs/ops/auth-mfa.md)) — `v1.1.0+` |
+| `DRAFT_RETENTION_DAYS` / `DRAFT_PURGE_INTERVAL_HOURS` | Abandoned draft purge ([retention.md](docs/ops/retention.md)); default 30 days |
 | `BRAND_*` | Department branding defaults — `v1.1.0+` |
 
 ## Architecture

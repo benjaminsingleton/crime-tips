@@ -64,6 +64,14 @@ class NavigationInner extends Component {
                 Branding
               </NavLink>
             )}
+            {admin && (
+              <NavLink
+                to="/audit"
+                className={({ isActive }) => (isActive ? 'is-active' : undefined)}
+              >
+                Audit
+              </NavLink>
+            )}
             {!uid && (
               <NavLink
                 to="/faq"

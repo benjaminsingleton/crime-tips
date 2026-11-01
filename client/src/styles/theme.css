@@ -955,7 +955,7 @@ textarea {
 .search-input {
   min-width: 11rem;
   flex: 1;
-  max-width: 16rem;
+  max-width: 18rem;
 }
 
 .progress {
@@ -1057,6 +1057,24 @@ textarea {
 .detail-row b {
   font-weight: 600;
   color: var(--ct-navy-900);
+}
+
+.activity-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.activity-timeline li {
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--ct-border);
+  font-size: 0.86rem;
+  color: var(--ct-ink);
+  line-height: 1.4;
+}
+
+.activity-timeline li:last-child {
+  border-bottom: 0;
 }
 
 .note-card {

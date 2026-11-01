@@ -9,6 +9,7 @@ import LoggedOut from './views/LoggedOut';
 import ForgotPassword from './views/ForgotPassword';
 import NoMatch from './views/NoMatch';
 import BrandingSettings from './views/BrandingSettings';
+import AuditLog from './views/AuditLog';
 import { api } from './api';
 import { BrandingProvider } from './branding';
 
@@ -41,6 +42,7 @@ const OFFICER_PATHS = [
   '/settings',
   '/account_management',
   '/branding',
+  '/audit',
   '/logout',
 ];
 
@@ -199,6 +201,20 @@ export default function App() {
                   <Navigate to="/settings" replace />
                 ) : user?.admin ? (
                   <BrandingSettings user={user} onLogout={onLogout} />
+                ) : (
+                  <Navigate to="/dashboard" replace />
+                )}
+              </PrivateRoute>
+            )}
+          />
+          <Route
+            path="/audit"
+            element={(
+              <PrivateRoute authed={authed}>
+                {needsMfaEnroll(user) ? (
+                  <Navigate to="/settings" replace />
+                ) : user?.admin ? (
+                  <AuditLog user={user} onLogout={onLogout} />
                 ) : (
                   <Navigate to="/dashboard" replace />
                 )}

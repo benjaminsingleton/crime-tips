@@ -10,58 +10,66 @@ export default class Mailbox extends Component {
     tipKeysToDisplay: [],
     selectedTipKeys: [],
     searchTerm: '',
+    crimeType: '',
     currentPage: 0,
     tipsPerPage: 10,
+    total: 0,
+    loading: false,
     showPreviousButton: false,
-    showNextButton: true,
+    showNextButton: false,
   };
+
+  searchTimer = null;
 
   componentDidMount() {
-    this.loadTips(this.props.tipFilter);
+    this.loadTips();
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     if (prevProps.tipFilter !== this.props.tipFilter) {
-      this.loadTips(this.props.tipFilter);
-    }
-    if (prevState.tips !== this.state.tips) {
-      this.showPaginationButtons(0, this.state.tipsPerPage);
+      this.setState({ currentPage: 0, searchTerm: '', crimeType: '' }, () => this.loadTips());
     }
   }
 
-  loadTips = async (tipFilter) => {
+  componentWillUnmount() {
+    if (this.searchTimer) clearTimeout(this.searchTimer);
+  }
+
+  loadTips = async () => {
+    const { tipFilter } = this.props;
+    const { currentPage, tipsPerPage, searchTerm, crimeType } = this.state;
+    const offset = currentPage * tipsPerPage;
+    this.setState({ loading: true });
     try {
-      const { tips } = await api.listTips(tipFilter.criteria, tipFilter.value);
-      const tipKeysToDisplay = Object.keys(tips || {}).slice(0, this.state.tipsPerPage);
-      this.setState({ tips: tips || {}, tipKeysToDisplay, currentPage: 0, selectedTipKeys: [] });
+      const data = await api.listTips(tipFilter.criteria, tipFilter.value, {
+        q: searchTerm.trim() || undefined,
+        crimeType: crimeType.trim() || undefined,
+        limit: tipsPerPage,
+        offset,
+      });
+      const tips = data.tips || {};
+      const tipKeysToDisplay = Object.keys(tips);
+      const total = Number(data.total || tipKeysToDisplay.length);
+      this.setState({
+        tips,
+        tipKeysToDisplay,
+        total,
+        selectedTipKeys: [],
+        loading: false,
+        showPreviousButton: offset > 0,
+        showNextButton: offset + tipKeysToDisplay.length < total,
+      });
     } catch (err) {
       console.error(err);
+      this.setState({ loading: false });
     }
   };
 
-  showPaginationButtons(startIndex, endIndex) {
-    const totalTips = Object.keys(this.state.tips).length;
-    if (startIndex === 0) {
-      if (totalTips - this.state.tipsPerPage <= 0) {
-        this.setState({ showNextButton: false, showPreviousButton: false });
-      } else {
-        this.setState({ showNextButton: true, showPreviousButton: false });
-      }
-    } else if (totalTips - endIndex <= 0) {
-      this.setState({ showNextButton: false, showPreviousButton: true });
-    } else {
-      this.setState({ showNextButton: true, showPreviousButton: true });
-    }
-  }
-
   changePage = (value) => {
-    const nextPage = this.state.currentPage + value;
-    const { tipsPerPage } = this.state;
-    const startIndex = nextPage * tipsPerPage;
-    const endIndex = startIndex + tipsPerPage;
-    const tipKeysToDisplay = Object.keys(this.state.tips).slice(startIndex, endIndex);
-    this.showPaginationButtons(startIndex, endIndex);
-    this.setState({ currentPage: nextPage, tipKeysToDisplay });
+    this.setState(
+      (prev) => ({ currentPage: Math.max(0, prev.currentPage + value) }),
+      () => this.loadTips(),
+    );
   };
 
   addSelectedItem = (selectedTipKey) => {
@@ -86,7 +94,7 @@ export default class Mailbox extends Component {
       await api.updateTipFlags(key, flags);
     } catch (err) {
       console.error(err);
-      this.loadTips(this.props.tipFilter);
+      this.loadTips();
     }
   };
 
@@ -110,19 +118,14 @@ export default class Mailbox extends Component {
     this.props.navigate(`/tip/${key}`);
   };
 
-  searchTips = (searchTerm) => this.setState({ searchTerm, currentPage: 0 });
+  searchTips = (searchTerm) => {
+    this.setState({ searchTerm, currentPage: 0 });
+    if (this.searchTimer) clearTimeout(this.searchTimer);
+    this.searchTimer = setTimeout(() => this.loadTips(), 300);
+  };
 
-  filteredKeys = () => {
-    const { searchTerm, tipKeysToDisplay, tips } = this.state;
-    if (!searchTerm) return tipKeysToDisplay;
-    const q = searchTerm.toLowerCase();
-    return tipKeysToDisplay.filter((key) => {
-      const tip = tips[key];
-      return (
-        String(tip.crimeType || '').toLowerCase().includes(q) ||
-        String(tip.tipText || '').toLowerCase().includes(q)
-      );
-    });
+  filterCrimeType = (crimeType) => {
+    this.setState({ crimeType, currentPage: 0 }, () => this.loadTips());
   };
 
   renderMailboxRows = (tipKeysToDisplay) => {
@@ -163,7 +166,7 @@ export default class Mailbox extends Component {
   };
 
   render() {
-    const keys = this.filteredKeys();
+    const { tipKeysToDisplay, total, loading } = this.state;
     return (
       <Panel>
         <div className="mailbox-toolbar">
@@ -177,12 +180,23 @@ export default class Mailbox extends Component {
           <input
             className="input search-input"
             type="search"
-            placeholder="Search…"
+            placeholder="Search tip text, suspects, plates, contact…"
             value={this.state.searchTerm}
             onChange={(e) => this.searchTips(e.target.value)}
             aria-label="Search tips"
           />
+          <input
+            className="input search-input"
+            type="search"
+            placeholder="Crime type"
+            value={this.state.crimeType}
+            onChange={(e) => this.filterCrimeType(e.target.value)}
+            aria-label="Filter by crime type"
+          />
         </div>
+        <p className="mailbox-meta" style={{ color: 'var(--ct-muted)', margin: '0 0 0.75rem', fontSize: '0.85rem' }}>
+          {loading ? 'Loading…' : `${total} tip${total === 1 ? '' : 's'}`}
+        </p>
         <div className="table-wrap">
           <table className="data-table">
             <thead>
@@ -196,14 +210,14 @@ export default class Mailbox extends Component {
               </tr>
             </thead>
             <tbody>
-              {keys.length === 0 ? (
+              {tipKeysToDisplay.length === 0 ? (
                 <tr>
                   <td colSpan={6} style={{ cursor: 'default', color: 'var(--ct-muted)' }}>
-                    No tips in this folder.
+                    {loading ? 'Loading…' : 'No tips in this folder.'}
                   </td>
                 </tr>
               ) : (
-                this.renderMailboxRows(keys)
+                this.renderMailboxRows(tipKeysToDisplay)
               )}
             </tbody>
           </table>
