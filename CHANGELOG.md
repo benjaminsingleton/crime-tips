@@ -7,6 +7,12 @@ Versioning follows [SemVer](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Server-side tip mailbox search (`GET /api/tips?q=`) over payload + tip id + attachment filenames, with pagination and optional `crimeType` filter (`pg_trgm` / `search_text`)
+- Abandoned-draft retention job (`DRAFT_RETENTION_DAYS`, default 30) with admin dry-run / purge (`/api/admin/draft-purge`) and [docs/ops/retention.md](docs/ops/retention.md)
+- Admin audit log browser + export (`/api/audit`, `/audit` UI) and per-tip activity timeline; expanded activity instrumentation (tip open, downloads, notes, branding, user create/disable, OIDC link)
+
 ## [1.1.3] - 2026-11-01
 
 Ops / install patch on the `v1.1.2` PD package. Includes [#20](https://github.com/benjaminsingleton/crime-tips/pull/20) (PD install dry-run friction).

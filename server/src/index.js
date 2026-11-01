@@ -20,6 +20,10 @@ import tipRoutes from './routes/tips.js';
 import userRoutes from './routes/users.js';
 import metricsRoutes from './routes/metrics.js';
 import brandingRoutes from './routes/branding.js';
+import auditRoutes from './routes/audit.js';
+import adminRoutes from './routes/admin.js';
+import { startDraftPurgeScheduler } from './services/draftPurge.js';
+import { backfillTipSearchText } from './services/tipSearch.js';
 
 assertSafeSecretsOrExit();
 
@@ -89,6 +93,8 @@ app.use('/api/tips', tipRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/metrics', metricsRoutes);
 app.use('/api/branding', brandingRoutes);
+app.use('/api/audit', auditRoutes);
+app.use('/api/admin', adminRoutes);
 
 const clientDist = process.env.CLIENT_DIST || path.join(__dirname, '../../client/dist');
 if (fs.existsSync(clientDist)) {
@@ -126,6 +132,15 @@ async function start() {
   await migrate();
   await seedAdmin();
   logEmailConfig();
+
+  try {
+    const n = await backfillTipSearchText();
+    if (n > 0) console.log(`[search] backfilled search_text for ${n} tip(s)`);
+  } catch (err) {
+    console.error('[search] backfill failed', err);
+  }
+
+  startDraftPurgeScheduler();
 
   app.listen(port, () => {
     console.log(`Crime Tips API listening on :${port}`);

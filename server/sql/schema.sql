@@ -1,4 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -44,11 +45,15 @@ CREATE TABLE IF NOT EXISTS tips (
 -- Additive for DBs created before edit tokens existed
 ALTER TABLE tips ADD COLUMN IF NOT EXISTS edit_token_hash TEXT;
 
+-- Officer mailbox full-text helper (payload + tip id + attachment filenames)
+ALTER TABLE tips ADD COLUMN IF NOT EXISTS search_text TEXT NOT NULL DEFAULT '';
+
 CREATE INDEX IF NOT EXISTS tips_submitted_idx ON tips (submitted);
 CREATE INDEX IF NOT EXISTS tips_archived_idx ON tips (archived);
 CREATE INDEX IF NOT EXISTS tips_important_idx ON tips (important);
 CREATE INDEX IF NOT EXISTS tips_read_idx ON tips (read);
 CREATE INDEX IF NOT EXISTS tips_created_at_idx ON tips (created_at DESC);
+CREATE INDEX IF NOT EXISTS tips_search_text_trgm_idx ON tips USING gin (search_text gin_trgm_ops);
 
 CREATE TABLE IF NOT EXISTS tip_attachments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -84,7 +89,9 @@ CREATE TABLE IF NOT EXISTS activity_logs (
 );
 
 CREATE INDEX IF NOT EXISTS activity_logs_user_id_idx ON activity_logs (user_id, created_at DESC);
-CREATE INDEX IF NOT EXISTS activity_logs_tip_id_idx ON activity_logs (tip_id);
+CREATE INDEX IF NOT EXISTS activity_logs_tip_id_idx ON activity_logs (tip_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS activity_logs_created_at_idx ON activity_logs (created_at DESC);
+CREATE INDEX IF NOT EXISTS activity_logs_action_idx ON activity_logs (action);
 
 -- Department branding (admin UI + env defaults; no fork required)
 CREATE TABLE IF NOT EXISTS app_settings (

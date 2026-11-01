@@ -39,15 +39,15 @@ Agencies should assume the following may exist outside the tip form’s “anony
 ## Compliance boundaries
 
 - **Not CJIS certified** (and not claimed elsewhere). See [SECURITY.md](../../SECURITY.md).
-- Records / FOIA / discovery / retention policies are **agency-owned**. This app does not implement automated legal-hold or purge workflows beyond what you operate (DB deletes, volume lifecycle, backup retention).
+- Records / FOIA / discovery / retention policies are **agency-owned**. Automated **abandoned-draft** purge is available (`DRAFT_RETENTION_DAYS`; see [retention.md](./retention.md)). Submitted-tip hard-delete / legal-hold are not implemented yet — use archive, SQL, and backup rotation until those land.
 
 ## Retention starters (agency policy)
 
 Decide and document (examples only — not legal advice):
 
 1. How long **submitted tips** and attachments stay online vs archive.
-2. Whether **abandoned drafts** are purged on a schedule.
-3. Retention for **officer activity logs**.
+2. **Abandoned drafts** — default app purge is 30 days (`DRAFT_RETENTION_DAYS`); set `0` to disable. Details: [retention.md](./retention.md).
+3. Retention for **officer activity logs** (browse/export under admin **Audit**).
 4. Backup retention (`BACKUP_KEEP_DAYS`) and encrypted off-box copies — [backup-restore.md](./backup-restore.md).
 5. Who may export or screenshot tip content.
 

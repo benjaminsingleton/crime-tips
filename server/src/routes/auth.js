@@ -113,6 +113,9 @@ async function resolveOidcUser(identity) {
          RETURNING *`,
         [sub, rows[0].id],
       );
+      await query(`INSERT INTO activity_logs (user_id, action) VALUES ($1, 'oidcLink')`, [
+        linked.rows[0].id,
+      ]);
       return { user: linked.rows[0] };
     }
   }

@@ -68,9 +68,41 @@ export const api = {
     request(`/tips/${id}`, { method: 'PATCH', body: payload, editToken }),
   submitTip: (id, payload, editToken) =>
     request(`/tips/${id}/submit`, { method: 'POST', body: payload || {}, editToken }),
-  listTips: (criteria, value) =>
-    request(`/tips?criteria=${encodeURIComponent(criteria)}&value=${encodeURIComponent(value)}`),
+  listTips: (criteria, value, { q, limit, offset, crimeType } = {}) => {
+    const params = new URLSearchParams();
+    params.set('criteria', criteria);
+    params.set('value', String(value));
+    if (q) params.set('q', q);
+    if (crimeType) params.set('crimeType', crimeType);
+    if (limit != null) params.set('limit', String(limit));
+    if (offset != null) params.set('offset', String(offset));
+    return request(`/tips?${params.toString()}`);
+  },
   getTip: (id) => request(`/tips/${id}`),
+  tipActivity: (id, { limit } = {}) => {
+    const params = new URLSearchParams();
+    if (limit != null) params.set('limit', String(limit));
+    const qs = params.toString();
+    return request(`/tips/${id}/activity${qs ? `?${qs}` : ''}`);
+  },
+  listAudit: (filters = {}) => {
+    const params = new URLSearchParams();
+    for (const key of ['userId', 'tipId', 'action', 'from', 'to', 'limit', 'offset']) {
+      if (filters[key] != null && filters[key] !== '') params.set(key, String(filters[key]));
+    }
+    return request(`/audit?${params.toString()}`);
+  },
+  exportAudit: (filters = {}) => {
+    const params = new URLSearchParams();
+    params.set('format', filters.format || 'json');
+    for (const key of ['userId', 'tipId', 'action', 'from', 'to', 'limit']) {
+      if (filters[key] != null && filters[key] !== '') params.set(key, String(filters[key]));
+    }
+    return request(`/audit/export?${params.toString()}`);
+  },
+  draftPurgeStatus: () => request('/admin/draft-purge'),
+  runDraftPurge: ({ dryRun = true } = {}) =>
+    request('/admin/draft-purge', { method: 'POST', body: { dryRun } }),
   updateTipFlags: (id, flags) =>
     request(`/tips/${id}/flags`, { method: 'PATCH', body: flags }),
   uploadAttachment: (id, file, onProgress, editToken) =>

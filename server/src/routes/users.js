@@ -15,6 +15,7 @@ import {
   consumeBackupCode,
   mfaRequiredGlobally,
 } from '../services/mfa.js';
+import { logActivity } from '../services/activityLog.js';
 
 const router = Router();
 
@@ -158,6 +159,7 @@ router.post('/', requireMfaIfEnforced, requireAdmin, async (req, res) => {
     [email, hash, rank, firstName, lastName, Boolean(admin)],
   );
 
+  await logActivity({ userId: req.user.sub, action: 'userCreate' });
   return res.status(201).json({ user: publicUser(rows[0]) });
 });
 
@@ -237,10 +239,17 @@ router.patch('/:id', async (req, res) => {
     );
 
     if (body.email && body.email !== rows[0].email) {
-      await query(
-        `INSERT INTO activity_logs (user_id, action) VALUES ($1, 'changeEmail')`,
-        [targetId],
-      );
+      await logActivity({ userId: targetId, action: 'changeEmail' });
+    }
+
+    if (
+      body.accountActive !== undefined &&
+      Boolean(body.accountActive) !== Boolean(rows[0].account_active)
+    ) {
+      await logActivity({
+        userId: req.user.sub,
+        action: body.accountActive ? 'userEnable' : 'userDisable',
+      });
     }
 
     return res.json({ user: publicUser(updated.rows[0]) });

@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { query } from '../db.js';
 import { requireAuth, loadUser, requireMfaIfEnforced } from '../middleware/auth.js';
+import { loadDraftPurgeStatus } from '../services/draftPurge.js';
 
 const router = Router();
 
-router.get('/', requireAuth, loadUser, requireMfaIfEnforced, async (_req, res) => {
+router.get('/', requireAuth, loadUser, requireMfaIfEnforced, async (req, res) => {
   const unreadTips = await query(
     `SELECT COUNT(*)::int AS count FROM tips WHERE submitted = TRUE AND read = FALSE AND archived = FALSE`,
   );
@@ -25,14 +26,18 @@ router.get('/', requireAuth, loadUser, requireMfaIfEnforced, async (_req, res) =
     [yearStart],
   );
 
-  res.json({
-    metrics: {
-      unreadTips: unreadTips.rows[0].count,
-      unreadAbandonedTips: unreadAbandoned.rows[0].count,
-      tipsReceivedLast24Hours: last24.rows[0].count,
-      tipsReceivedYTD: ytd.rows[0].count,
-    },
-  });
+  const metrics = {
+    unreadTips: unreadTips.rows[0].count,
+    unreadAbandonedTips: unreadAbandoned.rows[0].count,
+    tipsReceivedLast24Hours: last24.rows[0].count,
+    tipsReceivedYTD: ytd.rows[0].count,
+  };
+
+  if (req.dbUser?.admin) {
+    metrics.draftPurge = await loadDraftPurgeStatus();
+  }
+
+  res.json({ metrics });
 });
 
 export default router;
